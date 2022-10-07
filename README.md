@@ -2,6 +2,6 @@
 
 ## TODO
 
-- reamde
+- readme
 - documentation
 - tests
