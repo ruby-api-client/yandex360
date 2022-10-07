@@ -24,5 +24,4 @@ Gem::Specification.new do |s|
 
   s.add_dependency "addressable", "~> 2.3", ">= 2.3.7"
   s.add_dependency "faraday", "~> 1.7"
-  s.add_dependency "faraday_middleware", "~> 1.1"
 end

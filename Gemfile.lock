@@ -1,10 +1,9 @@
 PATH
   remote: .
   specs:
-    yandex360 (0.0.1)
+    yandex360 (1.0.1)
       addressable (~> 2.3, >= 2.3.7)
       faraday (~> 1.7)
-      faraday_middleware (~> 1.1)
 
 GEM
   remote: https://rubygems.org/
@@ -34,8 +33,6 @@ GEM
     faraday-patron (1.0.0)
     faraday-rack (1.0.0)
     faraday-retry (1.0.3)
-    faraday_middleware (1.2.0)
-      faraday (~> 1.0)
     multipart-post (2.2.3)
     public_suffix (5.0.0)
     ruby2_keywords (0.0.5)
