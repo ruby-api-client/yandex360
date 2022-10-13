@@ -26,5 +26,5 @@ module Yandex360
   autoload :GroupList, "yandex360/objects/types"
 
   autoload :UsersResource, "yandex360/resources/users"
-  autoload :UserList, "yandex360/objects/types"
+  autoload :User, "yandex360/objects/types"
 end

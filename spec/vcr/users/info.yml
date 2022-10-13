@@ -1,0 +1,42 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api360.yandex.net/directory/v1/org/743156/users/780891246
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Oct 2022 15:16:15 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '752'
+      Server:
+      - api360
+      X-Request-Id:
+      - 73dc9585-d689-4d01-9397-ec54a861e412
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJpZCI6Ijc4MDg5MTI0NiIsIm5pY2tuYW1lIjoieW5keC1mb3Jtcy1jbnQtcm9ib3QiLCJkZXBhcnRtZW50SWQiOjAsImVtYWlsIjoieW5keC1mb3Jtcy1jbnQtcm9ib3RAeWFuZGV4LnJ1IiwibmFtZSI6eyJmaXJzdCI6ItCg0L7QsdC+0YIg0YHQtdGA0LLQuNGB0LAgRm9ybXMiLCJsYXN0IjoiIiwibWlkZGxlIjoiIn0sImdlbmRlciI6Im1hbGUiLCJwb3NpdGlvbiI6IiIsImF2YXRhcklkIjoiIiwiYWJvdXQiOiIiLCJiaXJ0aGRheSI6IjIwMTktMDQtMjUiLCJjb250YWN0cyI6W3sidHlwZSI6InN0YWZmIiwidmFsdWUiOiJodHRwczovL3N0YWZmLnlhbmRleC5ydS95bmR4LWZvcm1zLWNudC1yb2JvdD9vcmdfaWQ9NzQzMTU2JnVpZD03ODA4OTEyNDYiLCJtYWluIjpmYWxzZSwiYWxpYXMiOmZhbHNlLCJzeW50aGV0aWMiOnRydWV9LHsidHlwZSI6ImVtYWlsIiwidmFsdWUiOiJ5bmR4LWZvcm1zLWNudC1yb2JvdEB5YW5kZXgucnUiLCJtYWluIjp0cnVlLCJhbGlhcyI6ZmFsc2UsInN5bnRoZXRpYyI6dHJ1ZX1dLCJhbGlhc2VzIjpbXSwiZ3JvdXBzIjpbNF0sImV4dGVybmFsSWQiOiIiLCJpc0FkbWluIjpmYWxzZSwiaXNSb2JvdCI6dHJ1ZSwiaXNEaXNtaXNzZWQiOmZhbHNlLCJpc0VuYWJsZWQiOmZhbHNlLCJ0aW1lem9uZSI6IkV1cm9wZS9Nb3Njb3ciLCJsYW5ndWFnZSI6InJ1IiwiY3JlYXRlZEF0IjoiMjAxOS0wNC0yNVQwODowMzo1Ni44MjNaIiwidXBkYXRlZEF0IjoiMjAxOS0wNC0yNVQwODowMzo1Ni44MjNaIn0=
+  recorded_at: Thu, 13 Oct 2022 15:16:15 GMT
+recorded_with: VCR 6.1.0

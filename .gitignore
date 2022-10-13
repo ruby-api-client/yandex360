@@ -36,3 +36,6 @@ build/
 ## macos
 .DS_Store
 dev
+
+Gemfile.lock
+.rspec_status

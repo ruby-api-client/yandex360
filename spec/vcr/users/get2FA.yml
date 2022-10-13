@@ -1,0 +1,41 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api360.yandex.net/directory/v1/org/743156/users/1130000018743049/2fa
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Oct 2022 15:16:14 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '44'
+      Server:
+      - api360
+      X-Request-Id:
+      - 6e744476-417c-4839-8294-b99c402c3d4c
+    body:
+      encoding: UTF-8
+      string: '{"userId":"1130000018743049","has2fa":false}'
+  recorded_at: Thu, 13 Oct 2022 15:16:14 GMT
+recorded_with: VCR 6.1.0

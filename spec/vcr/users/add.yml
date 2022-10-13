@@ -1,0 +1,43 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api360.yandex.net/directory/v1/org/743156/users
+    body:
+      encoding: UTF-8
+      string: '{"departmentId":1,"about":"Yandex360","name":{"first":"Ivan","last":"Ivanov","middle":"Ruby"},"nickname":"yandex360","password":"Q!123456678"}'
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Oct 2022 15:54:42 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '704'
+      Server:
+      - api360
+      X-Request-Id:
+      - f8c9231f-d1ad-4820-8caa-0a44b0ca1b43
+    body:
+      encoding: UTF-8
+      string: '{"id":"1130000061922106","nickname":"yandex360","departmentId":1,"email":"yandex360@codeplay.ru","name":{"first":"Ivan","last":"Ivanov","middle":"Ruby"},"gender":"","position":"","avatarId":"","about":"Yandex360","birthday":"","contacts":[{"type":"staff","value":"https://staff.yandex.ru/yandex360?org_id=743156&uid=1130000061922106","main":false,"alias":false,"synthetic":true},{"type":"email","value":"yandex360@codeplay.ru","main":true,"alias":false,"synthetic":true}],"aliases":[],"groups":[],"externalId":"","isAdmin":false,"isRobot":false,"isDismissed":false,"isEnabled":false,"timezone":"Europe/Moscow","language":"ru","createdAt":"2022-10-13T15:54:42.189Z","updatedAt":"2022-10-13T15:54:42.189Z"}'
+  recorded_at: Thu, 13 Oct 2022 15:54:42 GMT
+recorded_with: VCR 6.1.0

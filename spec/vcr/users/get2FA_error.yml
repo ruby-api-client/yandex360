@@ -1,0 +1,37 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api360.yandex.net/directory/v1/org/123/users/123/2fa
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 403
+      message: Forbidden
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Oct 2022 15:16:14 GMT
+      Content-Length:
+      - '48'
+      Server:
+      - api360
+      X-Request-Id:
+      - c155f3be-3376-468d-8fab-4bd1d8fceb39
+    body:
+      encoding: UTF-8
+      string: '{"code":7,"message":"Not an admin","details":[]}'
+  recorded_at: Thu, 13 Oct 2022 15:16:14 GMT
+recorded_with: VCR 6.1.0

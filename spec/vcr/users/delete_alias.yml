@@ -1,0 +1,41 @@
+---
+http_interactions:
+- request:
+    method: delete
+    uri: https://api360.yandex.net/directory/v1/org/743156/users/1130000018743049/aliases/ruby_gem_api
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Oct 2022 16:25:47 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '39'
+      Server:
+      - api360
+      X-Request-Id:
+      - 492593d7-6075-41af-8c1e-f3c5eefac9c4
+    body:
+      encoding: UTF-8
+      string: '{"alias":"ruby_gem_api","removed":true}'
+  recorded_at: Thu, 13 Oct 2022 16:25:47 GMT
+recorded_with: VCR 6.1.0
