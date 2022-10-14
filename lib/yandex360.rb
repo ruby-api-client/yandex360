@@ -15,6 +15,7 @@ module Yandex360
   autoload :AllowList, "yandex360/objects/types"
 
   autoload :DepartmentsResource, "yandex360/resources/departments"
+  autoload :Department, "yandex360/objects/types"
   autoload :Departments, "yandex360/objects/types"
   autoload :DepartmentList, "yandex360/objects/types"
   autoload :DepartmentAlias, "yandex360/objects/types"

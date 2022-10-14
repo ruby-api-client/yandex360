@@ -4,7 +4,7 @@ require "spec_helper"
 require "yandex360"
 
 RSpec.describe "#users.list" do
-  let(:org_id) { "743156" }
+  let(:org_id) { "1234567" }
 
   context "with params" do
     subject(:resp) do
@@ -30,7 +30,7 @@ RSpec.describe "#users.list" do
 end
 
 RSpec.describe "#users.add" do
-  let(:org_id) { "743156" }
+  let(:org_id) { "1234567" }
 
   context "with params" do
     subject(:resp) do
@@ -57,7 +57,7 @@ end
 
 RSpec.describe "#users.update" do
   let(:user_id) { "1130000061922106" }
-  let(:org_id)  { "743156" }
+  let(:org_id)  { "1234567" }
 
   context "with params" do
     subject(:resp) do
@@ -84,7 +84,7 @@ RSpec.describe "#users.update" do
 end
 
 RSpec.describe "#users.add_alias" do
-  let(:org_id) { "743156" }
+  let(:org_id) { "1234567" }
   let(:user_id) { "1130000018743049" }
   let(:user_alias) { "ruby_gem_api" }
 
@@ -101,7 +101,7 @@ RSpec.describe "#users.add_alias" do
 end
 
 RSpec.describe "#users.delete_alias" do
-  let(:org_id) { "743156" }
+  let(:org_id) { "1234567" }
   let(:user_id) { "1130000018743049" }
   let(:user_alias) { "ruby_gem_api" }
 
@@ -119,7 +119,7 @@ RSpec.describe "#users.delete_alias" do
 end
 
 RSpec.describe "#users.has2FA" do
-  let(:org_id) { "743156" }
+  let(:org_id) { "1234567" }
   let(:user_id) { "1130000018743049" }
 
   context "with params" do
@@ -134,7 +134,7 @@ RSpec.describe "#users.has2FA" do
 end
 
 RSpec.describe "#users.get2FA" do
-  let(:org_id) { "743156" }
+  let(:org_id) { "1234567" }
   let(:user_id) { "1130000018743049" }
 
   context "with params" do
@@ -161,7 +161,7 @@ RSpec.describe "#users.get2FA" do
 end
 
 RSpec.describe "#users.has2FA" do
-  let(:org_id) { "743156" }
+  let(:org_id) { "1234567" }
   let(:user_id) { "1130000018743049" }
 
   context "with params" do
@@ -176,7 +176,7 @@ RSpec.describe "#users.has2FA" do
 end
 
 RSpec.describe "#users.info" do
-  let(:org_id) { "743156" }
+  let(:org_id) { "1234567" }
   let(:user_id) { "780891246" }
 
   context "with params" do

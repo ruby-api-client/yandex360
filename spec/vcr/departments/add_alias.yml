@@ -1,0 +1,43 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api360.yandex.net/directory/v1/org/1234567/departments/13/aliases
+    body:
+      encoding: UTF-8
+      string: '{"alias":"support-team"}'
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 14 Oct 2022 12:23:15 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '240'
+      Server:
+      - api360
+      X-Request-Id:
+      - 78978203-a92f-4b6c-9c30-f8a60f4bdad9
+    body:
+      encoding: UTF-8
+      string: '{"id":13,"name":"Support Team","parentId":1,"description":"Yandex360","externalId":"","label":"support-team","email":"support-team@example.ru","headId":"0","membersCount":0,"aliases":["support-team"],"createdAt":"2022-10-14T12:23:13.909Z"}'
+  recorded_at: Fri, 14 Oct 2022 12:23:16 GMT
+recorded_with: VCR 6.1.0

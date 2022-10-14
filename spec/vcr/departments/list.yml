@@ -1,0 +1,42 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api360.yandex.net/directory/v1/org/1234567/departments?orderBy=id&page=1&parentId=0&perPage=10
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Fri, 14 Oct 2022 12:23:13 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '1008'
+      Server:
+      - api360
+      X-Request-Id:
+      - 7b5805d9-c678-4c64-b1eb-941ccd26fb7a
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        eyJkZXBhcnRtZW50cyI6W3siaWQiOjEsIm5hbWUiOiLQktGB0LUg0YHQvtGC0YDRg9C00L3QuNC60LgiLCJwYXJlbnRJZCI6MCwiZGVzY3JpcHRpb24iOiIiLCJleHRlcm5hbElkIjoiIiwibGFiZWwiOiIiLCJlbWFpbCI6IiIsImhlYWRJZCI6IjAiLCJtZW1iZXJzQ291bnQiOjI4LCJhbGlhc2VzIjpbXSwiY3JlYXRlZEF0IjoiMjAxOC0wOC0xM1QwOToyODoyOS40MzRaIn0seyJpZCI6MywibmFtZSI6IkdvbGFuZyBkZXZlbG9wZXJzIiwicGFyZW50SWQiOjEsImRlc2NyaXB0aW9uIjoi0LPQvtGE0LXRgNGLIiwiZXh0ZXJuYWxJZCI6IiIsImxhYmVsIjoiZ28tZGV2cyIsImVtYWlsIjoiZ28tZGV2c0Bjb2RlcGxheS5ydSIsImhlYWRJZCI6IjAiLCJtZW1iZXJzQ291bnQiOjAsImFsaWFzZXMiOltdLCJjcmVhdGVkQXQiOiIyMDIyLTEwLTA3VDE2OjAwOjAyLjkzMVoifSx7ImlkIjo2LCJuYW1lIjoianVuaW9ycyIsInBhcmVudElkIjozLCJkZXNjcmlwdGlvbiI6IiIsImV4dGVybmFsSWQiOiIiLCJsYWJlbCI6IiIsImVtYWlsIjoiIiwiaGVhZElkIjoiMCIsIm1lbWJlcnNDb3VudCI6MCwiYWxpYXNlcyI6W10sImNyZWF0ZWRBdCI6IjIwMjItMTAtMDdUMTY6MDE6NTEuNDcyWiJ9LHsiaWQiOjcsIm5hbWUiOiJtaWRkbGVzIiwicGFyZW50SWQiOjMsImRlc2NyaXB0aW9uIjoiIiwiZXh0ZXJuYWxJZCI6IiIsImxhYmVsIjoiIiwiZW1haWwiOiIiLCJoZWFkSWQiOiIwIiwibWVtYmVyc0NvdW50IjowLCJhbGlhc2VzIjpbXSwiY3JlYXRlZEF0IjoiMjAyMi0xMC0wN1QxNjowMTo1OC45ODVaIn0seyJpZCI6OCwibmFtZSI6InNlbmlvcnMiLCJwYXJlbnRJZCI6MywiZGVzY3JpcHRpb24iOiIiLCJleHRlcm5hbElkIjoiIiwibGFiZWwiOiIiLCJlbWFpbCI6IiIsImhlYWRJZCI6IjAiLCJtZW1iZXJzQ291bnQiOjAsImFsaWFzZXMiOltdLCJjcmVhdGVkQXQiOiIyMDIyLTEwLTA3VDE2OjAyOjA2LjU3MloifV0sInBhZ2UiOjEsInBhZ2VzIjoxLCJwZXJQYWdlIjoxMCwidG90YWwiOjV9
+  recorded_at: Fri, 14 Oct 2022 12:23:13 GMT
+recorded_with: VCR 6.1.0
