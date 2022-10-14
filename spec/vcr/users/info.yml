@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: get
-    uri: https://api360.yandex.net/directory/v1/org/743156/users/780891246
+    uri: https://api360.yandex.net/directory/v1/org/1234567/users/780891246
     body:
       encoding: US-ASCII
       string: ''

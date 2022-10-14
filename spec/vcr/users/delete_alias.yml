@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: delete
-    uri: https://api360.yandex.net/directory/v1/org/743156/users/1130000018743049/aliases/ruby_gem_api
+    uri: https://api360.yandex.net/directory/v1/org/1234567/users/1130000018743049/aliases/ruby_gem_api
     body:
       encoding: US-ASCII
       string: ''
