@@ -2,9 +2,9 @@
 
 module Yandex360
   class GroupsResource < Resource
-    def add_user(org_id:, group_id:, id:, type: "user")
+    def add_user(org_id:, group_id:, user_id:, type: "user")
       user = {
-        id: id,
+        id: user_id,
         type: type
       }
       Group.new post("directory/v1/org/#{org_id}/groups/#{group_id}/members", body: user).body
@@ -22,26 +22,28 @@ module Yandex360
 
     def list(org_id:, page: 1, per_page: 10)
       resp = get("directory/v1/org/#{org_id}/groups?page=#{page}&perPage=#{per_page}")
-      Collection.from_response(resp, key: "groups", type: Object)
+      Collection.from_response(resp, key: "groups", type: Group)
     end
 
     def users(org_id:, group_id:)
-      # TODO: GroupUserList.new type
-      Object.new get("directory/v1/org/#{org_id}/groups/#{group_id}/members").body
+      resp = get("directory/v1/org/#{org_id}/groups/#{group_id}/members")
+      Collection.from_response(resp, key: "users", type: User)
     end
 
-    def create(org_id:, **group_params)
-      group = {}
+    def create(org_id:, name:, **group_params)
+      group = {
+        name: name
+      }
       group_params.each {|param, value| group[param] = value }
       Group.new post("directory/v1/org/#{org_id}/groups", body: group).body
     end
 
     def delete(org_id:, group_id:)
-      delete_request("directory/v1/org/#{org_id}/groups/#{group_id}")
+      Group.new delete_request("directory/v1/org/#{org_id}/groups/#{group_id}").body
     end
 
-    def delete_user(org_id:, group_id:, type:, id:)
-      Object.new delete_request("directory/v1/org/#{org_id}/groups/#{group_id}/members/#{type}/#{id}").body
+    def delete_user(org_id:, group_id:, type:, user_id:)
+      Object.new delete_request("directory/v1/org/#{org_id}/groups/#{group_id}/members/#{type}/#{user_id}").body
     end
   end
 end

@@ -1,0 +1,41 @@
+---
+http_interactions:
+- request:
+    method: delete
+    uri: https://api360.yandex.net/directory/v1/org/1234567/groups/19
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 15 Oct 2022 10:28:51 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '24'
+      Server:
+      - api360
+      X-Request-Id:
+      - 34c3d591-c020-4817-94ba-13425ae02ed0
+    body:
+      encoding: UTF-8
+      string: '{"id":19,"removed":true}'
+  recorded_at: Sat, 15 Oct 2022 10:28:51 GMT
+recorded_with: VCR 6.1.0

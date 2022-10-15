@@ -1,0 +1,41 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api360.yandex.net/directory/v1/org/1234567/users/987654321
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 13 Oct 2022 15:16:15 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '752'
+      Server:
+      - api360
+      X-Request-Id:
+      - 73dc9585-d689-4d01-9397-ec54a861e412
+    body:
+      encoding: UTF-8
+      string: '{"id":"987654321","nickname":"yndx-forms-cnt-robot","departmentId":0,"email":"yndx-forms-cnt-robot@yandex.ru","name":{"first":"Робот сервиса Forms","last":"","middle":""},"gender":"male","position":"","avatarId":"","about":"","birthday":"2019-04-25","contacts":[{"type":"staff","value":"https://staff.yandex.ru/yndx-forms-cnt-robot?org_id=1234567&uid=987654321","main":false,"alias":false,"synthetic":true},{"type":"email","value":"yndx-forms-cnt-robot@yandex.ru","main":true,"alias":false,"synthetic":true}],"aliases":[],"groups":[4],"externalId":"","isAdmin":false,"isRobot":true,"isDismissed":false,"isEnabled":false,"timezone":"Europe/Moscow","language":"ru","createdAt":"2019-04-25T08:03:56.823Z","updatedAt":"2019-04-25T08:03:56.823Z"}'
+  recorded_at: Thu, 13 Oct 2022 15:16:15 GMT
+recorded_with: VCR 6.1.0

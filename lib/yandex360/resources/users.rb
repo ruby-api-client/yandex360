@@ -29,7 +29,7 @@ module Yandex360
 
     def list(org_id:, page: 1, per_page: 10)
       resp = get("directory/v1/org/#{org_id}/users?page=#{page}&perPage=#{per_page}")
-      Collection.from_response(resp, key: "users", type: UserList)
+      Collection.from_response(resp, key: "users", type: User)
     end
 
     # rubocop:disable Naming/MethodName
@@ -44,7 +44,7 @@ module Yandex360
     # rubocop:enable Naming/MethodName
 
     def delete_alias(org_id:, user_id:, user_alias:)
-      Alias.new delete_request("directory/v1/org/#{org_id}/users/#{user_id}/aliases/#{user_alias}")
+      Alias.new delete_request("directory/v1/org/#{org_id}/users/#{user_id}/aliases/#{user_alias}").body
     end
   end
 end

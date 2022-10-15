@@ -1,0 +1,41 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api360.yandex.net/directory/v1/org/1234567/groups/19/members
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 15 Oct 2022 10:21:03 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '457'
+      Server:
+      - api360
+      X-Request-Id:
+      - 1e225014-475e-4f7e-bcac-aa664fafd60c
+    body:
+      encoding: UTF-8
+      string: '{"departments":[],"groups":[],"users":[{"id":"48989999","nickname":"sample","departmentId":1,"email":"","name":{"first":"sample","last":"sample","middle":""},"gender":"male","position":"","avatarId":"78321/x1vWPx4b55UiDYwDs32NbEXio1-G"},{"id":"987654321","nickname":"yndx-forms-cnt-robot","departmentId":0,"email":"","name":{"first":"Робот сервиса Forms","last":"","middle":""},"gender":"male","position":"","avatarId":""}]}'
+  recorded_at: Sat, 15 Oct 2022 10:21:03 GMT
+recorded_with: VCR 6.1.0

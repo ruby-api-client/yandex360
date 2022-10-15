@@ -7,8 +7,12 @@ module Yandex360
       DepartmentAlias.new post("directory/v1/org/#{org_id}/departments/#{dep_id}/aliases", body: dep_alias).body
     end
 
-    def update(org_id:, dep_id:, **params)
-      department = {}
+    def update(org_id:, dep_id:, parent_id:, **params)
+      department = {
+        orgId: org_id,
+        departmentId: dep_id,
+        parentId: parent_id
+      }
       params.each {|param, value| department[param] = value }
       Department.new patch("directory/v1/org/#{org_id}/departments/#{dep_id}", body: department).body
     end
@@ -18,14 +22,12 @@ module Yandex360
     end
 
     def list(org_id:, page: 1, per_page: 10, parent_id: 0, order_by: "id")
-      resp = get(%{
-        directory/v1/org/#{org_id}/departments\
-          ?page=#{page}\
-          &perPage=#{per_page}\
-          &parentId=#{parent_id}\
-          &orderBy=#{order_by}")
-        }.gsub(/\s+/, "").strip)
-      Collection.from_response(resp, key: "departments", type: GroupList)
+      resp = get("directory/v1/org/#{org_id}/departments \
+                  ?page=#{page} \
+                  &perPage=#{per_page} \
+                  &parentId=#{parent_id} \
+                  &orderBy=#{order_by}".gsub(/\s+/, "").strip)
+      Collection.from_response(resp, key: "departments", type: Department)
     end
 
     # parent_id:, name:, description: "", external_id: "", head_id: 0, label: ""

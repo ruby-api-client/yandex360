@@ -1,0 +1,5 @@
+--tty
+--color
+--format documentation # progress
+--backtrace
+--require spec_helper
