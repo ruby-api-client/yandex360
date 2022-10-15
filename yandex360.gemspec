@@ -8,8 +8,8 @@ require "yandex360/version"
 Gem::Specification.new do |s|
   s.name          = "yandex360"
   s.version       = Yandex360::VERSION
-  s.summary       = "WIP - Yandex 360 API client"
-  s.description   = "WIP - Yandex 360 API wrapper written in Ruby"
+  s.summary       = "Yandex 360 API client"
+  s.description   = "Yandex 360 API wrapper written in Ruby"
   s.authors       = ["Ilya Brin"]
   s.email         = "ilya@codeplay.ru"
   s.files         = `git ls-files -z`.split("\x0")
