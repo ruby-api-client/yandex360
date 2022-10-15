@@ -3,6 +3,9 @@
 [![Gem Version](https://badge.fury.io/rb/yandex360.svg)](https://badge.fury.io/rb/yandex360)
 ![Gem](https://img.shields.io/gem/dt/yandex360)
 ![GitHub](https://img.shields.io/github/license/ruby-api-client/yandex360)
+[![Ruby specs](https://github.com/ruby-api-client/yandex360/actions/workflows/ci.yml/badge.svg)](https://github.com/ruby-api-client/yandex360/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/ruby-api-client/yandex360/badge.svg?branch=main)](https://coveralls.io/github/ruby-api-client/yandex360?branch=main)
+
 ## Installation
 
 ### Gemfile
