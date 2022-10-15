@@ -20,5 +20,5 @@ RSpec.describe Yandex360::Client do
 end
 
 RSpec.describe "#VERSION" do
-  it { expect(Yandex360::VERSION).to eq "1.1.0" }
+  it { expect(Yandex360::VERSION).to eq "1.1.1" }
 end
