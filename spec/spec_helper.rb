@@ -38,6 +38,10 @@ RSpec.configure do |config|
 end
 
 VCR.configure do |c|
+  c.before_record do |i|
+    i.response.body.force_encoding("UTF-8")
+  end
+
   c.ignore_localhost = true
   c.cassette_library_dir = "spec/vcr"
   c.hook_into :webmock
