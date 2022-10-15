@@ -15,7 +15,7 @@ jobs:
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
+        # bundler-cache: true
 
     - name: Get the newest rubygems version to rid ourselves of warnings
       run: gem update --system --no-document
