@@ -1,0 +1,41 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api360.yandex.net/admin/v1/org/1234567/mail/antispam/allowlist/ips
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 15 Oct 2022 11:29:15 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '40'
+      Server:
+      - api360
+      X-Request-Id:
+      - d51ba76c-429d-4e9b-920c-0e34ba77f461
+    body:
+      encoding: UTF-8
+      string: '{"allowList":["127.0.0.1","172.0.1.10"]}'
+  recorded_at: Sat, 15 Oct 2022 11:29:15 GMT
+recorded_with: VCR 6.1.0
