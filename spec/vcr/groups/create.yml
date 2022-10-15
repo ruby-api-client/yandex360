@@ -1,0 +1,43 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api360.yandex.net/directory/v1/org/1234567/groups
+    body:
+      encoding: UTF-8
+      string: '{"name":"Hotline"}'
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 15 Oct 2022 10:05:12 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '280'
+      Server:
+      - api360
+      X-Request-Id:
+      - e0a7f52a-5057-44bb-bce3-759754074fdf
+    body:
+      encoding: UTF-8
+      string: '{"id":19,"name":"Hotline","type":"generic","description":"","membersCount":1,"label":"","email":"","aliases":[],"externalId":"","removed":false,"members":[{"type":"user","id":"48989999"}],"adminIds":["48989999"],"authorId":"0","memberOf":[],"createdAt":"2022-10-15T10:05:12.657Z"}'
+  recorded_at: Sat, 15 Oct 2022 10:05:12 GMT
+recorded_with: VCR 6.1.0
