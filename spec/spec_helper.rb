@@ -3,7 +3,7 @@
 require "bundler/setup"
 require "simplecov"
 require "simplecov-lcov"
-require "Yandex360"
+require "yandex360"
 require "webmock/rspec"
 require "vcr"
 

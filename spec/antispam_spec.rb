@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "spec_helper"
+require "yandex360"
+
 RSpec.describe "#anispam.create" do
   let(:org_id) { "1234567" }
 

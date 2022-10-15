@@ -2,7 +2,7 @@
 
 module Yandex360
   major = 1
-  minor = 0
-  patch = 2
+  minor = 1
+  patch = 0
   VERSION = "#{major}.#{minor}.#{patch}"
 end
