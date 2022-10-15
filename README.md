@@ -47,7 +47,7 @@ users.delete_alias(org_id:, user_id:, user_alias:)
 
 # Departments
 departments.add_alias(org_id:, dep_id:, name:)
-departments.update(org_id:, dep_id:, **params)
+departments.update(org_id:, dep_id:, parent_id:, **params)
 departments.info(org_id:, dep_id:)
 departments.list(org_id:, page: 1, per_page: 10, parent_id: 0, order_by: "id")
 departments.create(org_id:, name:, parent_id:, **params)
@@ -55,18 +55,18 @@ departments.delete_alias(org_id:, dep_id:, name:)
 departments.delete(org_id:, dep_id:)
 
 # Groups
-groups.add_user(org_id:, group_id:, id:, type: "user")
+groups.add_user(org_id:, group_id:, user_id:, type: "user")
 groups.update(org_id:, group_id:, **user_params)
 groups.params(org_id:, group_id:)
 groups.list(org_id:, page: 1, per_page: 10)
 groups.users(org_id:, group_id:)
-groups.create(org_id:, **group_params)
+groups.create(org_id:, name:, **group_params)
 groups.delete(org_id:, group_id:)
-groups.delete_user(org_id:, group_id:, type:, id:)
+groups.delete_user(org_id:, group_id:, type:, user_id:)
 ```
 
 ## TODO
 
 - examples
 - documentation
-- tests
+- ~~tests~~
