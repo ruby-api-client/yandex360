@@ -177,7 +177,7 @@ end
 
 RSpec.describe "#users.info" do
   let(:org_id) { "1234567" }
-  let(:user_id) { "780891246" }
+  let(:user_id) { "987654321" }
 
   context "with params" do
     subject(:resp) do
