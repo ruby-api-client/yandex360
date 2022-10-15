@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.add_dependency "faraday", "~> 1.7"
 
   s.add_development_dependency "bundler"
-  s.add_development_dependency "rake", "~> 10"
+  s.add_development_dependency "rake", "~> 12.3.3"
   s.add_development_dependency "rspec", "~> 3.0"
   s.add_development_dependency "simplecov", "~> 0.9"
   s.add_development_dependency "simplecov-lcov", "~> 0.7.0"
