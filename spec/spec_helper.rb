@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 require "bundler/setup"
-require "simplecov"
-require "simplecov-lcov"
-require "yandex360"
 require "webmock/rspec"
 require "vcr"
+require "simplecov"
+require "simplecov-lcov"
+
+require "yandex360"
 
 SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
 SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "addressable/uri"
 require "faraday"
 require "yandex360/version"
 

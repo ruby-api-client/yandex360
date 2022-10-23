@@ -1,8 +1,7 @@
 PATH
   remote: .
   specs:
-    yandex360 (1.1.1)
-      addressable (~> 2.3, >= 2.3.7)
+    yandex360 (1.1.2)
       faraday (~> 1.7)
 
 GEM
