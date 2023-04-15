@@ -202,14 +202,14 @@ RSpec.describe "#users.info" do
   end
 end
 
-RSpec.describe "#users.delete_user" do
+RSpec.describe "#users.delete" do
   let(:org_id) { "12345678" }
   let(:user_id) { "12345678" }
 
   context "with params" do
     subject(:resp) do
-      VCR.use_cassette("users/delete_user") do
-        @yandex360.users.delete_user(org_id: org_id, user_id: user_id)
+      VCR.use_cassette("users/delete") do
+        @yandex360.users.delete(org_id: org_id, user_id: user_id)
       end
     end
     it { expect(resp).to be_an Yandex360::User }
@@ -217,8 +217,8 @@ RSpec.describe "#users.delete_user" do
 
   context "without params" do
     subject(:resp) do
-      VCR.use_cassette("users_delete_user") do
-        @yandex360.users.delete_user
+      VCR.use_cassette("users/delete") do
+        @yandex360.users.delete
       end
     end
 

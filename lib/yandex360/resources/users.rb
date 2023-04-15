@@ -43,7 +43,7 @@ module Yandex360
     end
     # rubocop:enable Naming/MethodName
 
-    def delete_user(org_id:, user_id:)
+    def delete(org_id:, user_id:)
       User.new delete_request("/directory/v1/org/#{org_id}/users/#{user_id}/contacts").body
     end
 

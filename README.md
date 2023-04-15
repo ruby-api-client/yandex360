@@ -47,6 +47,7 @@ users.list(org_id:, page: 1, per_page: 10)
 users.get2FA(org_id:, user_id:)
 users.has2FA?(org_id:, user_id:)
 users.delete_alias(org_id:, user_id:, user_alias:)
+users.delete(org_id:, user_id:)
 
 # Departments
 departments.add_alias(org_id:, dep_id:, name:)
