@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
 
   s.metadata["rubygems_mfa_required"] = "true"
 
-  s.add_dependency "faraday", "~> 1.7"
+  s.add_dependency "faraday", ">= 1.7", "< 3.0"
 
   s.add_development_dependency "bundler"
   s.add_development_dependency "rake", "~> 12.3.3"
