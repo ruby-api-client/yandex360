@@ -1,0 +1,41 @@
+---
+http_interactions:
+- request:
+    method: delete
+    uri: https://api360.yandex.net/directory/v1/org/12345678/users/12345678/contacts
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v1.10.2
+      Authorization:
+      - TOKEN
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json
+      Date:
+      - Sat, 15 Apr 2023 16:28:07 GMT
+      Grpc-Status:
+      - '0'
+      Grpc-Message:
+      - OK
+      Content-Length:
+      - '742'
+      Server:
+      - api360
+      X-Request-Id:
+      - a1a826e9-e549-96d4-815f-9446c7f2d482
+    body:
+      encoding: UTF-8
+      string: '{"id":"123","nickname":"user","departmentId":1,"email":"user@yandex.ru","name":{"first":"User","last":"User","middle":""},"gender":"male","position":"","avatarId":"PPeeZtrhVUI-1","about":"","birthday":"1910-11-14","contacts":[{"type":"staff","value":"https://staff.yandex.ru/user?org_id=12345678&uid=12345678","main":false,"alias":false,"synthetic":true},{"type":"email","value":"user@yandex.ru","main":true,"alias":false,"synthetic":true}],"aliases":[],"groups":[2],"externalId":"","isAdmin":true,"isRobot":false,"isDismissed":false,"isEnabled":true,"timezone":"Europe/Moscow","language":"ru","createdAt":"2020-04-18T21:25:56.501Z","updatedAt":"2023-04-15T16:28:06.983Z"}'
+  recorded_at: Sat, 15 Apr 2023 16:28:07 GMT
+recorded_with: VCR 6.1.0

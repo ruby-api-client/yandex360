@@ -201,3 +201,27 @@ RSpec.describe "#users.info" do
     it { expect { resp }.to raise_error(ArgumentError) }
   end
 end
+
+RSpec.describe "#users.delete" do
+  let(:org_id) { "12345678" }
+  let(:user_id) { "12345678" }
+
+  context "with params" do
+    subject(:resp) do
+      VCR.use_cassette("users/delete") do
+        @yandex360.users.delete(org_id: org_id, user_id: user_id)
+      end
+    end
+    it { expect(resp).to be_an Yandex360::User }
+  end
+
+  context "without params" do
+    subject(:resp) do
+      VCR.use_cassette("users/delete") do
+        @yandex360.users.delete
+      end
+    end
+
+    it { expect { resp }.to raise_error(ArgumentError) }
+  end
+end

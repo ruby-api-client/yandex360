@@ -11,7 +11,7 @@
 ### Gemfile
 
 ```gemfile
-gem 'yandex360', '~> 1.1', '>= 1.1.1'
+gem 'yandex360', '~> 1.1', '>= 1.1.3'
 ```
 
 ### Install
@@ -25,9 +25,9 @@ gem install yandex360
 ```ruby
     require "yandex360"
 
-    yandex360 = Yandex360::Client.new(token: "paste your access_token here")
+    client = Yandex360::Client.new(token: "paste your access_token here")
 
-    users = yandex360.users.list(org_id: 1234567)
+    users = client.users.list(org_id: 1234567)
 ```
 
 ## Available methods
@@ -47,6 +47,7 @@ users.list(org_id:, page: 1, per_page: 10)
 users.get2FA(org_id:, user_id:)
 users.has2FA?(org_id:, user_id:)
 users.delete_alias(org_id:, user_id:, user_alias:)
+users.delete(org_id:, user_id:)
 
 # Departments
 departments.add_alias(org_id:, dep_id:, name:)
