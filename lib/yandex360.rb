@@ -27,4 +27,7 @@ module Yandex360
 
   autoload :UsersResource, "yandex360/resources/users"
   autoload :User, "yandex360/objects/types"
+
+  autoload :Organization, "yandex360/objects/types"
+  autoload :OrganizationResource, "yandex360/resources/organizations"
 end
