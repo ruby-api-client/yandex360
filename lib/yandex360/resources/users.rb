@@ -42,8 +42,8 @@ module Yandex360
       get2FA(org_id: org_id, user_id: user_id).has2fa
     end
     # rubocop:enable Naming/MethodName
-    
-    def delete_user(org_id: org_id, user_id: user_id)
+
+    def delete_user(org_id:, user_id:)
       User.new delete_request("/directory/v1/org/#{org_id}/users/#{user_id}/contacts").body
     end
 
