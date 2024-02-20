@@ -7,10 +7,12 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.8.5)
+    addressable (2.8.6)
       public_suffix (>= 2.0.2, < 6.0)
     base64 (0.2.0)
-    crack (0.4.5)
+    bigdecimal (3.1.6)
+    crack (1.0.0)
+      bigdecimal
       rexml
     diff-lcs (1.5.0)
     docile (1.4.0)
@@ -19,8 +21,8 @@ GEM
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
-    hashdiff (1.0.1)
-    public_suffix (5.0.3)
+    hashdiff (1.1.0)
+    public_suffix (5.0.4)
     rake (13.1.0)
     rexml (3.2.6)
     rspec (3.12.0)
@@ -45,7 +47,7 @@ GEM
     simplecov-lcov (0.8.0)
     simplecov_json_formatter (0.1.4)
     vcr (6.1.0)
-    webmock (3.19.1)
+    webmock (3.21.2)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
