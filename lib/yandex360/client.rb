@@ -29,6 +29,10 @@ module Yandex360
       UsersResource.new(self)
     end
 
+    def orgs
+      OrganizationResource.new(self)
+    end
+
     def connection
       @connection ||= Faraday.new(BASE_URL) do |conn|
         conn.request :authorization, :OAuth, token
