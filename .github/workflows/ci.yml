@@ -12,7 +12,7 @@ jobs:
     continue-on-error: true
     steps:
     - uses: actions/checkout@v4
-    - uses: ruby/setup-ruby@v1.214.0
+    - uses: ruby/setup-ruby@v1.215.0
       with:
         ruby-version: ${{ matrix.ruby }}
         # bundler-cache: true
