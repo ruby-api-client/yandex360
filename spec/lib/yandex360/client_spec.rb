@@ -4,12 +4,12 @@ require "spec_helper"
 require "yandex360"
 
 RSpec.describe Yandex360::Client do
-  describe "#client", :vcr do
+  describe "#client" do
     context "with valid token" do
-      it do
-        allow(described_class).to receive(:new)
-          .with(token: ACCESS_TOKEN)
-          .and_return(Yandex360::Client)
+      it "creates client successfully" do
+        client = described_class.new(token: "valid_token")
+        expect(client).to be_a(Yandex360::Client)
+        expect(client.token).to eq("valid_token")
       end
     end
 
