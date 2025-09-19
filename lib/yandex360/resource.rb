@@ -10,6 +10,22 @@ module Yandex360
 
     private
 
+    def validate_required_params(params, required_keys)
+      missing_keys = required_keys.reject do |key|
+        value = params[key]
+        params.key?(key) && !value.nil? && (
+          (value.is_a?(String) && !value.strip.empty?) ||
+          (value.is_a?(Array) && !value.empty?) ||
+          (!value.is_a?(String) && !value.is_a?(Array))
+        )
+      end
+      raise ArgumentError, "Missing required parameters: #{missing_keys.join(', ')}" unless missing_keys.empty?
+    end
+
+    def build_url(path_segments)
+      "/" + path_segments.compact.join("/")
+    end
+
     def get(url, params: {}, headers: {})
       handle_response client.connection.get(url, params, headers)
     end
@@ -31,29 +47,35 @@ module Yandex360
     end
     alias delete_request delete
 
-    # rubocop:disable Metrics/CyclomaticComplexity
-    # rubocop:disable Metrics/AbcSize
     def handle_response(response)
+      return response if response.status.between?(200, 299)
+
+      error_message = extract_error_message(response)
+
       case response.status
       when 400
-        raise Error, "Your request was malformed. #{response.body['error']}"
+        raise ValidationError, "Your request was malformed. #{error_message}"
       when 401
-        raise Error, "You did not supply valid authentication credentials. #{response.body['error']}"
+        raise AuthenticationError, "You did not supply valid authentication credentials. #{error_message}"
       when 403
-        raise Error, "You are not allowed to perform that action. #{response.body['error']}"
+        raise AuthorizationError, "You are not allowed to perform that action. #{error_message}"
       when 404
-        raise Error, "No results were found for your request. #{response.body['error']}"
-      when 429
-        raise Error, "Your request exceeded the API rate limit. #{response.body['error']}"
-      when 500
-        raise Error, "We were unable to perform the request due to server-side problems. #{response.body['error']}"
-      when 503
-        raise Error, "You have been rate limited for sending more  requests per second. #{response.body['error']}"
+        raise NotFoundError, "No results were found for your request. #{error_message}"
+      when 429, 503
+        raise RateLimitError, "Your request exceeded the API rate limit. #{error_message}"
+      when 500..599
+        raise ServerError, "We were unable to perform the request due to server-side problems. #{error_message}"
+      else
+        raise Error, "Unexpected response status: #{response.status}. #{error_message}"
       end
-
-      response
     end
-    # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metrics/CyclomaticComplexity
+
+    def extract_error_message(response)
+      return "" unless response.body.is_a?(Hash)
+
+      response.body["error"] || response.body["message"] || ""
+    rescue StandardError
+      ""
+    end
   end
 end

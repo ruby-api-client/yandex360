@@ -2,7 +2,7 @@
 http_interactions:
 - request:
     method: delete
-    uri: https://api360.yandex.net/directory/v1/org/12345678/users/12345678/contacts
+    uri: https://api360.yandex.net/directory/v1/org/12345678/users/12345678
     body:
       encoding: US-ASCII
       string: ''

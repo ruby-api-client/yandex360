@@ -17,4 +17,5 @@ module Yandex360
   class GroupList < Object; end
 
   class Alias < Object; end
+  class UserAlias < Object; end
 end

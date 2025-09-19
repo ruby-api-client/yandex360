@@ -38,7 +38,6 @@ Style/OptionHash:
     - options
     - opts
     - args
-    - paramsgit sttus
     - parameters
 
 # Mixing the styles looks just silly.
