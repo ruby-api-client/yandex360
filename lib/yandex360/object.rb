@@ -13,9 +13,10 @@ module Yandex360
       case obj
       when Hash
         return OpenStruct.new if obj.empty?
-        OpenStruct.new(obj.transform_values { |val| to_ostruct(val) })
+
+        OpenStruct.new(obj.transform_values {|val| to_ostruct(val) })
       when Array
-        obj.map { |o| to_ostruct(o) }
+        obj.map {|o| to_ostruct(o) }
       when nil
         nil
       else

@@ -12,7 +12,7 @@ module Yandex360
       raise ArgumentError, "At least one IP address must be provided" if strings.empty?
 
       # Filter out empty strings
-      valid_strings = strings.compact.reject { |s| s.to_s.strip.empty? }
+      valid_strings = strings.compact.reject {|s| s.to_s.strip.empty? }
       raise ArgumentError, "At least one valid IP address must be provided" if valid_strings.empty?
 
       body = {allowList: valid_strings}

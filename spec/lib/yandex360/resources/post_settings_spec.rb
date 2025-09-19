@@ -10,7 +10,7 @@ RSpec.describe "#post_settings.list" do
   context "with params" do
     it "gets post settings successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/users/#{user_id}/settings/mail") do |env|
+      stubs.get("/directory/v1/org/#{org_id}/users/#{user_id}/settings/mail") do |_env|
         mock_response(body: mock_post_settings_list)
       end
 
@@ -29,7 +29,7 @@ RSpec.describe "#post_settings.forwarding_list" do
   context "with params" do
     it "gets forwarding list successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/users/#{user_id}/settings/mail/forwarding") do |env|
+      stubs.get("/directory/v1/org/#{org_id}/users/#{user_id}/settings/mail/forwarding") do |_env|
         mock_response(body: mock_post_settings_forwarding_list)
       end
 

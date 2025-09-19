@@ -9,7 +9,7 @@ RSpec.describe "#audit.list" do
   context "with params" do
     it "returns collection of audit events" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/audit/v1/org/#{org_id}/events") do |env|
+      stubs.get("/audit/v1/org/#{org_id}/events") do |_env|
         mock_response(body: mock_audit_list)
       end
 

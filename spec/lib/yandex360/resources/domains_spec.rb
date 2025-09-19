@@ -9,7 +9,7 @@ RSpec.describe "#domains.list" do
   context "with params" do
     it "returns collection of domains" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/domains") do |env|
+      stubs.get("/directory/v1/org/#{org_id}/domains") do |_env|
         mock_response(body: mock_domains_list)
       end
 
@@ -29,7 +29,7 @@ RSpec.describe "#domains.info" do
   context "with params" do
     it "gets domain info successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/domains/#{domain}") do |env|
+      stubs.get("/directory/v1/org/#{org_id}/domains/#{domain}") do |_env|
         mock_response(body: mock_domain_info)
       end
 
@@ -48,7 +48,7 @@ RSpec.describe "#domains.add" do
   context "with params" do
     it "adds domain successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.post("/directory/v1/org/#{org_id}/domains") do |env|
+      stubs.post("/directory/v1/org/#{org_id}/domains") do |_env|
         mock_response(body: mock_domain_create, status: 201)
       end
 

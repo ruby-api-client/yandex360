@@ -10,7 +10,7 @@ RSpec.describe "#groups.create" do
   context "with params" do
     it "creates group successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.post("/directory/v1/org/#{org_id}/groups") do |env|
+      stubs.post("/directory/v1/org/#{org_id}/groups") do |_env|
         mock_response(body: mock_group_create, status: 201)
       end
 
@@ -30,7 +30,7 @@ RSpec.describe "#groups.update" do
   context "with params" do
     it "updates group successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.patch("/directory/v1/org/#{org_id}/groups/#{group_id}") do |env|
+      stubs.patch("/directory/v1/org/#{org_id}/groups/#{group_id}") do |_env|
         mock_response(body: mock_group_info)
       end
 
@@ -49,7 +49,7 @@ RSpec.describe "#groups.params" do
   context "with params" do
     it "gets group params successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/groups/#{group_id}") do |env|
+      stubs.get("/directory/v1/org/#{org_id}/groups/#{group_id}") do |_env|
         mock_response(body: mock_group_info)
       end
 
@@ -67,7 +67,7 @@ RSpec.describe "#groups.list" do
   context "with params" do
     it "returns collection of groups" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/groups") do |env|
+      stubs.get("/directory/v1/org/#{org_id}/groups") do |_env|
         mock_response(body: mock_groups_list)
       end
 
@@ -87,7 +87,7 @@ RSpec.describe "#groups.add_user" do
   context "with params" do
     it "adds user to group successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.post("/directory/v1/org/#{org_id}/groups/19/members") do |env|
+      stubs.post("/directory/v1/org/#{org_id}/groups/19/members") do |_env|
         mock_response(body: mock_group_add_user, status: 201)
       end
 
@@ -109,7 +109,7 @@ RSpec.describe "#groups.users" do
   context "with params" do
     it "returns group users successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/groups/#{group_id}/members") do |env|
+      stubs.get("/directory/v1/org/#{org_id}/groups/#{group_id}/members") do |_env|
         mock_response(body: mock_group_users)
       end
 
@@ -129,7 +129,7 @@ RSpec.describe "#groups.delete_user" do
   context "with params" do
     it "deletes user from group successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.delete("/directory/v1/org/#{org_id}/groups/19/members/user/#{user_id}") do |env|
+      stubs.delete("/directory/v1/org/#{org_id}/groups/19/members/user/#{user_id}") do |_env|
         mock_response(body: mock_group_delete_user)
       end
 
@@ -150,7 +150,7 @@ RSpec.describe "#groups.delete" do
   context "with params" do
     it "deletes group successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.delete("/directory/v1/org/#{org_id}/groups/#{group_id}") do |env|
+      stubs.delete("/directory/v1/org/#{org_id}/groups/#{group_id}") do |_env|
         mock_response(body: mock_group_delete)
       end
 

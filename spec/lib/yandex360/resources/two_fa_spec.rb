@@ -10,7 +10,7 @@ RSpec.describe "#two_fa.status" do
   context "with params" do
     it "gets user 2FA status successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/security/v1/org/#{org_id}/users/#{user_id}/2fa/status") do |env|
+      stubs.get("/security/v1/org/#{org_id}/users/#{user_id}/2fa/status") do |_env|
         mock_response(body: mock_two_fa_status)
       end
 
@@ -28,7 +28,7 @@ RSpec.describe "#two_fa.domain_status" do
   context "with params" do
     it "gets domain 2FA status successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/security/v1/org/#{org_id}/domain_2fa") do |env|
+      stubs.get("/security/v1/org/#{org_id}/domain_2fa") do |_env|
         mock_response(body: mock_two_fa_domain_status)
       end
 

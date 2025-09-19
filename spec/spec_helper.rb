@@ -7,7 +7,7 @@ require "simplecov-lcov"
 require "yandex360"
 
 # Load support files
-Dir[File.expand_path("../support/**/*.rb", __FILE__)].each { |f| require f }
+Dir[File.join(__dir__, "support", "**", "*.rb")].sort.each {|f| require f }
 
 SimpleCov::Formatter::LcovFormatter.config.report_with_single_file = true
 SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter

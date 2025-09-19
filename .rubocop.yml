@@ -139,3 +139,16 @@ Lint/Debugger:
 # Style preference
 Style/MethodDefParentheses:
   Enabled: false
+
+# Allow longer blocks in specs and configuration files
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'test/**/*'
+    - 'Rakefile'
+    - '**/*.rake'
+
+# Allow longer modules in test support files due to mock data
+Metrics/ModuleLength:
+  Exclude:
+    - 'spec/support/**/*'

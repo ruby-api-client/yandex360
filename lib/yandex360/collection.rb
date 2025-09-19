@@ -9,7 +9,7 @@ module Yandex360
     def self.from_response(response, key:, type:)
       body = response.body
       new(
-        data: body[key]&.map { |attrs| type.new(attrs) } || [],
+        data: body[key]&.map {|attrs| type.new(attrs) } || [],
         items: body["items"] || 0,
         total: body["total"] || 0
       )
@@ -35,12 +35,12 @@ module Yandex360
       data.empty?
     end
 
-    def first(n = nil)
-      n ? data.first(n) : data.first
+    def first(idx=nil)
+      n ? data.first(idx) : data.first
     end
 
-    def last(n = nil)
-      n ? data.last(n) : data.last
+    def last(idx=nil)
+      n ? data.last(idx) : data.last
     end
 
     def [](index)

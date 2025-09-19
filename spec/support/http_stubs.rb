@@ -2,29 +2,7 @@
 
 require "faraday"
 
-module HttpStubs
-  def stub_client
-    @stubs ||= Faraday::Adapter::Test::Stubs.new
-    @client ||= Yandex360::Client.new(token: "test_token", adapter: :test, stubs: @stubs)
-    [@client, @stubs]
-  end
-
-  def reset_stubs
-    @stubs = nil
-    @client = nil
-  end
-
-  def mock_response(body:, status: 200, headers: {})
-    default_headers = {"content-type" => "application/json; charset=utf-8"}
-    [status, default_headers.merge(headers), body.to_json]
-  end
-
-  def mock_error_response(status:, message: "Error")
-    body = {"error" => message}
-    [status, {"content-type" => "application/json; charset=utf-8"}, body.to_json]
-  end
-
-  # Organization responses
+module OrganizationStubs
   def mock_organizations_list
     {
       "organizations" => [
@@ -43,8 +21,9 @@ module HttpStubs
       "created_at" => "2024-01-01T00:00:00Z"
     }
   end
+end
 
-  # User responses
+module UserStubs
   def mock_users_list
     {
       "users" => [
@@ -111,8 +90,9 @@ module HttpStubs
       "has2fa" => true
     }
   end
+end
 
-  # Department responses
+module DepartmentStubs
   def mock_departments_list
     {
       "departments" => [
@@ -159,8 +139,9 @@ module HttpStubs
       "alias" => "support-team"
     }
   end
+end
 
-  # Group responses
+module GroupStubs
   def mock_groups_list
     {
       "groups" => [
@@ -230,8 +211,9 @@ module HttpStubs
       "id" => 19
     }
   end
+end
 
-  # Antispam responses
+module AntispamStubs
   def mock_antispam_list
     {
       "allowList" => ["127.0.0.1", "172.0.1.10"]
@@ -243,8 +225,9 @@ module HttpStubs
       "allowList" => ["127.0.0.1", "172.0.1.10"]
     }
   end
+end
 
-  # Domain responses
+module DomainStubs
   def mock_domains_list
     {
       "domains" => [
@@ -272,8 +255,9 @@ module HttpStubs
       "created_at" => "2024-01-01T00:00:00Z"
     }
   end
+end
 
-  # DNS responses
+module DnsStubs
   def mock_dns_list
     {
       "records" => [
@@ -293,8 +277,9 @@ module HttpStubs
       "created_at" => "2024-01-01T00:00:00Z"
     }
   end
+end
 
-  # Two-FA responses
+module TwoFaStubs
   def mock_two_fa_status
     {
       "enabled" => true,
@@ -308,8 +293,9 @@ module HttpStubs
       "enforced" => false
     }
   end
+end
 
-  # Audit responses
+module AuditStubs
   def mock_audit_list
     {
       "events" => [
@@ -324,8 +310,9 @@ module HttpStubs
       "items" => 1
     }
   end
+end
 
-  # Post settings responses
+module PostSettingsStubs
   def mock_post_settings_list
     {
       "forwarding_enabled" => false,
@@ -343,4 +330,38 @@ module HttpStubs
       "items" => 1
     }
   end
+end
+
+module HttpStubs
+  def stub_client
+    @stubs ||= Faraday::Adapter::Test::Stubs.new
+    @client ||= Yandex360::Client.new(token: "test_token", adapter: :test, stubs: @stubs)
+    [@client, @stubs]
+  end
+
+  def reset_stubs
+    @stubs = nil
+    @client = nil
+  end
+
+  def mock_response(body:, status: 200, headers: {})
+    default_headers = {"content-type" => "application/json; charset=utf-8"}
+    [status, default_headers.merge(headers), body.to_json]
+  end
+
+  def mock_error_response(status:, message: "Error")
+    body = {"error" => message}
+    [status, {"content-type" => "application/json; charset=utf-8"}, body.to_json]
+  end
+
+  include OrganizationStubs
+  include UserStubs
+  include DepartmentStubs
+  include GroupStubs
+  include AntispamStubs
+  include DomainStubs
+  include DnsStubs
+  include TwoFaStubs
+  include AuditStubs
+  include PostSettingsStubs
 end

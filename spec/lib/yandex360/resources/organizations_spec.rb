@@ -7,7 +7,7 @@ RSpec.describe "#organizations.list" do
   context "when list" do
     it "returns collection of organizations" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org") do |env|
+      stubs.get("/directory/v1/org") do |_env|
         mock_response(body: mock_organizations_list)
       end
 
@@ -26,7 +26,7 @@ RSpec.describe "#organizations.info" do
   context "with params" do
     it "gets organization info successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}") do |env|
+      stubs.get("/directory/v1/org/#{org_id}") do |_env|
         mock_response(body: mock_organization_info)
       end
 

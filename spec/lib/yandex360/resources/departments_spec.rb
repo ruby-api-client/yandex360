@@ -9,7 +9,7 @@ RSpec.describe "#departments.list" do
   context "with params" do
     it "returns collection of departments" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/departments") do |env|
+      stubs.get("/directory/v1/org/#{org_id}/departments") do |_env|
         mock_response(body: mock_departments_list)
       end
 
@@ -28,7 +28,7 @@ RSpec.describe "#departments.create" do
   context "with params" do
     it "creates department successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.post("/directory/v1/org/#{org_id}/departments") do |env|
+      stubs.post("/directory/v1/org/#{org_id}/departments") do |_env|
         mock_response(body: mock_department_create, status: 201)
       end
 
@@ -48,7 +48,7 @@ RSpec.describe "#departments.update" do
   context "with params" do
     it "updates department successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.patch("/directory/v1/org/#{org_id}/departments/#{dep_id}") do |env|
+      stubs.patch("/directory/v1/org/#{org_id}/departments/#{dep_id}") do |_env|
         mock_response(body: mock_department_info)
       end
 
@@ -74,7 +74,7 @@ RSpec.describe "#departments.info" do
   context "with params" do
     it "gets department info successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/departments/#{dep_id}") do |env|
+      stubs.get("/directory/v1/org/#{org_id}/departments/#{dep_id}") do |_env|
         mock_response(body: mock_department_info)
       end
 
@@ -94,7 +94,7 @@ RSpec.describe "#departments.add_alias" do
   context "with params" do
     it "adds alias successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.post("/directory/v1/org/#{org_id}/departments/#{dep_id}/aliases") do |env|
+      stubs.post("/directory/v1/org/#{org_id}/departments/#{dep_id}/aliases") do |_env|
         mock_response(body: mock_department_alias, status: 201)
       end
 
@@ -115,7 +115,7 @@ RSpec.describe "#departments.delete_alias" do
   context "with params" do
     it "deletes alias successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.delete("/directory/v1/org/#{org_id}/departments/#{dep_id}/aliases/#{name}") do |env|
+      stubs.delete("/directory/v1/org/#{org_id}/departments/#{dep_id}/aliases/#{name}") do |_env|
         mock_response(body: mock_department_alias_delete)
       end
 
@@ -136,7 +136,7 @@ RSpec.describe "#departments.delete" do
   context "with params" do
     it "deletes department successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.delete("/directory/v1/org/#{org_id}/departments/#{dep_id}") do |env|
+      stubs.delete("/directory/v1/org/#{org_id}/departments/#{dep_id}") do |_env|
         mock_response(body: {"removed" => true, "id" => dep_id})
       end
 
@@ -150,12 +150,14 @@ RSpec.describe "#departments.delete" do
   context "with error" do
     it "raises not found error" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.delete("/directory/v1/org/#{org_id}/departments/#{dep_id}") do |env|
+      stubs.delete("/directory/v1/org/#{org_id}/departments/#{dep_id}") do |_env|
         mock_error_response(status: 404, message: "No results were found for your request")
       end
 
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
-      expect { client.departments.delete(org_id: org_id, dep_id: dep_id) }.to raise_error(Yandex360::NotFoundError, /No results/)
+      expect {
+        client.departments.delete(org_id: org_id, dep_id: dep_id)
+      }.to raise_error(Yandex360::NotFoundError, /No results/)
     end
   end
 end

@@ -28,7 +28,7 @@ RSpec.describe "#anispam.list" do
   context "when list" do
     it "returns allowlist successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/admin/v1/org/#{org_id}/mail/antispam/allowlist/ips") do |env|
+      stubs.get("/admin/v1/org/#{org_id}/mail/antispam/allowlist/ips") do |_env|
         mock_response(body: mock_antispam_list)
       end
 
@@ -46,7 +46,7 @@ RSpec.describe "#anispam.delete" do
   context "when delete" do
     it "deletes allowlist successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.delete("/admin/v1/org/#{org_id}/mail/antispam/allowlist/ips") do |env|
+      stubs.delete("/admin/v1/org/#{org_id}/mail/antispam/allowlist/ips") do |_env|
         [200, {"content-type" => "application/json"}, ""]
       end
 

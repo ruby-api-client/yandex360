@@ -10,7 +10,7 @@ RSpec.describe "#dns.list" do
   context "with params" do
     it "returns collection of DNS records" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/domains/#{domain}/dns") do |env|
+      stubs.get("/directory/v1/org/#{org_id}/domains/#{domain}/dns") do |_env|
         mock_response(body: mock_dns_list)
       end
 
@@ -30,7 +30,7 @@ RSpec.describe "#dns.create" do
   context "with params" do
     it "creates DNS record successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.post("/directory/v1/org/#{org_id}/domains/#{domain}/dns") do |env|
+      stubs.post("/directory/v1/org/#{org_id}/domains/#{domain}/dns") do |_env|
         mock_response(body: mock_dns_create, status: 201)
       end
 
