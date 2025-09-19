@@ -27,12 +27,57 @@ gem install yandex360
 
     client = Yandex360::Client.new(token: "paste your access_token here")
 
+    # List organizations
+    organizations = client.organizations.list
+
+    # List users in an organization
     users = client.users.list(org_id: 1234567)
+
+    # Get organization domains
+    domains = client.domains.list(org_id: 1234567)
+
+    # Check 2FA status for a user
+    two_fa_status = client.two_fa.status(org_id: 1234567, user_id: 987654321)
 ```
 
 ## Available methods
 
 ```ruby
+# Organizations
+organizations.list()
+organizations.info(org_id:)
+
+# Domains
+domains.list(org_id:)
+domains.add(org_id:, name:, **params)
+domains.info(org_id:, domain:)
+domains.delete(org_id:, domain:)
+domains.verify(org_id:, domain:)
+
+# DNS
+dns.list(org_id:, domain:)
+dns.create(org_id:, domain:, **params)
+dns.update(org_id:, domain:, record_id:, **params)
+dns.delete(org_id:, domain:, record_id:)
+
+# Two-Factor Authentication
+two_fa.enable(org_id:, user_id:)
+two_fa.disable(org_id:, user_id:)
+two_fa.status(org_id:, user_id:)
+two_fa.domain_status(org_id:)
+two_fa.configure_domain(org_id:, enabled:)
+
+# Audit
+audit.list(org_id:, page: 1, per_page: 100, **params)
+audit.export(org_id:, **params)
+
+# Post Settings
+post_settings.list(org_id:, user_id:)
+post_settings.update(org_id:, user_id:, **params)
+post_settings.forwarding_list(org_id:, user_id:)
+post_settings.add_forwarding(org_id:, user_id:, address:)
+post_settings.delete_forwarding(org_id:, user_id:, address:)
+
 # Antispam
 antispam.list(org_id:)
 antispam.create(org_id, *strings)

@@ -7,14 +7,8 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.8.7)
-      public_suffix (>= 2.0.2, < 7.0)
     ast (2.4.3)
     base64 (0.2.0)
-    bigdecimal (3.2.3)
-    crack (1.0.0)
-      bigdecimal
-      rexml
     diff-lcs (1.6.2)
     docile (1.4.0)
     faraday (2.8.1)
@@ -23,7 +17,6 @@ GEM
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
     fiddle (1.1.6)
-    hashdiff (1.2.1)
     json (2.14.1)
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
@@ -34,12 +27,10 @@ GEM
       ast (~> 2.4.1)
       racc
     prism (1.5.1)
-    public_suffix (5.1.1)
     racc (1.8.1)
     rainbow (3.1.1)
     rake (13.3.0)
     regexp_parser (2.11.3)
-    rexml (3.4.4)
     rspec (3.13.1)
       rspec-core (~> 3.13.0)
       rspec-expectations (~> 3.13.0)
@@ -79,11 +70,6 @@ GEM
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.1.0)
-    vcr (6.1.0)
-    webmock (3.25.1)
-      addressable (>= 2.8.0)
-      crack (>= 0.3.2)
-      hashdiff (>= 0.4.0, < 2.0.0)
 
 PLATFORMS
   x64-mingw-ucrt
@@ -100,8 +86,6 @@ DEPENDENCIES
   rubocop (~> 1.60)
   simplecov (~> 0.9)
   simplecov-lcov (~> 0.9.0)
-  vcr (~> 6.1)
-  webmock (~> 3.18, >= 3.18.1)
   yandex360!
 
 BUNDLED WITH

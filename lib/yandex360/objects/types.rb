@@ -18,4 +18,10 @@ module Yandex360
 
   class Alias < Object; end
   class UserAlias < Object; end
+
+  # New services
+  class Organization < Object; end
+  class Domain < Object; end
+  class DnsRecord < Object; end
+  class AuditEvent < Object; end
 end

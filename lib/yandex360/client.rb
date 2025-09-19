@@ -30,6 +30,30 @@ module Yandex360
       UsersResource.new(self)
     end
 
+    def organizations
+      OrganizationsResource.new(self)
+    end
+
+    def domains
+      DomainsResource.new(self)
+    end
+
+    def dns
+      DnsResource.new(self)
+    end
+
+    def two_fa
+      TwoFaResource.new(self)
+    end
+
+    def audit
+      AuditResource.new(self)
+    end
+
+    def post_settings
+      PostSettingsResource.new(self)
+    end
+
     def connection
       @connection ||= build_connection
     end
