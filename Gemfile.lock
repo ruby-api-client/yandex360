@@ -72,6 +72,7 @@ GEM
     unicode-emoji (4.1.0)
 
 PLATFORMS
+  arm64-darwin-23
   x64-mingw-ucrt
   x86_64-darwin-17
   x86_64-linux

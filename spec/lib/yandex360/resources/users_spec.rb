@@ -9,7 +9,7 @@ RSpec.describe "#users.list" do
   context "with params" do
     it "returns collection of users" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/users") do |_env|
+      stubs.get("/directory/v1/org/#{org_id}/users") do |_|
         mock_response(body: mock_users_list)
       end
 
@@ -26,7 +26,7 @@ RSpec.describe "#users.list" do
 
     it "raises authorization error" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/users") do |_env|
+      stubs.get("/directory/v1/org/#{org_id}/users") do |_|
         mock_error_response(status: 403, message: "You are not allowed to perform that action")
       end
 
@@ -42,7 +42,7 @@ RSpec.describe "#users.add" do
   context "with params" do
     it "creates user successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.post("/directory/v1/org/#{org_id}/users") do |_env|
+      stubs.post("/directory/v1/org/#{org_id}/users") do |_|
         mock_response(body: mock_user_create, status: 201)
       end
 
@@ -74,7 +74,7 @@ RSpec.describe "#users.update" do
   context "with params" do
     it "updates user successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.patch("/directory/v1/org/#{org_id}/users/#{user_id}") do |_env|
+      stubs.patch("/directory/v1/org/#{org_id}/users/#{user_id}") do |_|
         mock_response(body: mock_user_update)
       end
 
@@ -108,7 +108,7 @@ RSpec.describe "#users.add_alias" do
   context "with params" do
     it "adds alias successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.post("/directory/v1/org/#{org_id}/users/#{user_id}/aliases") do |_env|
+      stubs.post("/directory/v1/org/#{org_id}/users/#{user_id}/aliases") do |_|
         mock_response(body: mock_user_alias, status: 201)
       end
 
@@ -129,7 +129,7 @@ RSpec.describe "#users.delete_alias" do
   context "with params" do
     it "deletes alias successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.delete("/directory/v1/org/#{org_id}/users/#{user_id}/aliases/#{user_alias}") do |_env|
+      stubs.delete("/directory/v1/org/#{org_id}/users/#{user_id}/aliases/#{user_alias}") do |_|
         mock_response(body: mock_user_alias_delete)
       end
 
@@ -150,7 +150,7 @@ RSpec.describe "#users.get2FA" do
   context "with params" do
     it "gets 2FA info successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/users/#{user_id}/2fa") do |_env|
+      stubs.get("/directory/v1/org/#{org_id}/users/#{user_id}/2fa") do |_|
         mock_response(body: mock_user_2fa)
       end
 
@@ -166,14 +166,13 @@ RSpec.describe "#users.get2FA" do
   context "with error" do
     it "raises authorization error" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/123/users/123/2fa") do |_env|
+      stubs.get("/directory/v1/org/123/users/123/2fa") do |_|
         mock_error_response(status: 403, message: "You are not allowed to perform that action")
       end
 
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
-      expect {
-        client.users.get2FA(org_id: 123, user_id: 123)
-      }.to raise_error(Yandex360::AuthorizationError, /not allowed/)
+      expect { client.users.get2FA(org_id: 123, user_id: 123) }
+        .to raise_error(Yandex360::AuthorizationError, /not allowed/)
     end
   end
 end
@@ -185,7 +184,7 @@ RSpec.describe "#users.has2FA?" do
   context "with params" do
     it "returns 2FA status" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/users/#{user_id}/2fa") do |_env|
+      stubs.get("/directory/v1/org/#{org_id}/users/#{user_id}/2fa") do |_|
         mock_response(body: mock_user_2fa)
       end
 
@@ -204,7 +203,7 @@ RSpec.describe "#users.info" do
   context "with params" do
     it "gets user info successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/users/#{user_id}") do |_env|
+      stubs.get("/directory/v1/org/#{org_id}/users/#{user_id}") do |_|
         mock_response(body: mock_user_info)
       end
 
@@ -232,7 +231,7 @@ RSpec.describe "#users.delete" do
   context "with params" do
     it "deletes user successfully" do
       stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.delete("/directory/v1/org/#{org_id}/users/#{user_id}") do |_env|
+      stubs.delete("/directory/v1/org/#{org_id}/users/#{user_id}") do |_|
         mock_response(body: mock_user_info)
       end
 
