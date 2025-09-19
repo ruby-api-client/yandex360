@@ -1,0 +1,73 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'lib/**'
+      - 'README.md'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths:
+      - 'lib/**'
+      - 'README.md'
+
+jobs:
+  validate-docs:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1.257.0
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+
+      - name: Install YARD for documentation
+        run: gem install yard
+
+      - name: Generate API documentation
+        run: yard doc --no-output --fail-on-warning
+
+      - name: Check README links
+        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        with:
+          use-quiet-mode: 'yes'
+          use-verbose-mode: 'yes'
+          config-file: '.github/markdown-link-check.json'
+
+      - name: Validate code examples in README
+        run: |
+          echo "Extracting and testing Ruby code examples from README..."
+          # Extract Ruby code blocks and test basic syntax
+          grep -A 20 '```ruby' README.md | grep -v '```' | ruby -c
+
+  update-changelog:
+    name: Update Changelog
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Generate changelog
+        uses: mikepenz/release-changelog-builder-action@v4
+        with:
+          configuration: ".github/changelog_config.json"
+          outputFile: "CHANGELOG.md"
+          fromTag: ""
+          toTag: "HEAD"
+
+      - name: Commit changelog
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add CHANGELOG.md
+          git diff --staged --quiet || git commit -m "docs: update changelog"
+          git push
