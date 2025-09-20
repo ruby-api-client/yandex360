@@ -38,6 +38,18 @@ jobs:
       - name: Publish to RubyGems
         run: gem push yandex360-*.gem
 
+      - name: Configure GitHub Packages credentials
+        run: |
+          cat > ~/.gem/credentials << EOF
+          ---
+          :rubygems_api_key: ${{ secrets.RUBYGEMS_API_KEY }}
+          :github: Bearer ${{ secrets.GITHUB_TOKEN }}
+          EOF
+          chmod 600 ~/.gem/credentials
+
+      - name: Publish to GitHub Packages
+        run: gem push yandex360-*.gem --host https://rubygems.pkg.github.com/${{ github.repository_owner }}
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -49,4 +61,6 @@ jobs:
       - name: Update release notes
         run: |
           echo "✅ Gem version $(ruby -e "require './lib/yandex360/version'; puts Yandex360::VERSION") published successfully!"
-          echo "📦 Available at: https://rubygems.org/gems/yandex360"
+          echo "📦 Available at:"
+          echo "  - RubyGems: https://rubygems.org/gems/yandex360"
+          echo "  - GitHub Packages: https://github.com/${{ github.repository }}/packages"
