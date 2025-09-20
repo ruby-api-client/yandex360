@@ -1,0 +1,76 @@
+## 🧹 Maintenance
+
+- build(deps): update faraday requirement from ~> 1.7 to >= 1.7, < 3.0 by @dependabot[bot] in #8
+- build(deps-dev): update simplecov-lcov requirement from ~> 0.7.0 to ~> 0.8.0 by @dependabot[bot] in #5
+- build(deps-dev): bump rspec from 3.11.0 to 3.12.0 by @dependabot[bot] in #6
+- build(deps-dev): update rake requirement from ~> 12.3.3 to ~> 13.0.6 by @dependabot[bot] in #3
+- build(deps): bump coverallsapp/github-action from 1.1.3 to 2.1.0 by @dependabot[bot] in #7
+- build(deps): bump coverallsapp/github-action from 2.1.0 to 2.1.2 by @dependabot[bot] in #12
+- build(deps): bump faraday from 2.7.4 to 2.7.5 by @dependabot[bot] in #13
+- build(deps): bump coverallsapp/github-action from 2.1.2 to 2.2.0 by @dependabot[bot] in #15
+- build(deps): bump faraday from 2.7.5 to 2.7.7 by @dependabot[bot] in #16
+- build(deps): bump faraday from 2.7.7 to 2.7.10 by @dependabot[bot] in #19
+- build(deps): bump coverallsapp/github-action from 2.2.0 to 2.2.1 by @dependabot[bot] in #20
+- build(deps): bump coverallsapp/github-action from 2.2.1 to 2.2.3 by @dependabot[bot] in #25
+- build(deps): bump faraday from 2.7.10 to 2.7.11 by @dependabot[bot] in #26
+- build(deps): bump actions/checkout from 3 to 4 by @dependabot[bot] in #24
+- build(deps-dev): bump webmock from 3.18.1 to 3.19.1 by @dependabot[bot] in #22
+- build(deps-dev): update rake requirement from ~> 13.0.6 to ~> 13.1.0 by @dependabot[bot] in #27
+- build(deps): bump faraday from 2.7.11 to 2.7.12 by @dependabot[bot] in #28
+- build(deps-dev): bump simplecov from 0.21.2 to 0.22.0 by @dependabot[bot] in #4
+- build(deps): bump faraday from 2.7.12 to 2.8.1 by @dependabot[bot] in #30
+- build(deps): bump ruby/setup-ruby from 1.165.1 to 1.175.1 by @dependabot[bot] in #42
+- build(deps): bump ruby/setup-ruby from 1.175.1 to 1.176.0 by @dependabot[bot] in #43
+- build(deps-dev): bump rspec from 3.12.0 to 3.13.0 by @dependabot[bot] in #34
+- build(deps-dev): bump webmock from 3.19.1 to 3.23.0 by @dependabot[bot] in #38
+- build(deps): bump coverallsapp/github-action from 2.2.3 to 2.3.0 by @dependabot[bot] in #45
+- build(deps-dev): bump rexml from 3.2.6 to 3.2.8 by @dependabot[bot] in #46
+- build(deps-dev): update rake requirement from ~> 13.1.0 to ~> 13.2.1 by @dependabot[bot] in #47
+- build(deps): bump ruby/setup-ruby from 1.176.0 to 1.177.0 by @dependabot[bot] in #48
+- build(deps-dev): bump webmock from 3.23.0 to 3.23.1 by @dependabot[bot] in #49
+- build(deps): bump ruby/setup-ruby from 1.177.0 to 1.177.1 by @dependabot[bot] in #50
+- build(deps): bump ruby/setup-ruby from 1.177.1 to 1.179.0 by @dependabot[bot] in #51
+- build(deps): bump ruby/setup-ruby from 1.179.0 to 1.180.1 by @dependabot[bot] in #53
+- build(deps): bump ruby/setup-ruby from 1.180.1 to 1.185.0 by @dependabot[bot] in #55
+- build(deps): bump ruby/setup-ruby from 1.185.0 to 1.187.0 by @dependabot[bot] in #56
+- build(deps): bump ruby/setup-ruby from 1.187.0 to 1.188.0 by @dependabot[bot] in #57
+- build(deps-dev): bump rexml from 3.2.8 to 3.3.2 by @dependabot[bot] in #58
+- build(deps): bump ruby/setup-ruby from 1.188.0 to 1.190.0 by @dependabot[bot] in #59
+- build(deps-dev): bump rexml from 3.3.2 to 3.3.6 by @dependabot[bot] in #60
+- build(deps): bump ruby/setup-ruby from 1.190.0 to 1.191.0 by @dependabot[bot] in #61
+- build(deps): bump ruby/setup-ruby from 1.191.0 to 1.192.0 by @dependabot[bot] in #62
+- build(deps): bump ruby/setup-ruby from 1.192.0 to 1.193.0 by @dependabot[bot] in #63
+- build(deps): bump ruby/setup-ruby from 1.193.0 to 1.194.0 by @dependabot[bot] in #64
+- build(deps): bump ruby/setup-ruby from 1.194.0 to 1.196.0 by @dependabot[bot] in #65
+- build(deps): bump ruby/setup-ruby from 1.196.0 to 1.199.0 by @dependabot[bot] in #72
+- build(deps-dev): bump webmock from 3.23.1 to 3.24.0 by @dependabot[bot] in #71
+- build(deps-dev): bump rexml from 3.3.6 to 3.3.9 by @dependabot[bot] in #69
+- build(deps): bump coverallsapp/github-action from 2.3.0 to 2.3.4 by @dependabot[bot] in #70
+- build(deps): bump ruby/setup-ruby from 1.199.0 to 1.202.0 by @dependabot[bot] in #73
+- build(deps): bump ruby/setup-ruby from 1.202.0 to 1.203.0 by @dependabot[bot] in #74
+- build(deps): bump ruby/setup-ruby from 1.203.0 to 1.204.0 by @dependabot[bot] in #75
+- build(deps): bump ruby/setup-ruby from 1.204.0 to 1.205.0 by @dependabot[bot] in #76
+- build(deps): bump ruby/setup-ruby from 1.205.0 to 1.206.0 by @dependabot[bot] in #77
+- build(deps): bump ruby/setup-ruby from 1.206.0 to 1.207.0 by @dependabot[bot] in #78
+- build(deps): bump ruby/setup-ruby from 1.207.0 to 1.213.0 by @dependabot[bot] in #79
+- build(deps): bump coverallsapp/github-action from 2.3.4 to 2.3.6 by @dependabot[bot] in #81
+- build(deps): bump ruby/setup-ruby from 1.213.0 to 1.214.0 by @dependabot[bot] in #80
+- build(deps): bump ruby/setup-ruby from 1.214.0 to 1.215.0 by @dependabot[bot] in #82
+- build(deps): bump ruby/setup-ruby from 1.215.0 to 1.218.0 by @dependabot[bot] in #83
+- build(deps): bump ruby/setup-ruby from 1.218.0 to 1.221.0 by @dependabot[bot] in #84
+- build(deps): bump ruby/setup-ruby from 1.221.0 to 1.222.0 by @dependabot[bot] in #85
+- build(deps): bump ruby/setup-ruby from 1.222.0 to 1.226.0 by @dependabot[bot] in #86
+- build(deps): bump ruby/setup-ruby from 1.226.0 to 1.227.0 by @dependabot[bot] in #87
+- build(deps): bump ruby/setup-ruby from 1.227.0 to 1.229.0 by @dependabot[bot] in #88
+- build(deps): bump ruby/setup-ruby from 1.229.0 to 1.237.0 by @dependabot[bot] in #92
+- build(deps): bump ruby/setup-ruby from 1.237.0 to 1.242.0 by @dependabot[bot] in #94
+- build(deps): bump ruby/setup-ruby from 1.242.0 to 1.245.0 by @dependabot[bot] in #96
+- build(deps): bump ruby/setup-ruby from 1.245.0 to 1.247.0 by @dependabot[bot] in #97
+- build(deps): bump actions/checkout from 4 to 5 by @dependabot[bot] in #99
+- build(deps): bump ruby/setup-ruby from 1.247.0 to 1.256.0 by @dependabot[bot] in #101
+- build(deps): bump ruby/setup-ruby from 1.256.0 to 1.257.0 by @dependabot[bot] in #102
+- build(deps-dev): update rake requirement from ~> 13.2.1 to ~> 13.3.0 by @dependabot[bot] in #107
+- build(deps-dev): bump webmock from 3.24.0 to 3.25.1 by @dependabot[bot] in #106
+- build(deps-dev): bump rspec from 3.13.0 to 3.13.1 by @dependabot[bot] in #105
+- build(deps-dev): update simplecov-lcov requirement from ~> 0.8.0 to ~> 0.9.0 by @dependabot[bot] in #104
+
