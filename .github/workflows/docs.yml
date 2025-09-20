@@ -2,15 +2,15 @@ name: Documentation
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
-      - 'lib/**'
-      - 'README.md'
-      - '.github/workflows/docs.yml'
+      - "lib/**"
+      - "README.md"
+      - ".github/workflows/docs.yml"
   pull_request:
     paths:
-      - 'lib/**'
-      - 'README.md'
+      - "lib/**"
+      - "README.md"
 
 jobs:
   validate-docs:
@@ -23,7 +23,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1.257.0
         with:
-          ruby-version: '3.1'
+          ruby-version: "3.1"
           bundler-cache: true
 
       - name: Install YARD for documentation
@@ -33,11 +33,11 @@ jobs:
         run: yard doc --no-output --fail-on-warning
 
       - name: Check README links
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        uses: tcort/github-action-markdown-link-check@v1
         with:
-          use-quiet-mode: 'yes'
-          use-verbose-mode: 'yes'
-          config-file: '.github/markdown-link-check.json'
+          use-quiet-mode: "yes"
+          use-verbose-mode: "yes"
+          config-file: ".github/markdown-link-check.json"
 
       - name: Validate code examples in README
         run: |
