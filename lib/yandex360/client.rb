@@ -6,11 +6,12 @@ module Yandex360
 
     attr_reader :token, :adapter
 
-    # new client
     def initialize(token:, adapter: Faraday.default_adapter, stubs: nil)
+      raise ArgumentError, "Token cannot be nil or empty" if token.nil? || token.to_s.strip.empty?
+
       @token = token
       @adapter = adapter
-      @stubs = stubs # Test stubs for requests
+      @stubs = stubs
     end
 
     def antispam
@@ -29,8 +30,42 @@ module Yandex360
       UsersResource.new(self)
     end
 
+    def organizations
+      OrganizationsResource.new(self)
+    end
+
+    def domains
+      DomainsResource.new(self)
+    end
+
+    def dns
+      DnsResource.new(self)
+    end
+
+    def two_fa
+      TwoFaResource.new(self)
+    end
+
+    def audit
+      AuditResource.new(self)
+    end
+
+    def post_settings
+      PostSettingsResource.new(self)
+    end
+
     def connection
-      @connection ||= Faraday.new(BASE_URL) do |conn|
+      @connection ||= build_connection
+    end
+
+    def inspect
+      "#<#{self.class.name}:#{object_id} token=***>"
+    end
+
+    private
+
+    def build_connection
+      Faraday.new(BASE_URL) do |conn|
         conn.request :authorization, :OAuth, token
         conn.request :json
         conn.request :url_encoded

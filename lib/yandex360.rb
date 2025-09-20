@@ -8,7 +8,14 @@ module Yandex360
   autoload :Object, "yandex360/object"
   autoload :Resource, "yandex360/resource"
   autoload :Collection, "yandex360/collection"
+  autoload :ParamBuilder, "yandex360/param_builder"
   autoload :Error, "yandex360/error"
+  autoload :AuthenticationError, "yandex360/error"
+  autoload :AuthorizationError, "yandex360/error"
+  autoload :NotFoundError, "yandex360/error"
+  autoload :ValidationError, "yandex360/error"
+  autoload :RateLimitError, "yandex360/error"
+  autoload :ServerError, "yandex360/error"
 
   autoload :AntispamResource, "yandex360/resources/antispam"
   autoload :AllowList, "yandex360/objects/types"
@@ -27,4 +34,20 @@ module Yandex360
 
   autoload :UsersResource, "yandex360/resources/users"
   autoload :User, "yandex360/objects/types"
+
+  autoload :OrganizationsResource, "yandex360/resources/organizations"
+  autoload :Organization, "yandex360/objects/types"
+
+  autoload :DomainsResource, "yandex360/resources/domains"
+  autoload :Domain, "yandex360/objects/types"
+
+  autoload :DnsResource, "yandex360/resources/dns"
+  autoload :DnsRecord, "yandex360/objects/types"
+
+  autoload :TwoFaResource, "yandex360/resources/two_fa"
+
+  autoload :AuditResource, "yandex360/resources/audit"
+  autoload :AuditEvent, "yandex360/objects/types"
+
+  autoload :PostSettingsResource, "yandex360/resources/post_settings"
 end

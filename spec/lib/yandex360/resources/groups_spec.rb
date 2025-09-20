@@ -8,13 +8,17 @@ RSpec.describe "#groups.create" do
   let(:name) { "Hotline" }
 
   context "with params" do
-    subject(:resp) do
-      VCR.use_cassette("groups/create") do
-        @yandex360.groups.create org_id: org_id, name: name
+    it "creates group successfully" do
+      stubs = Faraday::Adapter::Test::Stubs.new
+      stubs.post("/directory/v1/org/#{org_id}/groups") do |_env|
+        mock_response(body: mock_group_create, status: 201)
       end
-    end
 
-    it { expect(resp).to be_an Yandex360::Group }
+      client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
+      resp = client.groups.create(org_id: org_id, name: name)
+
+      expect(resp).to be_an Yandex360::Group
+    end
   end
 end
 
@@ -24,13 +28,17 @@ RSpec.describe "#groups.update" do
   let(:group_id) { "19" }
 
   context "with params" do
-    subject(:resp) do
-      VCR.use_cassette("groups/update") do
-        @yandex360.groups.update org_id: org_id, group_id: group_id, name: name
+    it "updates group successfully" do
+      stubs = Faraday::Adapter::Test::Stubs.new
+      stubs.patch("/directory/v1/org/#{org_id}/groups/#{group_id}") do |_env|
+        mock_response(body: mock_group_info)
       end
-    end
 
-    it { expect(resp).to be_an Yandex360::Group }
+      client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
+      resp = client.groups.update(org_id: org_id, group_id: group_id, name: name)
+
+      expect(resp).to be_an Yandex360::Group
+    end
   end
 end
 
@@ -39,13 +47,17 @@ RSpec.describe "#groups.params" do
   let(:group_id) { "19" }
 
   context "with params" do
-    subject(:resp) do
-      VCR.use_cassette("groups/params") do
-        @yandex360.groups.params org_id: org_id, group_id: group_id
+    it "gets group params successfully" do
+      stubs = Faraday::Adapter::Test::Stubs.new
+      stubs.get("/directory/v1/org/#{org_id}/groups/#{group_id}") do |_env|
+        mock_response(body: mock_group_info)
       end
-    end
 
-    it { expect(resp).to be_an Yandex360::Group }
+      client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
+      resp = client.groups.params(org_id: org_id, group_id: group_id)
+
+      expect(resp).to be_an Yandex360::Group
+    end
   end
 end
 
@@ -53,14 +65,18 @@ RSpec.describe "#groups.list" do
   let(:org_id) { "1234567" }
 
   context "with params" do
-    subject(:resp) do
-      VCR.use_cassette("groups/list") do
-        @yandex360.groups.list org_id: org_id
+    it "returns collection of groups" do
+      stubs = Faraday::Adapter::Test::Stubs.new
+      stubs.get("/directory/v1/org/#{org_id}/groups") do |_env|
+        mock_response(body: mock_groups_list)
       end
-    end
 
-    it { expect(resp).to be_an Yandex360::Collection }
-    it { expect(resp.data.first).to be_an Yandex360::Group }
+      client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
+      resp = client.groups.list(org_id: org_id)
+
+      expect(resp).to be_an Yandex360::Collection
+      expect(resp.data.first).to be_an Yandex360::Group
+    end
   end
 end
 
@@ -69,16 +85,20 @@ RSpec.describe "#groups.add_user" do
   let(:user_id) { "987654321" }
 
   context "with params" do
-    subject(:resp) do
-      VCR.use_cassette("groups/add_user") do
-        @yandex360.groups.add_user org_id: org_id, group_id: "19", user_id: user_id, type: "user"
+    it "adds user to group successfully" do
+      stubs = Faraday::Adapter::Test::Stubs.new
+      stubs.post("/directory/v1/org/#{org_id}/groups/19/members") do |_env|
+        mock_response(body: mock_group_add_user, status: 201)
       end
-    end
 
-    it { expect(resp).to be_an Yandex360::Group }
-    it { expect(resp.added).to be true }
-    it { expect(resp.id).to eq user_id }
-    it { expect(resp.type).to eq "user" }
+      client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
+      resp = client.groups.add_user(org_id: org_id, group_id: "19", user_id: user_id, type: "user")
+
+      expect(resp).to be_an Yandex360::Group
+      expect(resp.added).to be true
+      expect(resp.id).to eq user_id
+      expect(resp.type).to eq "user"
+    end
   end
 end
 
@@ -87,14 +107,18 @@ RSpec.describe "#groups.users" do
   let(:group_id) { "19" }
 
   context "with params" do
-    subject(:resp) do
-      VCR.use_cassette("groups/users") do
-        @yandex360.groups.users org_id: org_id, group_id: group_id
+    it "returns group users successfully" do
+      stubs = Faraday::Adapter::Test::Stubs.new
+      stubs.get("/directory/v1/org/#{org_id}/groups/#{group_id}/members") do |_env|
+        mock_response(body: mock_group_users)
       end
-    end
 
-    it { expect(resp).to be_an Yandex360::Collection }
-    it { expect(resp.data.first).to be_an Yandex360::User }
+      client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
+      resp = client.groups.users(org_id: org_id, group_id: group_id)
+
+      expect(resp).to be_an Yandex360::Collection
+      expect(resp.data.first).to be_an Yandex360::User
+    end
   end
 end
 
@@ -103,15 +127,19 @@ RSpec.describe "#groups.delete_user" do
   let(:user_id) { "987654321" }
 
   context "with params" do
-    subject(:resp) do
-      VCR.use_cassette("groups/delete_user") do
-        @yandex360.groups.delete_user org_id: org_id, group_id: "19", type: "user", user_id: user_id
+    it "deletes user from group successfully" do
+      stubs = Faraday::Adapter::Test::Stubs.new
+      stubs.delete("/directory/v1/org/#{org_id}/groups/19/members/user/#{user_id}") do |_env|
+        mock_response(body: mock_group_delete_user)
       end
-    end
 
-    it { expect(resp.deleted).to be true }
-    it { expect(resp.type).to eq "user" }
-    it { expect(resp.id).to eq user_id }
+      client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
+      resp = client.groups.delete_user(org_id: org_id, group_id: "19", type: "user", user_id: user_id)
+
+      expect(resp.removed).to be true
+      expect(resp.type).to eq "user"
+      expect(resp.id).to eq user_id
+    end
   end
 end
 
@@ -120,14 +148,18 @@ RSpec.describe "#groups.delete" do
   let(:group_id) { 19 }
 
   context "with params" do
-    subject(:resp) do
-      VCR.use_cassette("groups/delete") do
-        @yandex360.groups.delete org_id: org_id, group_id: group_id
+    it "deletes group successfully" do
+      stubs = Faraday::Adapter::Test::Stubs.new
+      stubs.delete("/directory/v1/org/#{org_id}/groups/#{group_id}") do |_env|
+        mock_response(body: mock_group_delete)
       end
-    end
 
-    it { expect(resp).to be_an Yandex360::Group }
-    it { expect(resp.removed).to eq true }
-    it { expect(resp.id).to eq group_id }
+      client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
+      resp = client.groups.delete(org_id: org_id, group_id: group_id)
+
+      expect(resp).to be_an Yandex360::Group
+      expect(resp.removed).to eq true
+      expect(resp.id).to eq group_id
+    end
   end
 end

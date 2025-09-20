@@ -11,6 +11,7 @@
 
 ## Specific to RubyMotion:
 .dat*
+.c**
 .repl_history
 build/
 
@@ -38,3 +39,4 @@ build/
 dev
 
 .rspec_status
+TODO
