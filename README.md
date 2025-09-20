@@ -11,7 +11,7 @@
 ### Gemfile
 
 ```gemfile
-gem 'yandex360', '~> 1.1', '>= 1.1.3'
+gem 'yandex360', '~> 1.1', '>= 1.1.4'
 ```
 
 ### Install
