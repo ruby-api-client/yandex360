@@ -74,4 +74,5 @@
 - build(deps-dev): bump rspec from 3.13.0 to 3.13.1 by @dependabot[bot] in #105
 - build(deps-dev): update simplecov-lcov requirement from ~> 0.8.0 to ~> 0.9.0 by @dependabot[bot] in #104
 - build(deps): bump ruby/setup-ruby from 1.257.0 to 1.263.0 by @dependabot[bot] in #110
+- build(deps): bump ruby/setup-ruby from 1.263.0 to 1.265.0 by @dependabot[bot] in #113
 
