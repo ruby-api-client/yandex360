@@ -75,4 +75,7 @@
 - build(deps-dev): update simplecov-lcov requirement from ~> 0.8.0 to ~> 0.9.0 by @dependabot[bot] in #104
 - build(deps): bump ruby/setup-ruby from 1.257.0 to 1.263.0 by @dependabot[bot] in #110
 - build(deps): bump ruby/setup-ruby from 1.263.0 to 1.265.0 by @dependabot[bot] in #113
+- build(deps): bump github/codeql-action from 3 to 4 by @dependabot[bot] in #114
+- build(deps): bump peter-evans/create-pull-request from 6 to 7 by @dependabot[bot] in #111
+- build(deps): bump ruby/setup-ruby from 1.265.0 to 1.267.0 by @dependabot[bot] in #115
 
