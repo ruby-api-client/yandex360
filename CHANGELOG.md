@@ -80,4 +80,5 @@
 - build(deps): bump ruby/setup-ruby from 1.265.0 to 1.267.0 by @dependabot[bot] in #115
 - build(deps): bump mikepenz/release-changelog-builder-action from 4 to 6 by @dependabot[bot] in #116
 - build(deps): bump ruby/setup-ruby from 1.267.0 to 1.268.0 by @dependabot[bot] in #117
+- build(deps): bump actions/checkout from 5 to 6 by @dependabot[bot] in #118
 
