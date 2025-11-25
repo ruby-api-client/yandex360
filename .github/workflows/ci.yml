@@ -62,7 +62,7 @@ jobs:
 
       - name: Upload coverage (Ubuntu Ruby 3.1 only)
         if: matrix.os == 'ubuntu-latest' && matrix.ruby == '3.1'
-        uses: coverallsapp/github-action@v2.3.6
+        uses: coverallsapp/github-action@v2.3.7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov/yandex360.lcov
