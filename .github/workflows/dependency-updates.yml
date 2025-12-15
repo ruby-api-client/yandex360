@@ -21,7 +21,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1.269.0
+        uses: ruby/setup-ruby@v1.270.0
         with:
           ruby-version: '3.1'
 
