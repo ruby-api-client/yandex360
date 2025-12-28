@@ -84,4 +84,5 @@
 - build(deps): bump coverallsapp/github-action from 2.3.6 to 2.3.7 by @dependabot[bot] in #119
 - build(deps): bump ruby/setup-ruby from 1.268.0 to 1.269.0 by @dependabot[bot] in #120
 - build(deps): bump ruby/setup-ruby from 1.269.0 to 1.270.0 by @dependabot[bot] in #122
+- build(deps): bump ruby/setup-ruby from 1.270.0 to 1.275.0 by @dependabot[bot] in #123
 
