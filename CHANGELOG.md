@@ -85,4 +85,6 @@
 - build(deps): bump ruby/setup-ruby from 1.268.0 to 1.269.0 by @dependabot[bot] in #120
 - build(deps): bump ruby/setup-ruby from 1.269.0 to 1.270.0 by @dependabot[bot] in #122
 - build(deps): bump ruby/setup-ruby from 1.270.0 to 1.275.0 by @dependabot[bot] in #123
+- build(deps): bump peter-evans/create-pull-request from 7 to 8 by @dependabot[bot] in #121
+- build(deps): bump ruby/setup-ruby from 1.275.0 to 1.276.0 by @dependabot[bot] in #124
 
