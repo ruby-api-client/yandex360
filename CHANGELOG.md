@@ -98,4 +98,6 @@
 - build(deps): bump ruby/setup-ruby from 1.293.0 to 1.295.0 by @dependabot[bot] in #133
 - build(deps): bump ruby/setup-ruby from 1.295.0 to 1.299.0 by @dependabot[bot] in #134
 - build(deps): bump ruby/setup-ruby from 1.299.0 to 1.300.0 by @dependabot[bot] in #135
+- build(deps): bump softprops/action-gh-release from 2 to 3 by @dependabot[bot] in #137
+- build(deps): bump ruby/setup-ruby from 1.300.0 to 1.301.0 by @dependabot[bot] in #136
 
