@@ -101,4 +101,6 @@
 - build(deps): bump softprops/action-gh-release from 2 to 3 by @dependabot[bot] in #137
 - build(deps): bump ruby/setup-ruby from 1.300.0 to 1.301.0 by @dependabot[bot] in #136
 - build(deps): bump ruby/setup-ruby from 1.301.0 to 1.306.0 by @dependabot[bot] in #139
+- build(deps): bump actions/dependency-review-action from 4 to 5 by @dependabot[bot] in #140
+- build(deps): bump ruby/setup-ruby from 1.306.0 to 1.307.0 by @dependabot[bot] in #141
 
