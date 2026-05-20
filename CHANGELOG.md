@@ -103,4 +103,5 @@
 - build(deps): bump ruby/setup-ruby from 1.301.0 to 1.306.0 by @dependabot[bot] in #139
 - build(deps): bump actions/dependency-review-action from 4 to 5 by @dependabot[bot] in #140
 - build(deps): bump ruby/setup-ruby from 1.306.0 to 1.307.0 by @dependabot[bot] in #141
+- build(deps): bump ruby/setup-ruby from 1.307.0 to 1.308.0 by @dependabot[bot] in #142
 
