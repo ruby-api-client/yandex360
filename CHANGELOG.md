@@ -106,4 +106,5 @@
 - build(deps): bump ruby/setup-ruby from 1.307.0 to 1.308.0 by @dependabot[bot] in #142
 - build(deps): bump ruby/setup-ruby from 1.308.0 to 1.310.0 by @dependabot[bot] in #143
 - build(deps): bump ruby/setup-ruby from 1.310.0 to 1.311.0 by @dependabot[bot] in #144
+- build(deps): bump ruby/setup-ruby from 1.311.0 to 1.313.0 by @dependabot[bot] in #145
 
