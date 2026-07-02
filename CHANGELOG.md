@@ -108,4 +108,5 @@
 - build(deps): bump ruby/setup-ruby from 1.310.0 to 1.311.0 by @dependabot[bot] in #144
 - build(deps): bump ruby/setup-ruby from 1.311.0 to 1.313.0 by @dependabot[bot] in #145
 - build(deps): bump actions/checkout from 6 to 7 by @dependabot[bot] in #147
+- build(deps): bump ruby/setup-ruby from 1.313.0 to 1.314.0 by @dependabot[bot] in #146
 
