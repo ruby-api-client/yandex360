@@ -10,36 +10,27 @@
 
 Комплексная Ruby-обёртка для [Yandex 360 API](https://yandex.ru/dev/api360/), позволяющая управлять организациями, пользователями, отделами, группами, доменами, DNS-записями, настройками безопасности и многим другим.
 
-## Содержание
+## Оглавление
 
 - [Возможности](#возможности)
 - [Требования](#требования)
 - [Установка](#установка)
 - [Аутентификация](#аутентификация)
 - [Быстрый старт](#быстрый-старт)
-- [Руководство по использованию](#руководство-по-использованию)
-  - [Организации](#организации)
-  - [Пользователи](#пользователи)
-  - [Отделы](#отделы)
-  - [Группы](#группы)
-  - [Домены](#домены)
-  - [DNS-записи](#dns-записи)
-  - [Двухфакторная аутентификация](#двухфакторная-аутентификация-2fa)
-  - [Журнал аудита](#журнал-аудита)
-  - [Настройки почты](#настройки-почты)
-  - [Антиспам](#антиспам)
-  - [Сессии пользователей](#сессии-пользователей)
-  - [Почтовые ящики](#почтовые-ящики)
-  - [Парольная политика](#парольная-политика)
-  - [Политики домена](#политики-домена)
-  - [Маршрутизация почты](#маршрутизация-почты)
-  - [Сервисные приложения](#сервисные-приложения)
-  - [Внешние контакты](#внешние-контакты)
-  - [Пагинация](#пагинация)
+- [Настройка](#настройка)
+- [Пагинация](#пагинация)
 - [Обработка ошибок](#обработка-ошибок)
+- [Ресурсы](#ресурсы)
+  - **Каталог**: [Организации](#организации), [Пользователи](#пользователи), [Отделы](#отделы), [Группы](#группы), [Внешние контакты](#внешние-контакты)
+  - **Домены**: [Домены](#домены), [DNS-записи](#dns-записи)
+  - **Почта**: [Настройки почты](#настройки-почты), [Почтовые ящики](#почтовые-ящики), [Маршрутизация почты](#маршрутизация-почты), [Политики домена](#политики-домена), [Антиспам](#антиспам)
+  - **Безопасность**: [Двухфакторная аутентификация (2FA)](#двухфакторная-аутентификация-2fa), [Сессии пользователей](#сессии-пользователей), [Парольная политика](#парольная-политика), [Аудит-логи](#аудит-логи), [Сервисные приложения](#сервисные-приложения)
+- [Справочник API](#справочник-api)
 - [Разработка](#разработка)
 - [Вклад в проект](#вклад-в-проект)
 - [Лицензия](#лицензия)
+- [Ссылки](#ссылки)
+- [Поддержка](#поддержка)
 
 ## Возможности
 
@@ -63,7 +54,7 @@
 Добавьте эту строку в `Gemfile` вашего приложения:
 
 ```ruby
-gem 'yandex360', '~> 1.1', '>= 1.1.4'
+gem 'yandex360', '~> 2.0'
 ```
 
 Затем выполните:
@@ -96,17 +87,6 @@ require "yandex360"
 # Инициализация клиента с вашим OAuth токеном
 client = Yandex360::Client.new(token: "ваш_access_token")
 
-# У таймаутов и ретраев есть значения по умолчанию, их можно настроить.
-# Повторы срабатывают на 429 и 5xx, а также на ошибках соединения и таймаутах,
-# и только для идемпотентных методов, поэтому POST никогда не повторяется.
-client = Yandex360::Client.new(
-  token: "ваш_access_token",
-  open_timeout: 5,   # секунд на установку соединения
-  timeout: 30,       # секунд на весь ответ
-  max_retries: 2,    # попыток сверх первоначального запроса
-  retry_interval: 0.5 # секунд до первого повтора, дальше удваивается
-)
-
 # Получить список всех организаций
 organizations = client.organizations.list
 puts "Организации: #{organizations.count}"
@@ -132,7 +112,130 @@ two_fa_status = client.two_fa.status(org_id: 1234567, user_id: 987654321)
 puts "2FA включена: #{two_fa_status.enabled}"
 ```
 
-## Руководство по использованию
+## Настройка
+
+Клиенту достаточно токена. У всего остального есть значения по умолчанию, и
+менять их стоит только при наличии причины.
+
+```ruby
+client = Yandex360::Client.new(
+  token: "ваш_access_token",
+  open_timeout: 5,     # секунд на установку соединения
+  timeout: 30,         # секунд на весь ответ
+  max_retries: 2,      # попыток сверх первоначального запроса
+  retry_interval: 0.5  # секунд до первого повтора, дальше удваивается
+)
+```
+
+Таймауты важны под многопоточным веб-сервером: без них зависший вызов к API
+занимает свой поток сколько угодно, и это выглядит как деградация всего
+приложения, а не отказ одного эндпоинта.
+
+Повторы срабатывают на 429 и 5xx, а также на ошибках соединения и таймаутах.
+Только для идемпотентных методов, поэтому POST никогда не повторяется и
+повтор не может создать второго пользователя. Когда попытки заканчиваются, вы
+получаете типизированную ошибку гема, а не исключение faraday.
+
+Клиент строит соединение в конструкторе, поэтому его можно безопасно
+использовать из нескольких потоков.
+
+## Пагинация
+
+Каждый list-эндпоинт возвращает одну страницу. Коллекция несёт метаданные
+пагинации и умеет догружать остальное по требованию.
+
+```ruby
+users = client.users.list(org_id: 1234567, per_page: 100)
+
+users.page      # текущая страница
+users.pages     # всего страниц
+users.per_page  # размер страницы
+users.total     # всего записей
+users.last_page?
+```
+
+Постраничный обход, когда нужно работать с каждой пачкой:
+
+```ruby
+users.each_page do |page|
+  puts "Страница #{page.page} из #{page.pages}: #{page.size} сотрудников"
+end
+```
+
+Либо перебор всех записей, со страницами, которые догружаются по мере надобности:
+
+```ruby
+users.auto_paginate.each {|user| puts user.nickname }
+
+# Лениво: остановится на второй странице, а не выкачает все.
+first_fifty = client.users.list(org_id: 1234567, per_page: 25).auto_paginate.first(50)
+```
+
+Доступно для `users`, `groups`, `departments`, `external_contacts` и двух
+списков почтовых ящиков. Аргументы исходного вызова, такие как `per_page`
+или `parent_id` у подразделений, переносятся на следующие страницы.
+
+## Обработка ошибок
+
+Гем предоставляет специфичные классы исключений для различных сценариев ошибок:
+
+```ruby
+begin
+  user = client.users.info(org_id: 1234567, user_id: 999999)
+rescue Yandex360::AuthenticationError => e
+  puts "Ошибка аутентификации: #{e.message}"
+rescue Yandex360::AuthorizationError => e
+  puts "Доступ запрещён: #{e.message}"
+rescue Yandex360::NotFoundError => e
+  puts "Ресурс не найден: #{e.message}"
+rescue Yandex360::ValidationError => e
+  puts "Неверные параметры: #{e.message}"
+rescue Yandex360::RateLimitError => e
+  puts "Превышен лимит запросов: #{e.message}"
+rescue Yandex360::ServerError => e
+  puts "Ошибка сервера: #{e.message}"
+rescue Yandex360::Error => e
+  puts "Ошибка API: #{e.message}"
+end
+```
+
+### Типы исключений
+
+- `Yandex360::Error` - Базовый класс исключений
+- `Yandex360::AuthenticationError` - Неверный или отсутствующий токен (401)
+- `Yandex360::AuthorizationError` - Недостаточно прав доступа (403)
+- `Yandex360::NotFoundError` - Ресурс не найден (404)
+- `Yandex360::ValidationError` - Неверные параметры запроса (400)
+- `Yandex360::RateLimitError` - Превышен лимит запросов к API (429)
+- `Yandex360::ServerError` - Ошибка на стороне сервера (5xx)
+
+---
+
+## Ресурсы
+
+Каждый ресурс доступен через клиент и сгруппирован ниже по той части
+Yandex 360, к которой относится. Покрыты все семнадцать сервисов из
+справочника API.
+
+| Область | Обращение | Раздел |
+|---|---|---|
+| Каталог | `client.organizations` | [Организации](#организации) |
+|  | `client.users` | [Пользователи](#пользователи) |
+|  | `client.departments` | [Отделы](#отделы) |
+|  | `client.groups` | [Группы](#группы) |
+|  | `client.external_contacts` | [Внешние контакты](#внешние-контакты) |
+| Домены | `client.domains` | [Домены](#домены) |
+|  | `client.dns` | [DNS-записи](#dns-записи) |
+| Почта | `client.post_settings` | [Настройки почты](#настройки-почты) |
+|  | `client.mailboxes` | [Почтовые ящики](#почтовые-ящики) |
+|  | `client.routing` | [Маршрутизация почты](#маршрутизация-почты) |
+|  | `client.domain_policies` | [Политики домена](#политики-домена) |
+|  | `client.antispam` | [Антиспам](#антиспам) |
+| Безопасность | `client.two_fa` | [Двухфакторная аутентификация (2FA)](#двухфакторная-аутентификация-2fa) |
+|  | `client.sessions` | [Сессии пользователей](#сессии-пользователей) |
+|  | `client.passwords` | [Парольная политика](#парольная-политика) |
+|  | `client.audit` | [Аудит-логи](#аудит-логи) |
+|  | `client.service_applications` | [Сервисные приложения](#сервисные-приложения) |
 
 ### Организации
 
@@ -446,6 +549,44 @@ client.groups.delete(org_id: 1234567, group_id: 789)
 
 ---
 
+### Внешние контакты
+
+```ruby
+contacts = client.external_contacts.list(org_id: 1234567, page: 1, per_page: 50)
+contacts.each {|contact| puts "#{contact.firstName} #{contact.lastName}" }
+
+# Нужен хотя бы один адрес.
+created = client.external_contacts.create(
+  org_id: 1234567,
+  first_name: "Ivan",
+  last_name: "Petrov",
+  emails: [{email: "ivan@partner.example", type: "work", main: true}],
+  company: "Partner Ltd"
+)
+
+client.external_contacts.info(org_id: 1234567, contact_id: created.id)
+
+# PATCH: меняются только переданные поля.
+client.external_contacts.update(org_id: 1234567, contact_id: created.id, title: "CTO")
+
+# У адресов и телефонов свои эндпоинты, и каждый вызов заменяет
+# весь список. Ровно один адрес должен иметь main: true.
+client.external_contacts.update_emails(
+  org_id: 1234567,
+  contact_id: created.id,
+  emails: [{email: "ivan@partner.example", main: true}]
+)
+client.external_contacts.update_phones(
+  org_id: 1234567,
+  contact_id: created.id,
+  phones: [{phone: "+70000000000", type: "work", main: true}]
+)
+
+client.external_contacts.delete(org_id: 1234567, contact_id: created.id)
+```
+
+---
+
 ### Домены
 
 Управление доменами организации и проверка владения.
@@ -570,101 +711,6 @@ client.dns.delete(
 
 ---
 
-### Двухфакторная аутентификация (2FA)
-
-Управление настройками двухфакторной аутентификации для пользователей и всего домена.
-
-#### Включить 2FA для пользователя
-
-```ruby
-result = client.two_fa.enable(org_id: 1234567, user_id: 987654321)
-puts "2FA успешно включена"
-```
-
-#### Отключить 2FA для пользователя
-
-```ruby
-result = client.two_fa.disable(org_id: 1234567, user_id: 987654321)
-puts "2FA успешно отключена"
-```
-
-#### Проверить статус 2FA пользователя
-
-```ruby
-status = client.two_fa.status(org_id: 1234567, user_id: 987654321)
-puts "2FA включена: #{status.enabled}"
-puts "Есть TOTP: #{status.has_totp}"
-```
-
-#### Получить статус 2FA для всего домена
-
-```ruby
-domain_status = client.two_fa.domain_status(org_id: 1234567)
-puts "2FA включена для домена: #{domain_status.enabled}"
-```
-
-#### Настроить 2FA для всего домена
-
-```ruby
-# Включить 2FA для всего домена
-result = client.two_fa.configure_domain(
-  org_id: 1234567,
-  enabled: true
-)
-
-# Отключить 2FA для всего домена
-result = client.two_fa.configure_domain(
-  org_id: 1234567,
-  enabled: false
-)
-```
-
----
-
-### Аудит-логи
-
-У Почты и Диска отдельные аудит-логи и отдельные эндпоинты. Оба пагинируются
-непрозрачным токеном, а не номером страницы, поэтому аргумента `page` здесь нет.
-
-```ruby
-# События Почты
-events = client.audit.mail(org_id: 1234567, page_size: 100)
-
-events.each do |event|
-  puts "#{event.date} #{event.eventType} от #{event.userLogin}"
-end
-
-# События Диска
-client.audit.disk(org_id: 1234567).each {|event| puts "#{event.eventType} #{event.path}" }
-```
-
-Фильтры передаются в snake_case и преобразуются в camelCase, как того требует API:
-
-```ruby
-client.audit.mail(
-  org_id: 1234567,
-  page_size: 100,
-  after_date: "2026-01-01T00:00:00Z",
-  before_date: "2026-02-01T00:00:00Z",
-  include_uids: [987654321],
-  types: ["message_receive", "mailbox_send"]
-)
-```
-
-Пагинация работает так же, как в остальных ресурсах, по токену из ответа:
-
-```ruby
-client.audit.mail(org_id: 1234567).each_page do |page|
-  puts "#{page.size} событий, есть ещё: #{!page.last_page?}"
-end
-
-client.audit.disk(org_id: 1234567).auto_paginate.each {|event| puts event.path }
-```
-
-`page_size` ограничен сотней на стороне API и по умолчанию равен ей.
-
----
-
 ### Настройки почты
 
 Управление настройками электронной почты для пользователей, включая правила пересылки.
@@ -714,66 +760,6 @@ client.post_settings.delete_forwarding(
   user_id: 987654321,
   address: "forward@example.ru"
 )
-```
-
----
-
-### Антиспам
-
-Управление списком разрешённых IP-адресов для защиты от спама.
-
-#### Получить список разрешённых IP-адресов
-
-```ruby
-allowlist = client.antispam.list(org_id: 1234567)
-puts "Разрешённые IP: #{allowlist.allow_list}"
-```
-
-#### Добавить IP-адреса в список разрешённых
-
-```ruby
-# Добавить один IP
-result = client.antispam.create(1234567, "192.0.2.1")
-
-# Добавить несколько IP
-result = client.antispam.create(1234567, "192.0.2.1", "192.0.2.2", "192.0.2.3")
-
-# Добавить диапазоны IP
-result = client.antispam.create(1234567, "192.0.2.0/24")
-
-puts "Обновлённый список: #{result.allow_list}"
-```
-
-#### Очистить список разрешённых IP
-
-```ruby
-client.antispam.delete(org_id: 1234567)
-puts "Список очищен"
-```
-
----
-
-### Сессии пользователей
-
-#### Узнать время жизни cookie сессий
-
-```ruby
-sessions = client.sessions.info(org_id: 1234567)
-puts "Сессии завершаются через #{sessions.authTTL} секунд"
-```
-
-#### Задать время жизни cookie сессий
-
-```ruby
-# В секундах. Ноль означает, что сессии не истекают.
-client.sessions.update(org_id: 1234567, auth_ttl: 3600)
-```
-
-#### Выйти из аккаунта на всех устройствах
-
-```ruby
-# Пригодится, когда аккаунт скомпрометирован.
-client.sessions.logout(org_id: 1234567, user_id: 987654321)
 ```
 
 ---
@@ -832,16 +818,24 @@ puts status.status # running, complete или error
 
 ---
 
-### Парольная политика
+### Маршрутизация почты
 
 ```ruby
-policy = client.passwords.info(org_id: 1234567)
-puts "Пользователи могут менять пароль: #{policy.enabled}"
-puts "Срок действия пароля: #{policy.changeFrequency} дней"
+routing = client.routing.list(org_id: 1234567)
+routing.rules.each {|rule| puts "#{rule.scope.direction}: #{rule.actions.first.action}" }
 
-# Каждое поле можно передавать отдельно.
-client.passwords.update(org_id: 1234567, change_frequency: 90)
-client.passwords.update(org_id: 1234567, enabled: false)
+# set заменяет весь набор правил, как и domain_policies.set.
+client.routing.set(
+  org_id: 1234567,
+  rules: [
+    {
+      terminal: true,
+      scope: {direction: "inbound"},
+      condition: {field: "from", operator: "matches", value: "*@spam.example"},
+      actions: [{action: "drop"}]
+    }
+  ]
+)
 ```
 
 ---
@@ -877,25 +871,172 @@ client.domain_policies.set(
 
 ---
 
-### Маршрутизация почты
+### Антиспам
+
+Управление списком разрешённых IP-адресов для защиты от спама.
+
+#### Получить список разрешённых IP-адресов
 
 ```ruby
-routing = client.routing.list(org_id: 1234567)
-routing.rules.each {|rule| puts "#{rule.scope.direction}: #{rule.actions.first.action}" }
+allowlist = client.antispam.list(org_id: 1234567)
+puts "Разрешённые IP: #{allowlist.allow_list}"
+```
 
-# set заменяет весь набор правил, как и domain_policies.set.
-client.routing.set(
+#### Добавить IP-адреса в список разрешённых
+
+```ruby
+# Добавить один IP
+result = client.antispam.create(1234567, "192.0.2.1")
+
+# Добавить несколько IP
+result = client.antispam.create(1234567, "192.0.2.1", "192.0.2.2", "192.0.2.3")
+
+# Добавить диапазоны IP
+result = client.antispam.create(1234567, "192.0.2.0/24")
+
+puts "Обновлённый список: #{result.allow_list}"
+```
+
+#### Очистить список разрешённых IP
+
+```ruby
+client.antispam.delete(org_id: 1234567)
+puts "Список очищен"
+```
+
+---
+
+### Двухфакторная аутентификация (2FA)
+
+Управление настройками двухфакторной аутентификации для пользователей и всего домена.
+
+#### Включить 2FA для пользователя
+
+```ruby
+result = client.two_fa.enable(org_id: 1234567, user_id: 987654321)
+puts "2FA успешно включена"
+```
+
+#### Отключить 2FA для пользователя
+
+```ruby
+result = client.two_fa.disable(org_id: 1234567, user_id: 987654321)
+puts "2FA успешно отключена"
+```
+
+#### Проверить статус 2FA пользователя
+
+```ruby
+status = client.two_fa.status(org_id: 1234567, user_id: 987654321)
+puts "2FA включена: #{status.enabled}"
+puts "Есть TOTP: #{status.has_totp}"
+```
+
+#### Получить статус 2FA для всего домена
+
+```ruby
+domain_status = client.two_fa.domain_status(org_id: 1234567)
+puts "2FA включена для домена: #{domain_status.enabled}"
+```
+
+#### Настроить 2FA для всего домена
+
+```ruby
+# Включить 2FA для всего домена
+result = client.two_fa.configure_domain(
   org_id: 1234567,
-  rules: [
-    {
-      terminal: true,
-      scope: {direction: "inbound"},
-      condition: {field: "from", operator: "matches", value: "*@spam.example"},
-      actions: [{action: "drop"}]
-    }
-  ]
+  enabled: true
+)
+
+# Отключить 2FA для всего домена
+result = client.two_fa.configure_domain(
+  org_id: 1234567,
+  enabled: false
 )
 ```
+
+---
+
+### Сессии пользователей
+
+#### Узнать время жизни cookie сессий
+
+```ruby
+sessions = client.sessions.info(org_id: 1234567)
+puts "Сессии завершаются через #{sessions.authTTL} секунд"
+```
+
+#### Задать время жизни cookie сессий
+
+```ruby
+# В секундах. Ноль означает, что сессии не истекают.
+client.sessions.update(org_id: 1234567, auth_ttl: 3600)
+```
+
+#### Выйти из аккаунта на всех устройствах
+
+```ruby
+# Пригодится, когда аккаунт скомпрометирован.
+client.sessions.logout(org_id: 1234567, user_id: 987654321)
+```
+
+---
+
+### Парольная политика
+
+```ruby
+policy = client.passwords.info(org_id: 1234567)
+puts "Пользователи могут менять пароль: #{policy.enabled}"
+puts "Срок действия пароля: #{policy.changeFrequency} дней"
+
+# Каждое поле можно передавать отдельно.
+client.passwords.update(org_id: 1234567, change_frequency: 90)
+client.passwords.update(org_id: 1234567, enabled: false)
+```
+
+---
+
+### Аудит-логи
+
+У Почты и Диска отдельные аудит-логи и отдельные эндпоинты. Оба пагинируются
+непрозрачным токеном, а не номером страницы, поэтому аргумента `page` здесь нет.
+
+```ruby
+# События Почты
+events = client.audit.mail(org_id: 1234567, page_size: 100)
+
+events.each do |event|
+  puts "#{event.date} #{event.eventType} от #{event.userLogin}"
+end
+
+# События Диска
+client.audit.disk(org_id: 1234567).each {|event| puts "#{event.eventType} #{event.path}" }
+```
+
+Фильтры передаются в snake_case и преобразуются в camelCase, как того требует API:
+
+```ruby
+client.audit.mail(
+  org_id: 1234567,
+  page_size: 100,
+  after_date: "2026-01-01T00:00:00Z",
+  before_date: "2026-02-01T00:00:00Z",
+  include_uids: [987654321],
+  types: ["message_receive", "mailbox_send"]
+)
+```
+
+Пагинация работает так же, как в остальных ресурсах, по токену из ответа:
+
+```ruby
+client.audit.mail(org_id: 1234567).each_page do |page|
+  puts "#{page.size} событий, есть ещё: #{!page.last_page?}"
+end
+
+client.audit.disk(org_id: 1234567).auto_paginate.each {|event| puts event.path }
+```
+
+`page_size` ограничен сотней на стороне API и по умолчанию равен ей.
 
 ---
 
@@ -920,117 +1061,107 @@ client.service_applications.delete(org_id: 1234567)
 
 ---
 
-### Внешние контакты
+## Справочник API
+
+Все публичные методы, сгенерированы из исходного кода, поэтому не могут
+разойтись с ним. Что делает каждый, смотрите в разделах выше.
 
 ```ruby
-contacts = client.external_contacts.list(org_id: 1234567, page: 1, per_page: 50)
-contacts.each {|contact| puts "#{contact.firstName} #{contact.lastName}" }
+# Каталог
+organizations.list
+organizations.info(org_id:)
+users.add(org_id:, dep_id:, **user_params)
+users.add_alias(org_id:, user_id:, user_alias:)
+users.update(org_id:, user_id:, **user_params)
+users.info(org_id:, user_id:)
+users.list(org_id:, page: 1, per_page: 10)
+users.get2FA(org_id:, user_id:)
+users.has2FA?(org_id:, user_id:)
+users.delete_2fa_phone(org_id:, user_id:)
+users.update_avatar(org_id:, user_id:, image:, content_type: "image/png")
+users.update_contacts(org_id:, user_id:, contacts:)
+users.delete_contacts(org_id:, user_id:)
+users.delete(org_id:, user_id:)
+users.delete_alias(org_id:, user_id:, user_alias:)
+departments.add_alias(org_id:, dep_id:, name:)
+departments.update(org_id:, dep_id:, parent_id:, **params)
+departments.info(org_id:, dep_id:)
+departments.list(org_id:, page: 1, per_page: 10, parent_id: 0, order_by: "id")
+departments.create(org_id:, name:, parent_id:, **params)
+departments.delete_alias(org_id:, dep_id:, name:)
+departments.delete(org_id:, dep_id:)
+groups.add_user(org_id:, group_id:, user_id:, type: "user")
+groups.update(org_id:, group_id:, **user_params)
+groups.params(org_id:, group_id:)
+groups.list(org_id:, page: 1, per_page: 10)
+groups.users(org_id:, group_id:)
+groups.create(org_id:, name:, **group_params)
+groups.delete(org_id:, group_id:)
+groups.delete_user(org_id:, group_id:, type:, user_id:)
+external_contacts.list(org_id:, page: 1, per_page: 10)
+external_contacts.create(org_id:, first_name:, last_name:, emails:, **params)
+external_contacts.info(org_id:, contact_id:)
+external_contacts.update(org_id:, contact_id:, **params)
+external_contacts.delete(org_id:, contact_id:)
+external_contacts.update_emails(org_id:, contact_id:, emails:)
+external_contacts.update_phones(org_id:, contact_id:, phones:)
 
-# Нужен хотя бы один адрес.
-created = client.external_contacts.create(
-  org_id: 1234567,
-  first_name: "Ivan",
-  last_name: "Petrov",
-  emails: [{email: "ivan@partner.example", type: "work", main: true}],
-  company: "Partner Ltd"
-)
+# Домены
+domains.list(org_id:)
+domains.add(org_id:, name:, **params)
+domains.info(org_id:, domain:)
+domains.delete(org_id:, domain:)
+domains.verify(org_id:, domain:)
+dns.list(org_id:, domain:)
+dns.create(org_id:, domain:, **params)
+dns.update(org_id:, domain:, record_id:, **params)
+dns.delete(org_id:, domain:, record_id:)
 
-client.external_contacts.info(org_id: 1234567, contact_id: created.id)
+# Почта
+post_settings.list(org_id:, user_id:)
+post_settings.update(org_id:, user_id:, **params)
+post_settings.forwarding_list(org_id:, user_id:)
+post_settings.add_forwarding(org_id:, user_id:, address:)
+post_settings.delete_forwarding(org_id:, user_id:, address:)
+mailboxes.shared_list(org_id:, page: 1, per_page: 10)
+mailboxes.create_shared(org_id:, email:, name:, description:)
+mailboxes.shared_info(org_id:, resource_id:)
+mailboxes.update_shared(org_id:, resource_id:, **params)
+mailboxes.delete_shared(org_id:, resource_id:)
+mailboxes.delegated_list(org_id:, page: 1, per_page: 10)
+mailboxes.create_delegated(org_id:, resource_id:)
+mailboxes.delete_delegated(org_id:, resource_id:)
+mailboxes.actors(org_id:, resource_id:)
+mailboxes.resources(org_id:, actor_id:)
+mailboxes.set_access(org_id:, resource_id:, actor_id:, roles:, notify: nil)
+mailboxes.task_status(org_id:, task_id:)
+routing.list(org_id:)
+routing.set(org_id:, rules:)
+domain_policies.list(org_id:)
+domain_policies.set(org_id:, rules:)
+antispam.list(org_id:)
+antispam.create(org_id, *strings)
+antispam.delete(org_id:)
 
-# PATCH: меняются только переданные поля.
-client.external_contacts.update(org_id: 1234567, contact_id: created.id, title: "CTO")
-
-# У адресов и телефонов свои эндпоинты, и каждый вызов заменяет
-# весь список. Ровно один адрес должен иметь main: true.
-client.external_contacts.update_emails(
-  org_id: 1234567,
-  contact_id: created.id,
-  emails: [{email: "ivan@partner.example", main: true}]
-)
-client.external_contacts.update_phones(
-  org_id: 1234567,
-  contact_id: created.id,
-  phones: [{phone: "+70000000000", type: "work", main: true}]
-)
-
-client.external_contacts.delete(org_id: 1234567, contact_id: created.id)
+# Безопасность
+two_fa.enable(org_id:, user_id:)
+two_fa.disable(org_id:, user_id:)
+two_fa.status(org_id:, user_id:)
+two_fa.domain_status(org_id:)
+two_fa.configure_domain(org_id:, enabled:)
+sessions.info(org_id:)
+sessions.update(org_id:, auth_ttl:)
+sessions.logout(org_id:, user_id:)
+passwords.info(org_id:)
+passwords.update(org_id:, enabled: nil, change_frequency: nil)
+audit.mail(org_id:, page_size: 100, page_token: nil, **filters)
+audit.disk(org_id:, page_size: 100, page_token: nil, **filters)
+service_applications.list(org_id:)
+service_applications.create(org_id:, applications:)
+service_applications.delete(org_id:)
+service_applications.activate(org_id:)
+service_applications.deactivate(org_id:)
 ```
-
----
-
-### Пагинация
-
-Каждый list-эндпоинт возвращает одну страницу. Коллекция несёт метаданные
-пагинации и умеет догружать остальное по требованию.
-
-```ruby
-users = client.users.list(org_id: 1234567, per_page: 100)
-
-users.page      # текущая страница
-users.pages     # всего страниц
-users.per_page  # размер страницы
-users.total     # всего записей
-users.last_page?
-```
-
-Постраничный обход, когда нужно работать с каждой пачкой:
-
-```ruby
-users.each_page do |page|
-  puts "Страница #{page.page} из #{page.pages}: #{page.size} сотрудников"
-end
-```
-
-Либо перебор всех записей, со страницами, которые догружаются по мере надобности:
-
-```ruby
-users.auto_paginate.each {|user| puts user.nickname }
-
-# Лениво: остановится на второй странице, а не выкачает все.
-first_fifty = client.users.list(org_id: 1234567, per_page: 25).auto_paginate.first(50)
-```
-
-Доступно для `users`, `groups`, `departments`, `external_contacts` и двух
-списков почтовых ящиков. Аргументы исходного вызова, такие как `per_page`
-или `parent_id` у подразделений, переносятся на следующие страницы.
-
----
-
-## Обработка ошибок
-
-Гем предоставляет специфичные классы исключений для различных сценариев ошибок:
-
-```ruby
-begin
-  user = client.users.info(org_id: 1234567, user_id: 999999)
-rescue Yandex360::AuthenticationError => e
-  puts "Ошибка аутентификации: #{e.message}"
-rescue Yandex360::AuthorizationError => e
-  puts "Доступ запрещён: #{e.message}"
-rescue Yandex360::NotFoundError => e
-  puts "Ресурс не найден: #{e.message}"
-rescue Yandex360::ValidationError => e
-  puts "Неверные параметры: #{e.message}"
-rescue Yandex360::RateLimitError => e
-  puts "Превышен лимит запросов: #{e.message}"
-rescue Yandex360::ServerError => e
-  puts "Ошибка сервера: #{e.message}"
-rescue Yandex360::Error => e
-  puts "Ошибка API: #{e.message}"
-end
-```
-
-### Типы исключений
-
-- `Yandex360::Error` - Базовый класс исключений
-- `Yandex360::AuthenticationError` - Неверный или отсутствующий токен (401)
-- `Yandex360::AuthorizationError` - Недостаточно прав доступа (403)
-- `Yandex360::NotFoundError` - Ресурс не найден (404)
-- `Yandex360::ValidationError` - Неверные параметры запроса (422)
-- `Yandex360::RateLimitError` - Превышен лимит запросов к API (429)
-- `Yandex360::ServerError` - Ошибка на стороне сервера (5xx)
-
----
 
 ## Разработка
 
@@ -1061,103 +1192,6 @@ bundle exec rubocop -a
 ### Покрытие тестами
 
 Покрытие тестами отслеживается с помощью SimpleCov и отправляется в Coveralls. После запуска тестов откройте `coverage/index.html` для просмотра отчёта о покрытии.
-
----
-
-## Справочник по API
-
-### Краткая справочная таблица
-
-| Ресурс            | Доступные методы                                                                            |
-| ----------------- | ------------------------------------------------------------------------------------------- |
-| **Organizations** | `list`, `info`                                                                              |
-| **Users**         | `add`, `add_alias`, `update`, `info`, `list`, `get2FA`, `has2FA?`, `delete_alias`, `delete` |
-| **Departments**   | `create`, `add_alias`, `update`, `info`, `list`, `delete_alias`, `delete`                   |
-| **Groups**        | `create`, `add_user`, `update`, `params`, `list`, `users`, `delete`, `delete_user`          |
-| **Domains**       | `list`, `add`, `info`, `verify`, `delete`                                                   |
-| **DNS**           | `list`, `create`, `update`, `delete`                                                        |
-| **Two FA**        | `enable`, `disable`, `status`, `domain_status`, `configure_domain`                          |
-| **Audit**         | `list`, `export`                                                                            |
-| **Post Settings** | `list`, `update`, `forwarding_list`, `add_forwarding`, `delete_forwarding`                  |
-| **Antispam**      | `list`, `create`, `delete`                                                                  |
-
-### Справочник сигнатур методов
-
-```ruby
-# Организации
-organizations.list()
-organizations.info(org_id:)
-
-# Пользователи
-users.add(org_id:, dep_id:, **user_params)
-users.add_alias(org_id:, user_id:, user_alias:)
-users.update(org_id:, user_id:, **user_params)
-users.info(org_id:, user_id:)
-users.list(org_id:, page: 1, per_page: 10)
-users.get2FA(org_id:, user_id:)
-users.delete_2fa_phone(org_id:, user_id:)
-users.update_avatar(org_id:, user_id:, image:, content_type: "image/png")
-users.update_contacts(org_id:, user_id:, contacts:)
-users.delete_contacts(org_id:, user_id:)
-users.has2FA?(org_id:, user_id:)
-users.delete_alias(org_id:, user_id:, user_alias:)
-users.delete(org_id:, user_id:)
-
-# Отделы
-departments.create(org_id:, name:, parent_id:, **params)
-departments.add_alias(org_id:, dep_id:, name:)
-departments.update(org_id:, dep_id:, parent_id:, **params)
-departments.info(org_id:, dep_id:)
-departments.list(org_id:, page: 1, per_page: 10, parent_id: 0, order_by: "id")
-departments.delete_alias(org_id:, dep_id:, name:)
-departments.delete(org_id:, dep_id:)
-
-# Группы
-groups.create(org_id:, name:, **group_params)
-groups.add_user(org_id:, group_id:, user_id:, type: "user")
-groups.update(org_id:, group_id:, **user_params)
-groups.params(org_id:, group_id:)
-groups.list(org_id:, page: 1, per_page: 10)
-groups.users(org_id:, group_id:)
-groups.delete(org_id:, group_id:)
-groups.delete_user(org_id:, group_id:, type:, user_id:)
-
-# Домены
-domains.list(org_id:)
-domains.add(org_id:, name:, **params)
-domains.info(org_id:, domain:)
-domains.verify(org_id:, domain:)
-domains.delete(org_id:, domain:)
-
-# DNS-записи
-dns.list(org_id:, domain:)
-dns.create(org_id:, domain:, **params)
-dns.update(org_id:, domain:, record_id:, **params)
-dns.delete(org_id:, domain:, record_id:)
-
-# Двухфакторная аутентификация
-two_fa.enable(org_id:, user_id:)
-two_fa.disable(org_id:, user_id:)
-two_fa.status(org_id:, user_id:)
-two_fa.domain_status(org_id:)
-two_fa.configure_domain(org_id:, enabled:)
-
-# Журнал аудита
-audit.mail(org_id:, page_size: 100, page_token: nil, **filters)
-audit.disk(org_id:, page_size: 100, page_token: nil, **filters)
-
-# Настройки почты
-post_settings.list(org_id:, user_id:)
-post_settings.update(org_id:, user_id:, **params)
-post_settings.forwarding_list(org_id:, user_id:)
-post_settings.add_forwarding(org_id:, user_id:, address:)
-post_settings.delete_forwarding(org_id:, user_id:, address:)
-
-# Антиспам
-antispam.list(org_id:)
-antispam.create(org_id, *strings)
-antispam.delete(org_id:)
-```
 
 ---
 
