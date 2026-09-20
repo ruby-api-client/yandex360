@@ -9,7 +9,7 @@ module Yandex360
   class Collection
     include Enumerable
 
-    attr_reader :data, :items, :total, :page, :pages, :per_page
+    attr_reader :data, :items, :total, :page, :pages, :per_page, :next_page_token
 
     def self.from_response(response, key:, type:, &pager)
       body = response.body
@@ -24,6 +24,8 @@ module Yandex360
         page: body["page"],
         pages: body["pages"] || derive_pages(body),
         per_page: body["perPage"],
+        # Audit log endpoints page by opaque token instead of page number.
+        next_page_token: body["nextPageToken"],
         pager: pager
       )
     end
@@ -38,14 +40,16 @@ module Yandex360
     end
     private_class_method :derive_pages
 
-    def initialize(data:, items:, total:, page: nil, pages: nil, per_page: nil, pager: nil)
-      @data     = data
-      @items    = items
-      @total    = total
-      @page     = page
-      @pages    = pages
-      @per_page = per_page
-      @pager    = pager
+    def initialize(data:, items:, total:, page: nil, pages: nil, per_page: nil,
+                   next_page_token: nil, pager: nil)
+      @data            = data
+      @items           = items
+      @total           = total
+      @page            = page
+      @pages           = pages
+      @per_page        = per_page
+      @next_page_token = next_page_token
+      @pager           = pager
     end
 
     def each(&block)
@@ -75,9 +79,16 @@ module Yandex360
     end
 
     def last_page?
-      return true if page.nil? || pages.nil?
+      next_cursor.nil?
+    end
 
-      page >= pages
+    # What identifies the following page: an opaque token where the endpoint
+    # issues one, otherwise the next page number. Nil on the last page.
+    def next_cursor
+      return next_page_token unless next_page_token.nil? || next_page_token.empty?
+      return nil if page.nil? || pages.nil? || page >= pages
+
+      page + 1
     end
 
     # The next page, or nil when this is the last one or the collection was
@@ -85,7 +96,7 @@ module Yandex360
     def next_page
       return nil if @pager.nil? || last_page?
 
-      @pager.call(page + 1)
+      @pager.call(next_cursor)
     end
 
     # Yields this collection and each following one. Without a block, returns

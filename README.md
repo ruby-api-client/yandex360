@@ -593,48 +593,47 @@ result = client.two_fa.configure_domain(
 
 ### Audit Logs
 
-Access and export audit logs for security and compliance tracking.
-
-#### List audit events
+Mail and Disk keep separate audit logs, and they are separate endpoints. Both
+page by an opaque token rather than a page number, so there is no `page`
+argument here.
 
 ```ruby
-# Basic listing
-events = client.audit.list(
-  org_id: 1234567,
-  page: 1,
-  per_page: 100
-)
+# Mail events
+events = client.audit.mail(org_id: 1234567, page_size: 100)
 
 events.each do |event|
-  puts "Event: #{event.type}"
-  puts "User: #{event.user_id}"
-  puts "Time: #{event.created_at}"
-  puts "---"
+  puts "#{event.date} #{event.eventType} by #{event.userLogin}"
 end
 
-# With filters
-filtered_events = client.audit.list(
-  org_id: 1234567,
-  page: 1,
-  per_page: 100,
-  from: "2024-01-01",
-  to: "2024-12-31",
-  event_type: "user.created"
-)
+# Disk events
+client.audit.disk(org_id: 1234567).each {|event| puts "#{event.eventType} #{event.path}" }
 ```
 
-#### Export audit logs
+Filters are passed as keywords in snake_case and converted to the camelCase
+the API documents:
 
 ```ruby
-# Export logs for a specific time range
-export_result = client.audit.export(
+client.audit.mail(
   org_id: 1234567,
-  from: "2024-01-01",
-  to: "2024-12-31",
-  format: "json"  # or "csv"
+  page_size: 100,
+  after_date: "2026-01-01T00:00:00Z",
+  before_date: "2026-02-01T00:00:00Z",
+  include_uids: [987654321],
+  types: ["message_receive", "mailbox_send"]
 )
-puts "Export ID: #{export_result.export_id}"
 ```
+
+Pagination works as it does elsewhere, following the token the API returns:
+
+```ruby
+client.audit.mail(org_id: 1234567).each_page do |page|
+  puts "#{page.size} events, more to come: #{!page.last_page?}"
+end
+
+client.audit.disk(org_id: 1234567).auto_paginate.each {|event| puts event.path }
+```
+
+`page_size` is capped at 100 by the API and defaults to that.
 
 ---
 
@@ -1112,8 +1111,8 @@ two_fa.domain_status(org_id:)
 two_fa.configure_domain(org_id:, enabled:)
 
 # Audit Logs
-audit.list(org_id:, page: 1, per_page: 100, **params)
-audit.export(org_id:, **params)
+audit.mail(org_id:, page_size: 100, page_token: nil, **filters)
+audit.disk(org_id:, page_size: 100, page_token: nil, **filters)
 
 # Post Settings
 post_settings.list(org_id:, user_id:)
