@@ -111,4 +111,5 @@
 - build(deps): bump ruby/setup-ruby from 1.313.0 to 1.314.0 by @dependabot[bot] in #146
 - build(deps): bump ruby/setup-ruby from 1.314.0 to 1.316.0 by @dependabot[bot] in #148
 - build(deps): bump ruby/setup-ruby from 1.316.0 to 1.319.0 by @dependabot[bot] in #149
+- build(deps): bump github/codeql-action from 4 to 4.37.4 by @dependabot[bot] in #152
 
