@@ -47,17 +47,17 @@ jobs:
         # your codebase is analyzed, see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v7
+      uses: actions/checkout@v7.0.1
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4.37.4
+      uses: github/codeql-action/init@v4.38.1
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
         queries: security-extended,security-and-quality
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4.37.4
+      uses: github/codeql-action/analyze@v4.38.1
       with:
         category: "/language:${{matrix.language}}"
 
@@ -67,10 +67,10 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v7
+      uses: actions/checkout@v7.0.1
 
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@master
+      uses: aquasecurity/trivy-action@v0.36.0
       with:
         scan-type: 'fs'
         scan-ref: '.'
@@ -78,7 +78,7 @@ jobs:
         output: 'trivy-results.sarif'
 
     - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@v4.37.4
+      uses: github/codeql-action/upload-sarif@v4.38.1
       if: always()
       with:
         sarif_file: 'trivy-results.sarif'

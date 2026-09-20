@@ -18,12 +18,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
 
       - name: Set up Ruby
-        uses: ruby/setup-ruby@v1.319.0
+        uses: ruby/setup-ruby@v1.324.0
         with:
-          ruby-version: "3.1"
+          ruby-version: "3.3"
           bundler-cache: true
 
       - name: Install YARD for documentation
@@ -33,7 +33,7 @@ jobs:
         run: yard doc --no-output --fail-on-warning
 
       - name: Check README links
-        uses: tcort/github-action-markdown-link-check@v1
+        uses: tcort/github-action-markdown-link-check@v1.1.2
         with:
           use-quiet-mode: "yes"
           use-verbose-mode: "yes"
@@ -51,13 +51,13 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
       - name: Generate changelog
-        uses: mikepenz/release-changelog-builder-action@v6
+        uses: mikepenz/release-changelog-builder-action@v6.3.0
         with:
           configuration: ".github/changelog_config.json"
           outputFile: "CHANGELOG.md"
