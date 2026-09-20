@@ -1,0 +1,70 @@
+name: Check RubyGems Key
+
+# One-off diagnostic, run by hand before tagging a release. Delete it once the
+# key is confirmed: it exists only to answer "will the release job be able to
+# authenticate", which cannot be checked by reading the secret.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check RubyGems Key
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify the key against RubyGems
+        env:
+          # Passed through the environment rather than the command line so it
+          # never reaches a process listing. The value is never printed.
+          RUBYGEMS_API_KEY: ${{ secrets.RUBYGEMS_API_KEY }}
+        run: |
+          if [ -z "$RUBYGEMS_API_KEY" ]; then
+            echo "::error::RUBYGEMS_API_KEY is empty or not set for this repository."
+            exit 1
+          fi
+
+          body="$(mktemp)"
+          status="$(curl -sS -o "$body" -w '%{http_code}' \
+            -H "Authorization: $RUBYGEMS_API_KEY" \
+            https://rubygems.org/api/v1/profile/me.json)"
+
+          echo "Profile lookup: HTTP $status"
+
+          case "$status" in
+            200)
+              # Only the handle is printed. The response also carries an email
+              # address, which is left out on purpose.
+              echo "Authenticated as: $(jq -r '.handle // "unknown"' "$body")"
+              ;;
+            401)
+              echo "::error::The key was rejected. It is invalid, revoked or expired."
+              exit 1
+              ;;
+            *)
+              echo "::error::Unexpected response: HTTP $status"
+              exit 1
+              ;;
+          esac
+
+          # A second, narrower signal: this endpoint needs the index_rubygems
+          # scope. A push-only key answers 401 here and can still publish, so a
+          # failure is reported but not treated as fatal.
+          index_status="$(curl -sS -o /dev/null -w '%{http_code}' \
+            -H "Authorization: $RUBYGEMS_API_KEY" \
+            https://rubygems.org/api/v1/gems.json)"
+
+          echo "Gem index lookup: HTTP $index_status (401 here only means the key is push-scoped)"
+
+      - name: What this does not prove
+        run: |
+          echo "The key is valid and belongs to the account named above."
+          echo
+          echo "Two things remain unverified, because RubyGems offers no dry-run push:"
+          echo "  1. Whether the key carries the push_rubygem scope."
+          echo "  2. Whether it satisfies rubygems_mfa_required, which this gemspec sets."
+          echo
+          echo "A key issued before MFA was enforced authenticates here and is still"
+          echo "refused at 'gem push'. If this key predates that, reissue it with MFA"
+          echo "and update the secret rather than finding out during a release."
