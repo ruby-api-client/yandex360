@@ -11,11 +11,11 @@ module Yandex360
 
     def update(org_id:, dep_id:, parent_id:, **params)
       validate_required_params({org_id: org_id, dep_id: dep_id, parent_id: parent_id}, %i[org_id dep_id parent_id])
-      department = build_department_params({
-                                             orgId: org_id,
-                                             departmentId: dep_id,
-                                             parentId: parent_id
-                                           }, params)
+      department = build_params({
+                                  orgId: org_id,
+                                  departmentId: dep_id,
+                                  parentId: parent_id
+                                }, params)
       Department.new patch("/directory/v1/org/#{org_id}/departments/#{dep_id}", body: department).body
     end
 
@@ -42,10 +42,10 @@ module Yandex360
     # parent_id:, name:, description: "", external_id: "", head_id: 0, label: ""
     def create(org_id:, name:, parent_id:, **params)
       validate_required_params({org_id: org_id, name: name, parent_id: parent_id}, %i[org_id name parent_id])
-      department = build_department_params({
-                                             parentId: parent_id,
-                                             name: name
-                                           }, params)
+      department = build_params({
+                                  parentId: parent_id,
+                                  name: name
+                                }, params)
 
       Department.new post("/directory/v1/org/#{org_id}/departments", body: department).body
     end
@@ -58,12 +58,6 @@ module Yandex360
     def delete(org_id:, dep_id:)
       validate_required_params({org_id: org_id, dep_id: dep_id}, %i[org_id dep_id])
       Object.new delete_request("/directory/v1/org/#{org_id}/departments/#{dep_id}").body
-    end
-
-    private
-
-    def build_department_params(base_params, additional_params)
-      build_params(base_params, additional_params)
     end
   end
 end

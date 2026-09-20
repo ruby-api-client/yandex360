@@ -5,7 +5,7 @@ module Yandex360
     include ParamBuilder
     def add(org_id:, dep_id:, **user_params)
       validate_required_params({org_id: org_id, dep_id: dep_id}, %i[org_id dep_id])
-      user = build_user_params({departmentId: dep_id}, user_params)
+      user = build_params({departmentId: dep_id}, user_params)
 
       User.new post("/directory/v1/org/#{org_id}/users", body: user).body
     end
@@ -19,7 +19,7 @@ module Yandex360
 
     def update(org_id:, user_id:, **user_params)
       validate_required_params({org_id: org_id, user_id: user_id}, %i[org_id user_id])
-      user = build_user_params({}, user_params)
+      user = build_params({}, user_params)
 
       User.new patch("/directory/v1/org/#{org_id}/users/#{user_id}", body: user).body
     end
@@ -93,12 +93,6 @@ module Yandex360
       validate_required_params({org_id: org_id, user_id: user_id, user_alias: user_alias},
                                %i[org_id user_id user_alias])
       Alias.new delete_request("/directory/v1/org/#{org_id}/users/#{user_id}/aliases/#{user_alias}").body
-    end
-
-    private
-
-    def build_user_params(base_params, additional_params)
-      build_params(base_params, additional_params)
     end
   end
 end

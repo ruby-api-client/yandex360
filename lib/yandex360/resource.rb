@@ -36,10 +36,6 @@ module Yandex360
       !value.is_a?(String) && !value.is_a?(Array)
     end
 
-    def build_url(path_segments)
-      "/#{path_segments.compact.join('/')}"
-    end
-
     def get(url, params: {}, headers: {})
       handle_response(perform { client.connection.get(url, params, headers) })
     end

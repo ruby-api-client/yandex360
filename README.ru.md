@@ -498,7 +498,7 @@ end
 #### Получить информацию о группе
 
 ```ruby
-group = client.groups.params(org_id: 1234567, group_id: 789)
+group = client.groups.info(org_id: 1234567, group_id: 789)
 puts "Название: #{group.name}"
 puts "Метка: #{group.label}"
 puts "Участников: #{group.members_count}"
@@ -1092,7 +1092,8 @@ departments.delete_alias(org_id:, dep_id:, name:)
 departments.delete(org_id:, dep_id:)
 groups.add_user(org_id:, group_id:, user_id:, type: "user")
 groups.update(org_id:, group_id:, **user_params)
-groups.params(org_id:, group_id:)
+groups.info(org_id:, group_id:)
+groups.params(org_id:, group_id:)   # deprecated, use info
 groups.list(org_id:, page: 1, per_page: 10)
 groups.users(org_id:, group_id:)
 groups.create(org_id:, name:, **group_params)

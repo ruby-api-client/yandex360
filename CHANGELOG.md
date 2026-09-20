@@ -6,6 +6,30 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `groups.info`, the name the same call carries on every other resource.
+
+### Deprecated
+
+- `groups.params`, which is now an alias for `groups.info` and warns. The name
+  said nothing about what the call does and collides with a very common word.
+  Removed in 3.0.
+
+### Removed
+
+- `Resource#build_url`, which nothing called, and the `build_user_params`,
+  `build_group_params` and `build_department_params` wrappers, each of which
+  only forwarded to `build_params`. Line coverage reached 100% as a result:
+  this was the code the suite could not reach.
+
+### Internal
+
+- Resources load by directory instead of from a hand-written list of 54
+  `autoload` lines. Forgetting an entry raised `NameError` for the caller at
+  runtime, and the suite caught it only if some spec happened to touch that
+  constant.
+
 ## [2.0.0] - 2026-09-20
 
 Versions 1.1.5 through 1.7.0 exist in the commit history but were never
