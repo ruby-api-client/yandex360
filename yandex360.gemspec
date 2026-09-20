@@ -28,9 +28,6 @@ Gem::Specification.new do |s|
   s.metadata["rubygems_mfa_required"] = "true"
 
   s.add_dependency "faraday", ">= 1.7", "< 3.0"
-  # Required at runtime by lib/yandex360/object.rb. Ruby 3.5 demotes ostruct
-  # from a default gem to a bundled one, so it must be declared explicitly.
-  s.add_dependency "ostruct", ">= 0.5"
   # Retry middleware. 1.0.x carries no faraday constraint and 2.x requires
   # faraday 2, so this resolves across the supported faraday range.
   s.add_dependency "faraday-retry", ">= 1.0"

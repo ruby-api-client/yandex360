@@ -52,12 +52,12 @@ module Yandex360
 
     def delete_alias(org_id:, dep_id:, name:)
       validate_required_params({org_id: org_id, dep_id: dep_id, name: name}, %i[org_id dep_id name])
-      Object.new delete_request("/directory/v1/org/#{org_id}/departments/#{dep_id}/aliases/#{name}").body
+      Response.new delete_request("/directory/v1/org/#{org_id}/departments/#{dep_id}/aliases/#{name}").body
     end
 
     def delete(org_id:, dep_id:)
       validate_required_params({org_id: org_id, dep_id: dep_id}, %i[org_id dep_id])
-      Object.new delete_request("/directory/v1/org/#{org_id}/departments/#{dep_id}").body
+      Response.new delete_request("/directory/v1/org/#{org_id}/departments/#{dep_id}").body
     end
   end
 end

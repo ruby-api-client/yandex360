@@ -17,7 +17,7 @@ RSpec.describe "#two_fa.status" do
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
       resp = client.two_fa.status(org_id: org_id, user_id: user_id)
 
-      expect(resp).to be_a(Yandex360::Object)
+      expect(resp).to be_a(Yandex360::Response)
     end
   end
 end
@@ -35,7 +35,7 @@ RSpec.describe "#two_fa.domain_status" do
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
       resp = client.two_fa.domain_status(org_id: org_id)
 
-      expect(resp).to be_a(Yandex360::Object)
+      expect(resp).to be_a(Yandex360::Response)
     end
   end
 end

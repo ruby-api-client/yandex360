@@ -19,6 +19,7 @@
 - [Быстрый старт](#быстрый-старт)
 - [Настройка](#настройка)
 - [Пагинация](#пагинация)
+- [Объекты ответа](#объекты-ответа)
 - [Обработка ошибок](#обработка-ошибок)
 - [Ресурсы](#ресурсы)
   - **Каталог**: [Организации](#организации), [Пользователи](#пользователи), [Отделы](#отделы), [Группы](#группы), [Внешние контакты](#внешние-контакты)
@@ -174,6 +175,51 @@ first_fifty = client.users.list(org_id: 1234567, per_page: 25).auto_paginate.fir
 Доступно для `users`, `groups`, `departments`, `external_contacts` и двух
 списков почтовых ящиков. Аргументы исходного вызова, такие как `per_page`
 или `parent_id` у подразделений, переносятся на следующие страницы.
+
+## Объекты ответа
+
+Каждый ответ это объект, у которого объявленные поля являются настоящими
+методами, поэтому опечатка сообщает о себе, а не возвращает молча nil:
+
+```ruby
+user = client.users.info(org_id: 1234567, user_id: 987654321)
+
+user.nickname    # "ivan.ivanov"
+user.nickame     # NoMethodError
+```
+
+Имена полей в snake_case, даже если API пишет иначе. Это совпадает с тем, как
+гем и так принимает аргументы:
+
+```ruby
+client.passwords.update(org_id: 1234567, change_frequency: 90)
+client.passwords.info(org_id: 1234567).change_frequency
+```
+
+Исходное написание продолжает работать и предупреждает. Уйдёт в 4.0.
+
+```ruby
+policy.changeFrequency
+# [yandex360] Yandex360::DomainPassword#changeFrequency is deprecated,
+# use #change_frequency
+```
+
+Вложенные объекты и массивы объектов тоже оборачиваются:
+
+```ruby
+user.name.first
+routing.rules.first.actions.first.action
+```
+
+Поле, о котором гем не знает, потому что API получил его после последнего
+релиза, всё равно доступно. Ждать публикации не нужно:
+
+```ruby
+user["fieldAddedLater"]
+user.to_h                 # разобранное тело в том виде, в каком пришло
+```
+
+---
 
 ## Обработка ошибок
 
@@ -553,7 +599,7 @@ client.groups.delete(org_id: 1234567, group_id: 789)
 
 ```ruby
 contacts = client.external_contacts.list(org_id: 1234567, page: 1, per_page: 50)
-contacts.each {|contact| puts "#{contact.firstName} #{contact.lastName}" }
+contacts.each {|contact| puts "#{contact.first_name} #{contact.last_name}" }
 
 # Нужен хотя бы один адрес.
 created = client.external_contacts.create(
@@ -770,7 +816,7 @@ client.post_settings.delete_forwarding(
 
 ```ruby
 mailboxes = client.mailboxes.shared_list(org_id: 1234567, page: 1, per_page: 50)
-mailboxes.each {|mailbox| puts "#{mailbox.resourceId}: #{mailbox.count} сотрудников" }
+mailboxes.each {|mailbox| puts "#{mailbox.resource_id}: #{mailbox.count} сотрудников" }
 
 created = client.mailboxes.create_shared(
   org_id: 1234567,
@@ -779,11 +825,11 @@ created = client.mailboxes.create_shared(
   description: "Общий ящик поддержки"
 )
 
-mailbox = client.mailboxes.shared_info(org_id: 1234567, resource_id: created.resourceId)
+mailbox = client.mailboxes.shared_info(org_id: 1234567, resource_id: created.resource_id)
 puts mailbox.email
 
-client.mailboxes.update_shared(org_id: 1234567, resource_id: created.resourceId, name: "Helpdesk")
-client.mailboxes.delete_shared(org_id: 1234567, resource_id: created.resourceId)
+client.mailboxes.update_shared(org_id: 1234567, resource_id: created.resource_id, name: "Helpdesk")
+client.mailboxes.delete_shared(org_id: 1234567, resource_id: created.resource_id)
 ```
 
 #### Делегированные ящики
@@ -812,7 +858,7 @@ task = client.mailboxes.set_access(
   notify: "none" # "all" (по умолчанию), "delegates" или "none"
 )
 
-status = client.mailboxes.task_status(org_id: 1234567, task_id: task.taskId)
+status = client.mailboxes.task_status(org_id: 1234567, task_id: task.task_id)
 puts status.status # running, complete или error
 ```
 
@@ -963,7 +1009,7 @@ result = client.two_fa.configure_domain(
 
 ```ruby
 sessions = client.sessions.info(org_id: 1234567)
-puts "Сессии завершаются через #{sessions.authTTL} секунд"
+puts "Сессии завершаются через #{sessions.auth_ttl} секунд"
 ```
 
 #### Задать время жизни cookie сессий
@@ -987,7 +1033,7 @@ client.sessions.logout(org_id: 1234567, user_id: 987654321)
 ```ruby
 policy = client.passwords.info(org_id: 1234567)
 puts "Пользователи могут менять пароль: #{policy.enabled}"
-puts "Срок действия пароля: #{policy.changeFrequency} дней"
+puts "Срок действия пароля: #{policy.change_frequency} дней"
 
 # Каждое поле можно передавать отдельно.
 client.passwords.update(org_id: 1234567, change_frequency: 90)
@@ -1006,11 +1052,11 @@ client.passwords.update(org_id: 1234567, enabled: false)
 events = client.audit.mail(org_id: 1234567, page_size: 100)
 
 events.each do |event|
-  puts "#{event.date} #{event.eventType} от #{event.userLogin}"
+  puts "#{event.date} #{event.event_type} от #{event.user_login}"
 end
 
 # События Диска
-client.audit.disk(org_id: 1234567).each {|event| puts "#{event.eventType} #{event.path}" }
+client.audit.disk(org_id: 1234567).each {|event| puts "#{event.event_type} #{event.path}" }
 ```
 
 Фильтры передаются в snake_case и преобразуются в camelCase, как того требует API:

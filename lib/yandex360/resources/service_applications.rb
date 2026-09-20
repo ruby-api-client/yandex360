@@ -27,12 +27,12 @@ module Yandex360
 
     def activate(org_id:)
       validate_required_params({org_id: org_id}, [:org_id])
-      Object.new post("/security/v1/org/#{org_id}/service_applications/activate", body: {}).body
+      Response.new post("/security/v1/org/#{org_id}/service_applications/activate", body: {}).body
     end
 
     def deactivate(org_id:)
       validate_required_params({org_id: org_id}, [:org_id])
-      Object.new post("/security/v1/org/#{org_id}/service_applications/deactivate", body: {}).body
+      Response.new post("/security/v1/org/#{org_id}/service_applications/deactivate", body: {}).body
     end
   end
 end

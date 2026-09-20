@@ -96,7 +96,7 @@ RSpec.describe Yandex360::DomainPoliciesResource do
       end
 
       expect(client_for(stubs).domain_policies.set(org_id: org_id, rules: mock_policy_rules))
-        .to be_a(Yandex360::Object)
+        .to be_a(Yandex360::Response)
     end
 
     it "requires rules" do

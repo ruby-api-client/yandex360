@@ -124,7 +124,7 @@ RSpec.describe "#groups.add_user" do
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
       resp = client.groups.add_user(org_id: org_id, group_id: "19", user_id: user_id, type: "user")
 
-      expect(resp).to be_an Yandex360::Group
+      expect(resp).to be_a Yandex360::Response
       expect(resp.added).to be true
       expect(resp.id).to eq user_id
       expect(resp.type).to eq "user"

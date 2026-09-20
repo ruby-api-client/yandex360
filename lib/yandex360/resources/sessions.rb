@@ -20,7 +20,7 @@ module Yandex360
     # Signs the user out everywhere. The endpoint takes no body.
     def logout(org_id:, user_id:)
       validate_required_params({org_id: org_id, user_id: user_id}, %i[org_id user_id])
-      Object.new put("/security/v1/org/#{org_id}/domain_sessions/users/#{user_id}/logout", body: {}).body
+      Response.new put("/security/v1/org/#{org_id}/domain_sessions/users/#{user_id}/logout", body: {}).body
     end
   end
 end

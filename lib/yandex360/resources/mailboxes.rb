@@ -35,7 +35,7 @@ module Yandex360
 
     def delete_shared(org_id:, resource_id:)
       validate_required_params({org_id: org_id, resource_id: resource_id}, %i[org_id resource_id])
-      Object.new delete_request("/admin/v1/org/#{org_id}/mailboxes/shared/#{resource_id}").body
+      Response.new delete_request("/admin/v1/org/#{org_id}/mailboxes/shared/#{resource_id}").body
     end
 
     def delegated_list(org_id:, page: 1, per_page: 10)
@@ -54,7 +54,7 @@ module Yandex360
 
     def delete_delegated(org_id:, resource_id:)
       validate_required_params({org_id: org_id, resource_id: resource_id}, %i[org_id resource_id])
-      Object.new delete_request("/admin/v1/org/#{org_id}/mailboxes/delegated/#{resource_id}").body
+      Response.new delete_request("/admin/v1/org/#{org_id}/mailboxes/delegated/#{resource_id}").body
     end
 
     # Employees who can reach the given mailbox.

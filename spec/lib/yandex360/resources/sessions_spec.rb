@@ -62,7 +62,7 @@ RSpec.describe Yandex360::SessionsResource do
       end
 
       expect(client_for(stubs).sessions.logout(org_id: org_id, user_id: user_id))
-        .to be_a(Yandex360::Object)
+        .to be_a(Yandex360::Response)
     end
 
     it "requires user_id" do

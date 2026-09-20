@@ -14,7 +14,7 @@ module Yandex360
       validate_required_params({org_id: org_id, user_id: user_id, user_alias: user_alias},
                                %i[org_id user_id user_alias])
       body = {alias: user_alias}
-      User.new post("/directory/v1/org/#{org_id}/users/#{user_id}/aliases", body: body).body
+      Alias.new post("/directory/v1/org/#{org_id}/users/#{user_id}/aliases", body: body).body
     end
 
     def update(org_id:, user_id:, **user_params)
@@ -56,7 +56,7 @@ module Yandex360
     # suppression, and matching it would spread the exception further.
     def delete_2fa_phone(org_id:, user_id:)
       validate_required_params({org_id: org_id, user_id: user_id}, %i[org_id user_id])
-      Object.new delete_request("/directory/v1/org/#{org_id}/users/#{user_id}/2fa").body
+      Response.new delete_request("/directory/v1/org/#{org_id}/users/#{user_id}/2fa").body
     end
 
     # The body is the raw image, not JSON and not multipart, so the content
@@ -66,7 +66,7 @@ module Yandex360
                                %i[org_id user_id image])
       resp = put("/directory/v1/org/#{org_id}/users/#{user_id}/avatar",
                  body: image, headers: {"Content-Type" => content_type})
-      Object.new resp.body
+      Response.new resp.body
     end
 
     # Replaces the contact list. Entries the API generated itself, marked

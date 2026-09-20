@@ -80,7 +80,7 @@ RSpec.describe Yandex360::MailboxesResource do
       stubs.delete("#{base}/shared/#{resource_id}") { mock_response(body: {}) }
 
       expect(client_for(stubs).mailboxes.delete_shared(org_id: org_id, resource_id: resource_id))
-        .to be_a(Yandex360::Object)
+        .to be_a(Yandex360::Response)
     end
   end
 
@@ -108,7 +108,7 @@ RSpec.describe Yandex360::MailboxesResource do
       stubs.delete("#{base}/delegated/#{resource_id}") { mock_response(body: {}) }
 
       expect(client_for(stubs).mailboxes.delete_delegated(org_id: org_id, resource_id: resource_id))
-        .to be_a(Yandex360::Object)
+        .to be_a(Yandex360::Response)
     end
   end
 
