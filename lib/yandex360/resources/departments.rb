@@ -33,7 +33,10 @@ module Yandex360
         orderBy: order_by
       }
       resp = get("/directory/v1/org/#{org_id}/departments", params: params)
-      Collection.from_response(resp, key: "departments", type: Department)
+      Collection.from_response(resp, key: "departments", type: Department) do |next_page|
+        list(org_id: org_id, page: next_page, per_page: per_page,
+             parent_id: parent_id, order_by: order_by)
+      end
     end
 
     # parent_id:, name:, description: "", external_id: "", head_id: 0, label: ""

@@ -33,7 +33,9 @@ module Yandex360
       validate_required_params({org_id: org_id}, [:org_id])
       params = {page: page, perPage: per_page}
       resp = get("/directory/v1/org/#{org_id}/users", params: params)
-      Collection.from_response(resp, key: "users", type: User)
+      Collection.from_response(resp, key: "users", type: User) do |next_page|
+        list(org_id: org_id, page: next_page, per_page: per_page)
+      end
     end
 
     # rubocop:disable Naming/MethodName
