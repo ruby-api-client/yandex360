@@ -25,6 +25,7 @@ module Yandex360
   class DnsRecord < Object; end
   class AuditEvent < Object; end
 
+  class User2FA < Object; end
   class DomainSession < Object; end
   class Mailbox < Object; end
   class MailboxResource < Object; end

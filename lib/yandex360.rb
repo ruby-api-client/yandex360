@@ -40,6 +40,7 @@ module Yandex360
 
   autoload :UsersResource, "yandex360/resources/users"
   autoload :User, "yandex360/objects/types"
+  autoload :User2FA, "yandex360/objects/types"
 
   autoload :OrganizationsResource, "yandex360/resources/organizations"
   autoload :Organization, "yandex360/objects/types"

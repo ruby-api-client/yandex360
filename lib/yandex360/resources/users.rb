@@ -39,8 +39,7 @@ module Yandex360
     # rubocop:disable Naming/MethodName
     def get2FA(org_id:, user_id:)
       validate_required_params({org_id: org_id, user_id: user_id}, %i[org_id user_id])
-      # TODO: add User2FA.new type
-      Object.new get("/directory/v1/org/#{org_id}/users/#{user_id}/2fa").body
+      User2FA.new get("/directory/v1/org/#{org_id}/users/#{user_id}/2fa").body
     end
 
     def has2FA?(org_id:, user_id:)

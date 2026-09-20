@@ -157,7 +157,7 @@ RSpec.describe "#users.get2FA" do
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
       resp = client.users.get2FA(org_id: org_id, user_id: user_id)
 
-      expect(resp).to be_an(Yandex360::Object)
+      expect(resp).to be_a(Yandex360::User2FA)
       expect(resp.id).to eq("1130000018743049")
       expect(resp.has2fa).to be(true).or be(false)
     end
