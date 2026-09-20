@@ -41,9 +41,27 @@ jobs:
 
       - name: Validate code examples in README
         run: |
-          echo "Extracting and testing Ruby code examples from README..."
-          # Extract Ruby code blocks and test basic syntax
-          grep -A 20 '```ruby' README.md | grep -v '```' | ruby -c
+          echo "Checking the syntax of Ruby examples in the READMEs..."
+          # Each fenced block is checked on its own. Concatenating them, or
+          # grepping a fixed number of lines after each fence, mixes unrelated
+          # snippets and surrounding prose into a single invalid program.
+          dir="$(mktemp -d)"
+          for md in README.md README.ru.md; do
+            awk -v d="$dir" -v p="$(basename "$md" .md)" '
+              /^```ruby$/ { n++; inblock = 1; next }
+              /^```/      { inblock = 0; next }
+              inblock     { print > (d "/" p "_" n ".rb") }
+            ' "$md"
+          done
+          status=0
+          for block in "$dir"/*.rb; do
+            if ! ruby -c "$block" > /dev/null; then
+              echo "::error::Syntax error in $(basename "$block")"
+              status=1
+            fi
+          done
+          echo "Checked $(ls -1 "$dir" | wc -l) block(s)."
+          exit $status
 
   update-changelog:
     name: Update Changelog
