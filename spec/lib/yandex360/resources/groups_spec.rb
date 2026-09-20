@@ -42,21 +42,51 @@ RSpec.describe "#groups.update" do
   end
 end
 
-RSpec.describe "#groups.params" do
+RSpec.describe "#groups.info" do
   let(:org_id) { "1234567" }
   let(:group_id) { "19" }
 
-  context "with params" do
-    it "gets group params successfully" do
-      stubs = Faraday::Adapter::Test::Stubs.new
-      stubs.get("/directory/v1/org/#{org_id}/groups/#{group_id}") do |_env|
-        mock_response(body: mock_group_info)
-      end
+  def client_for(stubs)
+    Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
+  end
 
-      client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
-      resp = client.groups.params(org_id: org_id, group_id: group_id)
+  def stubs_for_group
+    stubs = Faraday::Adapter::Test::Stubs.new
+    stubs.get("/directory/v1/org/#{org_id}/groups/#{group_id}") do |_env|
+      mock_response(body: mock_group_info)
+    end
+    stubs
+  end
+
+  it "reads one group" do
+    resp = client_for(stubs_for_group).groups.info(org_id: org_id, group_id: group_id)
+
+    expect(resp).to be_an Yandex360::Group
+  end
+
+  it "requires group_id" do
+    client = client_for(Faraday::Adapter::Test::Stubs.new)
+
+    expect { client.groups.info(org_id: org_id, group_id: nil) }
+      .to raise_error(ArgumentError, /group_id/)
+  end
+
+  describe "the deprecated #params alias" do
+    it "still returns the group" do
+      client = client_for(stubs_for_group)
+
+      resp = nil
+      expect { resp = client.groups.params(org_id: org_id, group_id: group_id) }
+        .to output(/deprecated/).to_stderr
 
       expect(resp).to be_an Yandex360::Group
+    end
+
+    it "names the replacement in the warning" do
+      client = client_for(stubs_for_group)
+
+      expect { client.groups.params(org_id: org_id, group_id: group_id) }
+        .to output(/use groups\.info/).to_stderr
     end
   end
 end

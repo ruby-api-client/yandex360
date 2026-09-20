@@ -7,78 +7,21 @@ begin
 rescue LoadError
   nil
 end
+
+# Base classes first: types subclass Object, resources subclass Resource.
 require "yandex360/version"
+require "yandex360/error"
+require "yandex360/object"
+require "yandex360/collection"
+require "yandex360/param_builder"
+require "yandex360/resource"
+require "yandex360/objects/types"
+require "yandex360/client"
 
-module Yandex360
-  autoload :Client, "yandex360/client"
-  autoload :Object, "yandex360/object"
-  autoload :Resource, "yandex360/resource"
-  autoload :Collection, "yandex360/collection"
-  autoload :ParamBuilder, "yandex360/param_builder"
-  autoload :Error, "yandex360/error"
-  autoload :AuthenticationError, "yandex360/error"
-  autoload :AuthorizationError, "yandex360/error"
-  autoload :NotFoundError, "yandex360/error"
-  autoload :ValidationError, "yandex360/error"
-  autoload :RateLimitError, "yandex360/error"
-  autoload :ServerError, "yandex360/error"
-
-  autoload :AntispamResource, "yandex360/resources/antispam"
-  autoload :AllowList, "yandex360/objects/types"
-
-  autoload :DepartmentsResource, "yandex360/resources/departments"
-  autoload :Department, "yandex360/objects/types"
-  autoload :Departments, "yandex360/objects/types"
-  autoload :DepartmentList, "yandex360/objects/types"
-  autoload :DepartmentAlias, "yandex360/objects/types"
-  autoload :DeletedDepartment, "yandex360/objects/types"
-  autoload :DeletedDepartmentAlias, "yandex360/objects/types"
-
-  autoload :GroupsResource, "yandex360/resources/groups"
-  autoload :Group, "yandex360/objects/types"
-  autoload :GroupList, "yandex360/objects/types"
-
-  autoload :UsersResource, "yandex360/resources/users"
-  autoload :User, "yandex360/objects/types"
-  autoload :User2FA, "yandex360/objects/types"
-
-  autoload :OrganizationsResource, "yandex360/resources/organizations"
-  autoload :Organization, "yandex360/objects/types"
-
-  autoload :DomainsResource, "yandex360/resources/domains"
-  autoload :Domain, "yandex360/objects/types"
-
-  autoload :DnsResource, "yandex360/resources/dns"
-  autoload :DnsRecord, "yandex360/objects/types"
-
-  autoload :TwoFaResource, "yandex360/resources/two_fa"
-
-  autoload :AuditResource, "yandex360/resources/audit"
-  autoload :AuditEvent, "yandex360/objects/types"
-
-  autoload :PostSettingsResource, "yandex360/resources/post_settings"
-
-  autoload :SessionsResource, "yandex360/resources/sessions"
-  autoload :DomainSession, "yandex360/objects/types"
-
-  autoload :PasswordsResource, "yandex360/resources/passwords"
-  autoload :DomainPassword, "yandex360/objects/types"
-
-  autoload :DomainPoliciesResource, "yandex360/resources/domain_policies"
-  autoload :DomainPolicy, "yandex360/objects/types"
-
-  autoload :RoutingResource, "yandex360/resources/routing"
-  autoload :RoutingRules, "yandex360/objects/types"
-
-  autoload :ServiceApplicationsResource, "yandex360/resources/service_applications"
-  autoload :ServiceApplication, "yandex360/objects/types"
-
-  autoload :ExternalContactsResource, "yandex360/resources/external_contacts"
-  autoload :ExternalContact, "yandex360/objects/types"
-
-  autoload :MailboxesResource, "yandex360/resources/mailboxes"
-  autoload :Mailbox, "yandex360/objects/types"
-  autoload :MailboxResource, "yandex360/objects/types"
-  autoload :MailboxActor, "yandex360/objects/types"
-  autoload :MailboxTask, "yandex360/objects/types"
+# Resources are loaded by directory rather than listed. The list they replace
+# had to be edited by hand for every new resource, and forgetting an entry
+# raises NameError for the caller at runtime, which the suite only catches if
+# some spec happens to touch that constant.
+Dir[File.join(__dir__, "yandex360", "resources", "*.rb")].sort.each do |resource|
+  require resource
 end
