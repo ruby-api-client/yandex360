@@ -1,4 +1,97 @@
-## 🧹 Maintenance
+# Changelog
+
+Notable changes to this gem. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
+follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## [2.0.0] - 2026-09-20
+
+Versions 1.1.5 through 1.7.0 exist in the commit history but were never
+published, so this release covers everything since 1.1.4.
+
+### Breaking
+
+- `audit.list` and `audit.export` are gone. The resource pointed at
+  `/audit/v1/org/{orgId}/events`, which is not part of the API; the audit log
+  is two endpoints, `/security/v1/org/{orgId}/audit_log/mail` and
+  `.../audit_log/disk`, paging by token rather than page number. Use
+  `audit.mail` and `audit.disk`. (#167)
+- A 503 response now raises `Yandex360::ServerError` rather than
+  `Yandex360::RateLimitError`. Code rescuing `RateLimitError` to catch a 503
+  must rescue `ServerError`. 429 still raises `RateLimitError`. (#160)
+- `required_ruby_version` is now `>= 3.3`, matching what CI tests. It
+  previously claimed `>= 2.6`, which could not have worked: faraday 2 requires
+  Ruby 3.0. Existing installs are unaffected, since RubyGems keeps serving
+  older releases to older Rubies. (#163)
+- Passing a keyword that collides with a field a method fills in itself now
+  raises `ArgumentError`. Previously one of the two values was silently
+  dropped, and it was the declared one. (#168)
+
+### Added
+
+- Timeouts, defaulting to 5s to connect and 30s overall, and retries on 429
+  and 5xx plus connection and timeout errors. Retries apply only to idempotent
+  verbs, so a POST is never replayed. Both are configurable. (#160)
+- Pagination on `Collection`: `page`, `pages`, `per_page`, `total`,
+  `last_page?`, `next_page`, `each_page` and `auto_paginate`. `auto_paginate`
+  is lazy, and the arguments of the original call carry into later pages.
+  (#166, #167)
+- Seven services that had no resource: `sessions`, `mailboxes`, `passwords`,
+  `domain_policies`, `routing`, `service_applications` and `external_contacts`.
+  All seventeen services in the API reference are now covered. (#161, #164,
+  #165)
+- The four remaining `UserService` operations: `delete_2fa_phone`,
+  `update_avatar`, `update_contacts` and `delete_contacts`. (#168)
+- `Resource#post` accepts query parameters alongside a body. (#161)
+
+### Fixed
+
+- `Collection#first` and `#last` raised `NameError` unconditionally, with or
+  without an argument, because both referenced an undefined local instead of
+  their parameter. Nine list methods return a `Collection`, so
+  `client.users.list(org_id:).first` failed for every resource. (#159)
+- `ostruct` is declared as a runtime dependency. It is required at runtime but
+  was listed under development, so nothing guaranteed it for consumers. Ruby
+  3.5 demotes it from a default gem, at which point the omission becomes a
+  `LoadError`. (#159)
+- `Collection#items` read a field the API never returns and so reported zero
+  against the real service. It now falls back to the number of records on the
+  page. (#166)
+- The client built its connection on first use, which races when the client is
+  shared across threads. It is built in the constructor. (#160)
+- `users.get2FA` returns a `User2FA` rather than a bare `Object`. (#163)
+
+### Changed
+
+- The gem no longer packages the repository's own infrastructure. `s.files`
+  was `git ls-files` minus `spec/`, so every release shipped `.github/` with
+  all six workflows, `.gitignore`, `.rubocop.yml`, `Gemfile`, `Gemfile.lock`
+  and the `Rakefile`. (#163)
+- Both READMEs are reorganised: resources grouped by area, pagination and
+  error handling moved ahead of the catalogue, configuration given its own
+  section, and the API reference generated from the source so it cannot drift.
+  (#170)
+
+### Internal
+
+- CI was failing on every pull request. The lockfile carried a high severity
+  faraday advisory and a json one, Ruby 3.1 was past end of life and broke the
+  weekly dependency job, and every action is now pinned to an exact version.
+  (#158, #162)
+- Releases publish to RubyGems through trusted publishing. There is no stored
+  API key, nothing to rotate, and the account's MFA requirement no longer
+  stands in the way of an automated release. (#171, #172)
+- Tests went from 47 to 149, line coverage from 88.94% to 94.38%.
+
+## Earlier versions
+
+Up to and including 1.1.4 this file was generated from merged pull requests
+and is kept below unchanged. Release notes for those versions are also on the
+[releases page](https://github.com/ruby-api-client/yandex360/releases).
+
+### 🧹 Maintenance
 
 - build(deps): update faraday requirement from ~> 1.7 to >= 1.7, < 3.0 by @dependabot[bot] in #8
 - build(deps-dev): update simplecov-lcov requirement from ~> 0.7.0 to ~> 0.8.0 by @dependabot[bot] in #5
@@ -113,3 +206,5 @@
 - build(deps): bump ruby/setup-ruby from 1.316.0 to 1.319.0 by @dependabot[bot] in #149
 - build(deps): bump github/codeql-action from 4 to 4.37.4 by @dependabot[bot] in #152
 
+[Unreleased]: https://github.com/ruby-api-client/yandex360/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/ruby-api-client/yandex360/compare/v1.1.4...v2.0.0

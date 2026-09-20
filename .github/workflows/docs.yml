@@ -63,29 +63,33 @@ jobs:
           echo "Checked $(ls -1 "$dir" | wc -l) block(s)."
           exit $status
 
-  update-changelog:
-    name: Update Changelog
+  # CHANGELOG.md is written by hand. The job that used to regenerate it on
+  # every push rebuilt the whole file from merged pull requests, so it could
+  # only ever produce a flat list of titles, never a record of what actually
+  # breaks for a user. It also ran on branch pushes rather than releases, which
+  # is why 2.0.0 came and went without leaving a trace in it.
+  #
+  # The release notes on GitHub are still generated from pull requests, which
+  # is the right job for that tool.
+
+  changelog-updated:
+    name: Changelog Updated
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Generate changelog
-        uses: mikepenz/release-changelog-builder-action@v6.3.0
-        with:
-          configuration: ".github/changelog_config.json"
-          outputFile: "CHANGELOG.md"
-          fromTag: ""
-          toTag: "HEAD"
-
-      - name: Commit changelog
+      # A reminder, not a gate: plenty of changes under lib/ are refactors that
+      # no user needs to read about.
+      - name: Check whether CHANGELOG.md was touched
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add CHANGELOG.md
-          git diff --staged --quiet || git commit -m "docs: update changelog"
-          git push
+          base="origin/${{ github.base_ref }}"
+          git fetch --quiet origin "${{ github.base_ref }}"
+          if git diff --name-only "$base"...HEAD | grep -qx "CHANGELOG.md"; then
+            echo "CHANGELOG.md is part of this change."
+          else
+            echo "::warning::lib/ changed but CHANGELOG.md did not. Add an entry under Unreleased if this is visible to users."
+          fi
