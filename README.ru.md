@@ -32,6 +32,9 @@
   - [Почтовые ящики](#почтовые-ящики)
   - [Парольная политика](#парольная-политика)
   - [Политики домена](#политики-домена)
+  - [Маршрутизация почты](#маршрутизация-почты)
+  - [Сервисные приложения](#сервисные-приложения)
+  - [Внешние контакты](#внешние-контакты)
 - [Обработка ошибок](#обработка-ошибок)
 - [Разработка](#разработка)
 - [Вклад в проект](#вклад-в-проект)
@@ -842,6 +845,87 @@ client.domain_policies.set(
     }
   ]
 )
+```
+
+---
+
+### Маршрутизация почты
+
+```ruby
+routing = client.routing.list(org_id: 1234567)
+routing.rules.each {|rule| puts "#{rule.scope.direction}: #{rule.actions.first.action}" }
+
+# set заменяет весь набор правил, как и domain_policies.set.
+client.routing.set(
+  org_id: 1234567,
+  rules: [
+    {
+      terminal: true,
+      scope: {direction: "inbound"},
+      condition: {field: "from", operator: "matches", value: "*@spam.example"},
+      actions: [{action: "drop"}]
+    }
+  ]
+)
+```
+
+---
+
+### Сервисные приложения
+
+```ruby
+apps = client.service_applications.list(org_id: 1234567)
+apps.each {|app| puts "#{app.id}: #{app.scopes.join(', ')}" }
+
+# create заменяет сохранённый список, а не дополняет его.
+client.service_applications.create(
+  org_id: 1234567,
+  applications: [{id: "app-1", scopes: ["ya360_security:domain_passwords_read"]}]
+)
+
+client.service_applications.activate(org_id: 1234567)
+client.service_applications.deactivate(org_id: 1234567)
+
+# Удаления по одному нет: это очищает весь список.
+client.service_applications.delete(org_id: 1234567)
+```
+
+---
+
+### Внешние контакты
+
+```ruby
+contacts = client.external_contacts.list(org_id: 1234567, page: 1, per_page: 50)
+contacts.each {|contact| puts "#{contact.firstName} #{contact.lastName}" }
+
+# Нужен хотя бы один адрес.
+created = client.external_contacts.create(
+  org_id: 1234567,
+  first_name: "Ivan",
+  last_name: "Petrov",
+  emails: [{email: "ivan@partner.example", type: "work", main: true}],
+  company: "Partner Ltd"
+)
+
+client.external_contacts.info(org_id: 1234567, contact_id: created.id)
+
+# PATCH: меняются только переданные поля.
+client.external_contacts.update(org_id: 1234567, contact_id: created.id, title: "CTO")
+
+# У адресов и телефонов свои эндпоинты, и каждый вызов заменяет
+# весь список. Ровно один адрес должен иметь main: true.
+client.external_contacts.update_emails(
+  org_id: 1234567,
+  contact_id: created.id,
+  emails: [{email: "ivan@partner.example", main: true}]
+)
+client.external_contacts.update_phones(
+  org_id: 1234567,
+  contact_id: created.id,
+  phones: [{phone: "+70000000000", type: "work", main: true}]
+)
+
+client.external_contacts.delete(org_id: 1234567, contact_id: created.id)
 ```
 
 ---

@@ -92,6 +92,18 @@ module Yandex360
       DomainPoliciesResource.new(self)
     end
 
+    def routing
+      RoutingResource.new(self)
+    end
+
+    def service_applications
+      ServiceApplicationsResource.new(self)
+    end
+
+    def external_contacts
+      ExternalContactsResource.new(self)
+    end
+
     def inspect
       "#<#{self.class.name}:#{object_id} token=***>"
     end

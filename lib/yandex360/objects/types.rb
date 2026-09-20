@@ -29,6 +29,9 @@ module Yandex360
   class DomainSession < Object; end
   class DomainPassword < Object; end
   class DomainPolicy < Object; end
+  class RoutingRules < Object; end
+  class ServiceApplication < Object; end
+  class ExternalContact < Object; end
   class Mailbox < Object; end
   class MailboxResource < Object; end
   class MailboxActor < Object; end
