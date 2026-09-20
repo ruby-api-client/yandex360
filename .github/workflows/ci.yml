@@ -27,9 +27,7 @@ jobs:
         run: bundle exec rubocop --format github
 
       - name: Run security audit
-        run: |
-          gem install bundler-audit
-          bundle audit --update
+        run: bundle exec bundle-audit check --update
 
   test:
     name: Test (Ruby ${{ matrix.ruby }} on ${{ matrix.os }})
@@ -158,7 +156,13 @@ jobs:
     name: Notify Success
     runs-on: ubuntu-latest
     needs: [lint, test, integration]
-    if: always() && (needs.lint.result == 'success' && needs.test.result == 'success' && needs.integration.result == 'success')
+    # integration only runs on pull requests, so on push it reports 'skipped'.
+    # Requiring 'success' from it meant this job never ran on main.
+    if: >-
+      always() &&
+      needs.lint.result == 'success' &&
+      needs.test.result == 'success' &&
+      (needs.integration.result == 'success' || needs.integration.result == 'skipped')
     steps:
       - name: Success notification
         run: echo "✅ All CI checks passed successfully!"
