@@ -76,6 +76,14 @@ module Yandex360
       PostSettingsResource.new(self)
     end
 
+    def sessions
+      SessionsResource.new(self)
+    end
+
+    def mailboxes
+      MailboxesResource.new(self)
+    end
+
     def inspect
       "#<#{self.class.name}:#{object_id} token=***>"
     end

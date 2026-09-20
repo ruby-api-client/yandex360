@@ -56,4 +56,13 @@ module Yandex360
   autoload :AuditEvent, "yandex360/objects/types"
 
   autoload :PostSettingsResource, "yandex360/resources/post_settings"
+
+  autoload :SessionsResource, "yandex360/resources/sessions"
+  autoload :DomainSession, "yandex360/objects/types"
+
+  autoload :MailboxesResource, "yandex360/resources/mailboxes"
+  autoload :Mailbox, "yandex360/objects/types"
+  autoload :MailboxResource, "yandex360/objects/types"
+  autoload :MailboxActor, "yandex360/objects/types"
+  autoload :MailboxTask, "yandex360/objects/types"
 end

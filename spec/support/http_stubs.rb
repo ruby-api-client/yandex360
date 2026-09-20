@@ -332,6 +332,64 @@ module PostSettingsStubs
   end
 end
 
+module SessionStubs
+  def mock_domain_session
+    {"authTTL" => 86_400}
+  end
+end
+
+module MailboxStubs
+  def mock_shared_mailboxes_list
+    {
+      "resources" => [
+        {"resourceId" => "1130000000000001", "count" => 3}
+      ],
+      "page" => 1,
+      "perPage" => 10,
+      "total" => 1
+    }
+  end
+
+  def mock_shared_mailbox
+    {
+      "id" => "1130000000000001",
+      "email" => "support@example.com",
+      "name" => "Support",
+      "description" => "Shared support mailbox",
+      "createdAt" => "2026-01-01T00:00:00Z",
+      "updatedAt" => "2026-01-02T00:00:00Z"
+    }
+  end
+
+  def mock_mailbox_resource_id
+    {"resourceId" => "1130000000000001"}
+  end
+
+  def mock_mailbox_actors
+    {
+      "actors" => [
+        {"actorId" => "1130000000000009", "roles" => %w[shared_mailbox_reader shared_mailbox_sender]}
+      ]
+    }
+  end
+
+  def mock_mailbox_resources
+    {
+      "resources" => [
+        {"resourceId" => "1130000000000001", "type" => "shared", "roles" => ["shared_mailbox_owner"]}
+      ]
+    }
+  end
+
+  def mock_mailbox_task
+    {"taskId" => "task-42"}
+  end
+
+  def mock_mailbox_task_status
+    {"status" => "complete"}
+  end
+end
+
 module HttpStubs
   def stub_client
     @stubs ||= Faraday::Adapter::Test::Stubs.new
@@ -364,4 +422,6 @@ module HttpStubs
   include TwoFaStubs
   include AuditStubs
   include PostSettingsStubs
+  include SessionStubs
+  include MailboxStubs
 end
