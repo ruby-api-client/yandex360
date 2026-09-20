@@ -16,30 +16,21 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Authentication](#authentication)
-- [Getting Started](#getting-started)
-- [Usage Guide](#usage-guide)
-  - [Organizations](#organizations)
-  - [Users](#users)
-  - [Departments](#departments)
-  - [Groups](#groups)
-  - [Domains](#domains)
-  - [DNS Records](#dns-records)
-  - [Two-Factor Authentication](#two-factor-authentication-2fa)
-  - [Audit Logs](#audit-logs)
-  - [Post Settings](#post-settings)
-  - [Antispam](#antispam)
-  - [User Sessions](#user-sessions)
-  - [Mailboxes](#mailboxes)
-  - [Password Policy](#password-policy)
-  - [Domain Policies](#domain-policies)
-  - [Mail Routing](#mail-routing)
-  - [Service Applications](#service-applications)
-  - [External Contacts](#external-contacts)
-  - [Pagination](#pagination)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Pagination](#pagination)
 - [Error Handling](#error-handling)
+- [Resources](#resources)
+  - **Directory**: [Organizations](#organizations), [Users](#users), [Departments](#departments), [Groups](#groups), [External Contacts](#external-contacts)
+  - **Domains**: [Domains](#domains), [DNS Records](#dns-records)
+  - **Mail**: [Post Settings](#post-settings), [Mailboxes](#mailboxes), [Mail Routing](#mail-routing), [Domain Policies](#domain-policies), [Antispam](#antispam)
+  - **Security**: [Two-Factor Authentication (2FA)](#two-factor-authentication-2fa), [User Sessions](#user-sessions), [Password Policy](#password-policy), [Audit Logs](#audit-logs), [Service Applications](#service-applications)
+- [API Reference](#api-reference)
 - [Development](#development)
 - [Contributing](#contributing)
 - [License](#license)
+- [Links](#links)
+- [Support](#support)
 
 ## Features
 
@@ -63,7 +54,7 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
 Add this line to your application's `Gemfile`:
 
 ```ruby
-gem 'yandex360', '~> 1.1', '>= 1.1.4'
+gem 'yandex360', '~> 2.0'
 ```
 
 Then execute:
@@ -88,24 +79,13 @@ To use the Yandex 360 API, you need an OAuth token. You can obtain this token by
 
 For more information, visit the [Yandex 360 API Documentation](https://yandex.ru/dev/api360/doc/concepts/access.html).
 
-## Getting Started
+## Quick Start
 
 ```ruby
 require "yandex360"
 
 # Initialize the client with your OAuth token
 client = Yandex360::Client.new(token: "your_access_token_here")
-
-# Timeouts and retries have defaults and can be tuned. Retries cover 429 and
-# 5xx responses plus connection and timeout errors, and apply only to
-# idempotent verbs, so a POST is never replayed.
-client = Yandex360::Client.new(
-  token: "your_access_token_here",
-  open_timeout: 5,   # seconds to establish the connection
-  timeout: 30,       # seconds for the whole response
-  max_retries: 2,    # attempts on top of the initial request
-  retry_interval: 0.5 # seconds before the first retry, doubling after that
-)
 
 # List all organizations
 organizations = client.organizations.list
@@ -132,7 +112,130 @@ two_fa_status = client.two_fa.status(org_id: 1234567, user_id: 987654321)
 puts "2FA enabled: #{two_fa_status.enabled}"
 ```
 
-## Usage Guide
+## Configuration
+
+The client works with the token alone. Everything below has a default and is
+worth changing only when you have a reason to.
+
+```ruby
+client = Yandex360::Client.new(
+  token: "your_access_token_here",
+  open_timeout: 5,     # seconds to establish the connection
+  timeout: 30,         # seconds for the whole response
+  max_retries: 2,      # attempts on top of the initial request
+  retry_interval: 0.5  # seconds before the first retry, doubling after that
+)
+```
+
+Timeouts matter under a threaded web server: without them a hung call to the
+API holds its thread indefinitely, which shows up as the whole application
+degrading rather than one endpoint failing.
+
+Retries cover 429 and 5xx responses along with connection and timeout errors.
+They apply only to idempotent verbs, so a POST is never replayed and a retry
+cannot create a second user. When the retries run out you still get the typed
+error, not a Faraday one.
+
+The client builds its connection in the constructor and is safe to share
+between threads.
+
+## Pagination
+
+Every list endpoint returns one page. The collection carries the pagination
+metadata and can fetch the rest on demand.
+
+```ruby
+users = client.users.list(org_id: 1234567, per_page: 100)
+
+users.page      # current page
+users.pages     # total pages
+users.per_page  # page size
+users.total     # total records
+users.last_page?
+```
+
+Walk page by page when you want to act on each batch:
+
+```ruby
+users.each_page do |page|
+  puts "Page #{page.page} of #{page.pages}: #{page.size} users"
+end
+```
+
+Or iterate every record and let the pages be fetched as they are needed:
+
+```ruby
+users.auto_paginate.each {|user| puts user.nickname }
+
+# Lazy, so this stops after the second page rather than fetching all of them.
+first_fifty = client.users.list(org_id: 1234567, per_page: 25).auto_paginate.first(50)
+```
+
+Both are available on `users`, `groups`, `departments`, `external_contacts`
+and the two mailbox lists. Arguments given to the original call, such as
+`per_page` or a department's `parent_id`, are carried into the following pages.
+
+## Error Handling
+
+The gem provides specific exception classes for different error scenarios:
+
+```ruby
+begin
+  user = client.users.info(org_id: 1234567, user_id: 999999)
+rescue Yandex360::AuthenticationError => e
+  puts "Authentication failed: #{e.message}"
+rescue Yandex360::AuthorizationError => e
+  puts "Access denied: #{e.message}"
+rescue Yandex360::NotFoundError => e
+  puts "Resource not found: #{e.message}"
+rescue Yandex360::ValidationError => e
+  puts "Invalid parameters: #{e.message}"
+rescue Yandex360::RateLimitError => e
+  puts "Rate limit exceeded: #{e.message}"
+rescue Yandex360::ServerError => e
+  puts "Server error: #{e.message}"
+rescue Yandex360::Error => e
+  puts "API error: #{e.message}"
+end
+```
+
+### Exception Types
+
+- `Yandex360::Error` - Base exception class
+- `Yandex360::AuthenticationError` - Invalid or missing token (401)
+- `Yandex360::AuthorizationError` - Insufficient permissions (403)
+- `Yandex360::NotFoundError` - Resource not found (404)
+- `Yandex360::ValidationError` - Invalid request parameters (400)
+- `Yandex360::RateLimitError` - API rate limit exceeded (429)
+- `Yandex360::ServerError` - Server-side error (5xx)
+
+---
+
+## Resources
+
+Every resource hangs off the client and is grouped below by the part of
+Yandex 360 it belongs to. All seventeen services in the API reference are
+covered.
+
+| Area | Accessor | Section |
+|---|---|---|
+| Directory | `client.organizations` | [Organizations](#organizations) |
+|  | `client.users` | [Users](#users) |
+|  | `client.departments` | [Departments](#departments) |
+|  | `client.groups` | [Groups](#groups) |
+|  | `client.external_contacts` | [External Contacts](#external-contacts) |
+| Domains | `client.domains` | [Domains](#domains) |
+|  | `client.dns` | [DNS Records](#dns-records) |
+| Mail | `client.post_settings` | [Post Settings](#post-settings) |
+|  | `client.mailboxes` | [Mailboxes](#mailboxes) |
+|  | `client.routing` | [Mail Routing](#mail-routing) |
+|  | `client.domain_policies` | [Domain Policies](#domain-policies) |
+|  | `client.antispam` | [Antispam](#antispam) |
+| Security | `client.two_fa` | [Two-Factor Authentication (2FA)](#two-factor-authentication-2fa) |
+|  | `client.sessions` | [User Sessions](#user-sessions) |
+|  | `client.passwords` | [Password Policy](#password-policy) |
+|  | `client.audit` | [Audit Logs](#audit-logs) |
+|  | `client.service_applications` | [Service Applications](#service-applications) |
 
 ### Organizations
 
@@ -445,6 +548,44 @@ client.groups.delete(org_id: 1234567, group_id: 789)
 
 ---
 
+### External Contacts
+
+```ruby
+contacts = client.external_contacts.list(org_id: 1234567, page: 1, per_page: 50)
+contacts.each {|contact| puts "#{contact.firstName} #{contact.lastName}" }
+
+# At least one email is required.
+created = client.external_contacts.create(
+  org_id: 1234567,
+  first_name: "Ivan",
+  last_name: "Petrov",
+  emails: [{email: "ivan@partner.example", type: "work", main: true}],
+  company: "Partner Ltd"
+)
+
+client.external_contacts.info(org_id: 1234567, contact_id: created.id)
+
+# PATCH: only the fields given are touched.
+client.external_contacts.update(org_id: 1234567, contact_id: created.id, title: "CTO")
+
+# Emails and phones have their own endpoints, and each call replaces the
+# whole list. Exactly one email must carry main: true.
+client.external_contacts.update_emails(
+  org_id: 1234567,
+  contact_id: created.id,
+  emails: [{email: "ivan@partner.example", main: true}]
+)
+client.external_contacts.update_phones(
+  org_id: 1234567,
+  contact_id: created.id,
+  phones: [{phone: "+70000000000", type: "work", main: true}]
+)
+
+client.external_contacts.delete(org_id: 1234567, contact_id: created.id)
+```
+
+---
+
 ### Domains
 
 Manage organization domains and verify ownership.
@@ -569,103 +710,6 @@ client.dns.delete(
 
 ---
 
-### Two-Factor Authentication (2FA)
-
-Manage two-factor authentication settings for users and the entire domain.
-
-#### Enable 2FA for a user
-
-```ruby
-result = client.two_fa.enable(org_id: 1234567, user_id: 987654321)
-puts "2FA enabled successfully"
-```
-
-#### Disable 2FA for a user
-
-```ruby
-result = client.two_fa.disable(org_id: 1234567, user_id: 987654321)
-puts "2FA disabled successfully"
-```
-
-#### Check user 2FA status
-
-```ruby
-status = client.two_fa.status(org_id: 1234567, user_id: 987654321)
-puts "2FA enabled: #{status.enabled}"
-puts "Has TOTP: #{status.has_totp}"
-```
-
-#### Get domain-wide 2FA status
-
-```ruby
-domain_status = client.two_fa.domain_status(org_id: 1234567)
-puts "Domain 2FA enabled: #{domain_status.enabled}"
-```
-
-#### Configure domain-wide 2FA
-
-```ruby
-# Enable 2FA for entire domain
-result = client.two_fa.configure_domain(
-  org_id: 1234567,
-  enabled: true
-)
-
-# Disable 2FA for entire domain
-result = client.two_fa.configure_domain(
-  org_id: 1234567,
-  enabled: false
-)
-```
-
----
-
-### Audit Logs
-
-Mail and Disk keep separate audit logs, and they are separate endpoints. Both
-page by an opaque token rather than a page number, so there is no `page`
-argument here.
-
-```ruby
-# Mail events
-events = client.audit.mail(org_id: 1234567, page_size: 100)
-
-events.each do |event|
-  puts "#{event.date} #{event.eventType} by #{event.userLogin}"
-end
-
-# Disk events
-client.audit.disk(org_id: 1234567).each {|event| puts "#{event.eventType} #{event.path}" }
-```
-
-Filters are passed as keywords in snake_case and converted to the camelCase
-the API documents:
-
-```ruby
-client.audit.mail(
-  org_id: 1234567,
-  page_size: 100,
-  after_date: "2026-01-01T00:00:00Z",
-  before_date: "2026-02-01T00:00:00Z",
-  include_uids: [987654321],
-  types: ["message_receive", "mailbox_send"]
-)
-```
-
-Pagination works as it does elsewhere, following the token the API returns:
-
-```ruby
-client.audit.mail(org_id: 1234567).each_page do |page|
-  puts "#{page.size} events, more to come: #{!page.last_page?}"
-end
-
-client.audit.disk(org_id: 1234567).auto_paginate.each {|event| puts event.path }
-```
-
-`page_size` is capped at 100 by the API and defaults to that.
-
----
-
 ### Post Settings
 
 Manage email settings for users including forwarding rules.
@@ -715,66 +759,6 @@ client.post_settings.delete_forwarding(
   user_id: 987654321,
   address: "forward@example.com"
 )
-```
-
----
-
-### Antispam
-
-Manage IP allowlist for antispam protection.
-
-#### List allowed IPs
-
-```ruby
-allowlist = client.antispam.list(org_id: 1234567)
-puts "Allowed IPs: #{allowlist.allow_list}"
-```
-
-#### Add IPs to allowlist
-
-```ruby
-# Add single IP
-result = client.antispam.create(1234567, "192.0.2.1")
-
-# Add multiple IPs
-result = client.antispam.create(1234567, "192.0.2.1", "192.0.2.2", "192.0.2.3")
-
-# Add IP ranges
-result = client.antispam.create(1234567, "192.0.2.0/24")
-
-puts "Updated allowlist: #{result.allow_list}"
-```
-
-#### Clear allowlist
-
-```ruby
-client.antispam.delete(org_id: 1234567)
-puts "Allowlist cleared"
-```
-
----
-
-### User Sessions
-
-#### Read the session cookie lifetime
-
-```ruby
-sessions = client.sessions.info(org_id: 1234567)
-puts "Sessions expire after #{sessions.authTTL} seconds"
-```
-
-#### Set the session cookie lifetime
-
-```ruby
-# Seconds. Zero means sessions never expire.
-client.sessions.update(org_id: 1234567, auth_ttl: 3600)
-```
-
-#### Sign a user out on all devices
-
-```ruby
-# Useful when an account is compromised.
-client.sessions.logout(org_id: 1234567, user_id: 987654321)
 ```
 
 ---
@@ -833,16 +817,24 @@ puts status.status # running, complete or error
 
 ---
 
-### Password Policy
+### Mail Routing
 
 ```ruby
-policy = client.passwords.info(org_id: 1234567)
-puts "Users may change their password: #{policy.enabled}"
-puts "Password expires after #{policy.changeFrequency} days"
+routing = client.routing.list(org_id: 1234567)
+routing.rules.each {|rule| puts "#{rule.scope.direction}: #{rule.actions.first.action}" }
 
-# Either field may be sent on its own.
-client.passwords.update(org_id: 1234567, change_frequency: 90)
-client.passwords.update(org_id: 1234567, enabled: false)
+# set replaces the entire rule set, like domain_policies.set.
+client.routing.set(
+  org_id: 1234567,
+  rules: [
+    {
+      terminal: true,
+      scope: {direction: "inbound"},
+      condition: {field: "from", operator: "matches", value: "*@spam.example"},
+      actions: [{action: "drop"}]
+    }
+  ]
+)
 ```
 
 ---
@@ -878,25 +870,174 @@ client.domain_policies.set(
 
 ---
 
-### Mail Routing
+### Antispam
+
+Manage IP allowlist for antispam protection.
+
+#### List allowed IPs
 
 ```ruby
-routing = client.routing.list(org_id: 1234567)
-routing.rules.each {|rule| puts "#{rule.scope.direction}: #{rule.actions.first.action}" }
+allowlist = client.antispam.list(org_id: 1234567)
+puts "Allowed IPs: #{allowlist.allow_list}"
+```
 
-# set replaces the entire rule set, like domain_policies.set.
-client.routing.set(
+#### Add IPs to allowlist
+
+```ruby
+# Add single IP
+result = client.antispam.create(1234567, "192.0.2.1")
+
+# Add multiple IPs
+result = client.antispam.create(1234567, "192.0.2.1", "192.0.2.2", "192.0.2.3")
+
+# Add IP ranges
+result = client.antispam.create(1234567, "192.0.2.0/24")
+
+puts "Updated allowlist: #{result.allow_list}"
+```
+
+#### Clear allowlist
+
+```ruby
+client.antispam.delete(org_id: 1234567)
+puts "Allowlist cleared"
+```
+
+---
+
+### Two-Factor Authentication (2FA)
+
+Manage two-factor authentication settings for users and the entire domain.
+
+#### Enable 2FA for a user
+
+```ruby
+result = client.two_fa.enable(org_id: 1234567, user_id: 987654321)
+puts "2FA enabled successfully"
+```
+
+#### Disable 2FA for a user
+
+```ruby
+result = client.two_fa.disable(org_id: 1234567, user_id: 987654321)
+puts "2FA disabled successfully"
+```
+
+#### Check user 2FA status
+
+```ruby
+status = client.two_fa.status(org_id: 1234567, user_id: 987654321)
+puts "2FA enabled: #{status.enabled}"
+puts "Has TOTP: #{status.has_totp}"
+```
+
+#### Get domain-wide 2FA status
+
+```ruby
+domain_status = client.two_fa.domain_status(org_id: 1234567)
+puts "Domain 2FA enabled: #{domain_status.enabled}"
+```
+
+#### Configure domain-wide 2FA
+
+```ruby
+# Enable 2FA for entire domain
+result = client.two_fa.configure_domain(
   org_id: 1234567,
-  rules: [
-    {
-      terminal: true,
-      scope: {direction: "inbound"},
-      condition: {field: "from", operator: "matches", value: "*@spam.example"},
-      actions: [{action: "drop"}]
-    }
-  ]
+  enabled: true
+)
+
+# Disable 2FA for entire domain
+result = client.two_fa.configure_domain(
+  org_id: 1234567,
+  enabled: false
 )
 ```
+
+---
+
+### User Sessions
+
+#### Read the session cookie lifetime
+
+```ruby
+sessions = client.sessions.info(org_id: 1234567)
+puts "Sessions expire after #{sessions.authTTL} seconds"
+```
+
+#### Set the session cookie lifetime
+
+```ruby
+# Seconds. Zero means sessions never expire.
+client.sessions.update(org_id: 1234567, auth_ttl: 3600)
+```
+
+#### Sign a user out on all devices
+
+```ruby
+# Useful when an account is compromised.
+client.sessions.logout(org_id: 1234567, user_id: 987654321)
+```
+
+---
+
+### Password Policy
+
+```ruby
+policy = client.passwords.info(org_id: 1234567)
+puts "Users may change their password: #{policy.enabled}"
+puts "Password expires after #{policy.changeFrequency} days"
+
+# Either field may be sent on its own.
+client.passwords.update(org_id: 1234567, change_frequency: 90)
+client.passwords.update(org_id: 1234567, enabled: false)
+```
+
+---
+
+### Audit Logs
+
+Mail and Disk keep separate audit logs, and they are separate endpoints. Both
+page by an opaque token rather than a page number, so there is no `page`
+argument here.
+
+```ruby
+# Mail events
+events = client.audit.mail(org_id: 1234567, page_size: 100)
+
+events.each do |event|
+  puts "#{event.date} #{event.eventType} by #{event.userLogin}"
+end
+
+# Disk events
+client.audit.disk(org_id: 1234567).each {|event| puts "#{event.eventType} #{event.path}" }
+```
+
+Filters are passed as keywords in snake_case and converted to the camelCase
+the API documents:
+
+```ruby
+client.audit.mail(
+  org_id: 1234567,
+  page_size: 100,
+  after_date: "2026-01-01T00:00:00Z",
+  before_date: "2026-02-01T00:00:00Z",
+  include_uids: [987654321],
+  types: ["message_receive", "mailbox_send"]
+)
+```
+
+Pagination works as it does elsewhere, following the token the API returns:
+
+```ruby
+client.audit.mail(org_id: 1234567).each_page do |page|
+  puts "#{page.size} events, more to come: #{!page.last_page?}"
+end
+
+client.audit.disk(org_id: 1234567).auto_paginate.each {|event| puts event.path }
+```
+
+`page_size` is capped at 100 by the API and defaults to that.
 
 ---
 
@@ -921,117 +1062,107 @@ client.service_applications.delete(org_id: 1234567)
 
 ---
 
-### External Contacts
+## API Reference
+
+Every public method, generated from the source so it cannot drift out of
+date. See the sections above for what each one does.
 
 ```ruby
-contacts = client.external_contacts.list(org_id: 1234567, page: 1, per_page: 50)
-contacts.each {|contact| puts "#{contact.firstName} #{contact.lastName}" }
+# Directory
+organizations.list
+organizations.info(org_id:)
+users.add(org_id:, dep_id:, **user_params)
+users.add_alias(org_id:, user_id:, user_alias:)
+users.update(org_id:, user_id:, **user_params)
+users.info(org_id:, user_id:)
+users.list(org_id:, page: 1, per_page: 10)
+users.get2FA(org_id:, user_id:)
+users.has2FA?(org_id:, user_id:)
+users.delete_2fa_phone(org_id:, user_id:)
+users.update_avatar(org_id:, user_id:, image:, content_type: "image/png")
+users.update_contacts(org_id:, user_id:, contacts:)
+users.delete_contacts(org_id:, user_id:)
+users.delete(org_id:, user_id:)
+users.delete_alias(org_id:, user_id:, user_alias:)
+departments.add_alias(org_id:, dep_id:, name:)
+departments.update(org_id:, dep_id:, parent_id:, **params)
+departments.info(org_id:, dep_id:)
+departments.list(org_id:, page: 1, per_page: 10, parent_id: 0, order_by: "id")
+departments.create(org_id:, name:, parent_id:, **params)
+departments.delete_alias(org_id:, dep_id:, name:)
+departments.delete(org_id:, dep_id:)
+groups.add_user(org_id:, group_id:, user_id:, type: "user")
+groups.update(org_id:, group_id:, **user_params)
+groups.params(org_id:, group_id:)
+groups.list(org_id:, page: 1, per_page: 10)
+groups.users(org_id:, group_id:)
+groups.create(org_id:, name:, **group_params)
+groups.delete(org_id:, group_id:)
+groups.delete_user(org_id:, group_id:, type:, user_id:)
+external_contacts.list(org_id:, page: 1, per_page: 10)
+external_contacts.create(org_id:, first_name:, last_name:, emails:, **params)
+external_contacts.info(org_id:, contact_id:)
+external_contacts.update(org_id:, contact_id:, **params)
+external_contacts.delete(org_id:, contact_id:)
+external_contacts.update_emails(org_id:, contact_id:, emails:)
+external_contacts.update_phones(org_id:, contact_id:, phones:)
 
-# At least one email is required.
-created = client.external_contacts.create(
-  org_id: 1234567,
-  first_name: "Ivan",
-  last_name: "Petrov",
-  emails: [{email: "ivan@partner.example", type: "work", main: true}],
-  company: "Partner Ltd"
-)
+# Domains
+domains.list(org_id:)
+domains.add(org_id:, name:, **params)
+domains.info(org_id:, domain:)
+domains.delete(org_id:, domain:)
+domains.verify(org_id:, domain:)
+dns.list(org_id:, domain:)
+dns.create(org_id:, domain:, **params)
+dns.update(org_id:, domain:, record_id:, **params)
+dns.delete(org_id:, domain:, record_id:)
 
-client.external_contacts.info(org_id: 1234567, contact_id: created.id)
+# Mail
+post_settings.list(org_id:, user_id:)
+post_settings.update(org_id:, user_id:, **params)
+post_settings.forwarding_list(org_id:, user_id:)
+post_settings.add_forwarding(org_id:, user_id:, address:)
+post_settings.delete_forwarding(org_id:, user_id:, address:)
+mailboxes.shared_list(org_id:, page: 1, per_page: 10)
+mailboxes.create_shared(org_id:, email:, name:, description:)
+mailboxes.shared_info(org_id:, resource_id:)
+mailboxes.update_shared(org_id:, resource_id:, **params)
+mailboxes.delete_shared(org_id:, resource_id:)
+mailboxes.delegated_list(org_id:, page: 1, per_page: 10)
+mailboxes.create_delegated(org_id:, resource_id:)
+mailboxes.delete_delegated(org_id:, resource_id:)
+mailboxes.actors(org_id:, resource_id:)
+mailboxes.resources(org_id:, actor_id:)
+mailboxes.set_access(org_id:, resource_id:, actor_id:, roles:, notify: nil)
+mailboxes.task_status(org_id:, task_id:)
+routing.list(org_id:)
+routing.set(org_id:, rules:)
+domain_policies.list(org_id:)
+domain_policies.set(org_id:, rules:)
+antispam.list(org_id:)
+antispam.create(org_id, *strings)
+antispam.delete(org_id:)
 
-# PATCH: only the fields given are touched.
-client.external_contacts.update(org_id: 1234567, contact_id: created.id, title: "CTO")
-
-# Emails and phones have their own endpoints, and each call replaces the
-# whole list. Exactly one email must carry main: true.
-client.external_contacts.update_emails(
-  org_id: 1234567,
-  contact_id: created.id,
-  emails: [{email: "ivan@partner.example", main: true}]
-)
-client.external_contacts.update_phones(
-  org_id: 1234567,
-  contact_id: created.id,
-  phones: [{phone: "+70000000000", type: "work", main: true}]
-)
-
-client.external_contacts.delete(org_id: 1234567, contact_id: created.id)
+# Security
+two_fa.enable(org_id:, user_id:)
+two_fa.disable(org_id:, user_id:)
+two_fa.status(org_id:, user_id:)
+two_fa.domain_status(org_id:)
+two_fa.configure_domain(org_id:, enabled:)
+sessions.info(org_id:)
+sessions.update(org_id:, auth_ttl:)
+sessions.logout(org_id:, user_id:)
+passwords.info(org_id:)
+passwords.update(org_id:, enabled: nil, change_frequency: nil)
+audit.mail(org_id:, page_size: 100, page_token: nil, **filters)
+audit.disk(org_id:, page_size: 100, page_token: nil, **filters)
+service_applications.list(org_id:)
+service_applications.create(org_id:, applications:)
+service_applications.delete(org_id:)
+service_applications.activate(org_id:)
+service_applications.deactivate(org_id:)
 ```
-
----
-
-### Pagination
-
-Every list endpoint returns one page. The collection carries the pagination
-metadata and can fetch the rest on demand.
-
-```ruby
-users = client.users.list(org_id: 1234567, per_page: 100)
-
-users.page      # current page
-users.pages     # total pages
-users.per_page  # page size
-users.total     # total records
-users.last_page?
-```
-
-Walk page by page when you want to act on each batch:
-
-```ruby
-users.each_page do |page|
-  puts "Page #{page.page} of #{page.pages}: #{page.size} users"
-end
-```
-
-Or iterate every record and let the pages be fetched as they are needed:
-
-```ruby
-users.auto_paginate.each {|user| puts user.nickname }
-
-# Lazy, so this stops after the second page rather than fetching all of them.
-first_fifty = client.users.list(org_id: 1234567, per_page: 25).auto_paginate.first(50)
-```
-
-Both are available on `users`, `groups`, `departments`, `external_contacts`
-and the two mailbox lists. Arguments given to the original call, such as
-`per_page` or a department's `parent_id`, are carried into the following pages.
-
----
-
-## Error Handling
-
-The gem provides specific exception classes for different error scenarios:
-
-```ruby
-begin
-  user = client.users.info(org_id: 1234567, user_id: 999999)
-rescue Yandex360::AuthenticationError => e
-  puts "Authentication failed: #{e.message}"
-rescue Yandex360::AuthorizationError => e
-  puts "Access denied: #{e.message}"
-rescue Yandex360::NotFoundError => e
-  puts "Resource not found: #{e.message}"
-rescue Yandex360::ValidationError => e
-  puts "Invalid parameters: #{e.message}"
-rescue Yandex360::RateLimitError => e
-  puts "Rate limit exceeded: #{e.message}"
-rescue Yandex360::ServerError => e
-  puts "Server error: #{e.message}"
-rescue Yandex360::Error => e
-  puts "API error: #{e.message}"
-end
-```
-
-### Exception Types
-
-- `Yandex360::Error` - Base exception class
-- `Yandex360::AuthenticationError` - Invalid or missing token (401)
-- `Yandex360::AuthorizationError` - Insufficient permissions (403)
-- `Yandex360::NotFoundError` - Resource not found (404)
-- `Yandex360::ValidationError` - Invalid request parameters (422)
-- `Yandex360::RateLimitError` - API rate limit exceeded (429)
-- `Yandex360::ServerError` - Server-side error (5xx)
-
----
 
 ## Development
 
@@ -1062,103 +1193,6 @@ bundle exec rubocop -a
 ### Test Coverage
 
 Test coverage is tracked using SimpleCov and reported to Coveralls. After running tests, open `coverage/index.html` to view the coverage report.
-
----
-
-## API Reference
-
-### Quick Reference Table
-
-| Resource          | Available Methods                                                                           |
-| ----------------- | ------------------------------------------------------------------------------------------- |
-| **Organizations** | `list`, `info`                                                                              |
-| **Users**         | `add`, `add_alias`, `update`, `info`, `list`, `get2FA`, `has2FA?`, `delete_alias`, `delete` |
-| **Departments**   | `create`, `add_alias`, `update`, `info`, `list`, `delete_alias`, `delete`                   |
-| **Groups**        | `create`, `add_user`, `update`, `params`, `list`, `users`, `delete`, `delete_user`          |
-| **Domains**       | `list`, `add`, `info`, `verify`, `delete`                                                   |
-| **DNS**           | `list`, `create`, `update`, `delete`                                                        |
-| **Two FA**        | `enable`, `disable`, `status`, `domain_status`, `configure_domain`                          |
-| **Audit**         | `list`, `export`                                                                            |
-| **Post Settings** | `list`, `update`, `forwarding_list`, `add_forwarding`, `delete_forwarding`                  |
-| **Antispam**      | `list`, `create`, `delete`                                                                  |
-
-### Method Signatures Reference
-
-```ruby
-# Organizations
-organizations.list()
-organizations.info(org_id:)
-
-# Users
-users.add(org_id:, dep_id:, **user_params)
-users.add_alias(org_id:, user_id:, user_alias:)
-users.update(org_id:, user_id:, **user_params)
-users.info(org_id:, user_id:)
-users.list(org_id:, page: 1, per_page: 10)
-users.get2FA(org_id:, user_id:)
-users.delete_2fa_phone(org_id:, user_id:)
-users.update_avatar(org_id:, user_id:, image:, content_type: "image/png")
-users.update_contacts(org_id:, user_id:, contacts:)
-users.delete_contacts(org_id:, user_id:)
-users.has2FA?(org_id:, user_id:)
-users.delete_alias(org_id:, user_id:, user_alias:)
-users.delete(org_id:, user_id:)
-
-# Departments
-departments.create(org_id:, name:, parent_id:, **params)
-departments.add_alias(org_id:, dep_id:, name:)
-departments.update(org_id:, dep_id:, parent_id:, **params)
-departments.info(org_id:, dep_id:)
-departments.list(org_id:, page: 1, per_page: 10, parent_id: 0, order_by: "id")
-departments.delete_alias(org_id:, dep_id:, name:)
-departments.delete(org_id:, dep_id:)
-
-# Groups
-groups.create(org_id:, name:, **group_params)
-groups.add_user(org_id:, group_id:, user_id:, type: "user")
-groups.update(org_id:, group_id:, **user_params)
-groups.params(org_id:, group_id:)
-groups.list(org_id:, page: 1, per_page: 10)
-groups.users(org_id:, group_id:)
-groups.delete(org_id:, group_id:)
-groups.delete_user(org_id:, group_id:, type:, user_id:)
-
-# Domains
-domains.list(org_id:)
-domains.add(org_id:, name:, **params)
-domains.info(org_id:, domain:)
-domains.verify(org_id:, domain:)
-domains.delete(org_id:, domain:)
-
-# DNS Records
-dns.list(org_id:, domain:)
-dns.create(org_id:, domain:, **params)
-dns.update(org_id:, domain:, record_id:, **params)
-dns.delete(org_id:, domain:, record_id:)
-
-# Two-Factor Authentication
-two_fa.enable(org_id:, user_id:)
-two_fa.disable(org_id:, user_id:)
-two_fa.status(org_id:, user_id:)
-two_fa.domain_status(org_id:)
-two_fa.configure_domain(org_id:, enabled:)
-
-# Audit Logs
-audit.mail(org_id:, page_size: 100, page_token: nil, **filters)
-audit.disk(org_id:, page_size: 100, page_token: nil, **filters)
-
-# Post Settings
-post_settings.list(org_id:, user_id:)
-post_settings.update(org_id:, user_id:, **params)
-post_settings.forwarding_list(org_id:, user_id:)
-post_settings.add_forwarding(org_id:, user_id:, address:)
-post_settings.delete_forwarding(org_id:, user_id:, address:)
-
-# Antispam
-antispam.list(org_id:)
-antispam.create(org_id, *strings)
-antispam.delete(org_id:)
-```
 
 ---
 
