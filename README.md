@@ -35,6 +35,7 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
   - [Mail Routing](#mail-routing)
   - [Service Applications](#service-applications)
   - [External Contacts](#external-contacts)
+  - [Pagination](#pagination)
 - [Error Handling](#error-handling)
 - [Development](#development)
 - [Contributing](#contributing)
@@ -927,6 +928,44 @@ client.external_contacts.update_phones(
 
 client.external_contacts.delete(org_id: 1234567, contact_id: created.id)
 ```
+
+---
+
+### Pagination
+
+Every list endpoint returns one page. The collection carries the pagination
+metadata and can fetch the rest on demand.
+
+```ruby
+users = client.users.list(org_id: 1234567, per_page: 100)
+
+users.page      # current page
+users.pages     # total pages
+users.per_page  # page size
+users.total     # total records
+users.last_page?
+```
+
+Walk page by page when you want to act on each batch:
+
+```ruby
+users.each_page do |page|
+  puts "Page #{page.page} of #{page.pages}: #{page.size} users"
+end
+```
+
+Or iterate every record and let the pages be fetched as they are needed:
+
+```ruby
+users.auto_paginate.each {|user| puts user.nickname }
+
+# Lazy, so this stops after the second page rather than fetching all of them.
+first_fifty = client.users.list(org_id: 1234567, per_page: 25).auto_paginate.first(50)
+```
+
+Both are available on `users`, `groups`, `departments`, `external_contacts`
+and the two mailbox lists. Arguments given to the original call, such as
+`per_page` or a department's `parent_id`, are carried into the following pages.
 
 ---
 

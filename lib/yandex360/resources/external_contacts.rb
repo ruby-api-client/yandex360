@@ -11,7 +11,9 @@ module Yandex360
       validate_required_params({org_id: org_id}, [:org_id])
       resp = get("/directory/v1/org/#{org_id}/external_contacts",
                  params: {page: page, perPage: per_page})
-      Collection.from_response(resp, key: "contacts", type: ExternalContact)
+      Collection.from_response(resp, key: "contacts", type: ExternalContact) do |next_page|
+        list(org_id: org_id, page: next_page, per_page: per_page)
+      end
     end
 
     # emails must hold at least one entry; the API rejects a contact without one.

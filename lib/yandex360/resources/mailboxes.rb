@@ -10,7 +10,9 @@ module Yandex360
     def shared_list(org_id:, page: 1, per_page: 10)
       validate_required_params({org_id: org_id}, [:org_id])
       resp = get("/admin/v1/org/#{org_id}/mailboxes/shared", params: {page: page, perPage: per_page})
-      Collection.from_response(resp, key: "resources", type: MailboxResource)
+      Collection.from_response(resp, key: "resources", type: MailboxResource) do |next_page|
+        shared_list(org_id: org_id, page: next_page, per_page: per_page)
+      end
     end
 
     def create_shared(org_id:, email:, name:, description:)
@@ -39,7 +41,9 @@ module Yandex360
     def delegated_list(org_id:, page: 1, per_page: 10)
       validate_required_params({org_id: org_id}, [:org_id])
       resp = get("/admin/v1/org/#{org_id}/mailboxes/delegated", params: {page: page, perPage: per_page})
-      Collection.from_response(resp, key: "resources", type: MailboxResource)
+      Collection.from_response(resp, key: "resources", type: MailboxResource) do |next_page|
+        delegated_list(org_id: org_id, page: next_page, per_page: per_page)
+      end
     end
 
     def create_delegated(org_id:, resource_id:)
