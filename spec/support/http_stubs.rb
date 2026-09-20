@@ -390,6 +390,40 @@ module MailboxStubs
   end
 end
 
+module PasswordStubs
+  def mock_domain_passwords
+    {"enabled" => true, "changeFrequency" => 90}
+  end
+end
+
+module DomainPolicyStubs
+  def mock_domain_policies
+    {
+      "rules" => [
+        {
+          "name" => "block-spammers",
+          "description" => "Reject a known bad domain",
+          "enabled" => true,
+          "condition" => {"domain_filter" => {"domains" => ["spam.example"]}},
+          "action" => {"type" => "reject"}
+        }
+      ],
+      "revision" => 7
+    }
+  end
+
+  def mock_policy_rules
+    [
+      {
+        "name" => "trust-partner",
+        "enabled" => true,
+        "condition" => {"ip_filter" => {"ips" => ["203.0.113.0/24"]}},
+        "action" => {"type" => "accept", "options" => {"force" => "ham"}}
+      }
+    ]
+  end
+end
+
 module HttpStubs
   def stub_client
     @stubs ||= Faraday::Adapter::Test::Stubs.new
@@ -424,4 +458,6 @@ module HttpStubs
   include PostSettingsStubs
   include SessionStubs
   include MailboxStubs
+  include PasswordStubs
+  include DomainPolicyStubs
 end

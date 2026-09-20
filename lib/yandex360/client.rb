@@ -84,6 +84,14 @@ module Yandex360
       MailboxesResource.new(self)
     end
 
+    def passwords
+      PasswordsResource.new(self)
+    end
+
+    def domain_policies
+      DomainPoliciesResource.new(self)
+    end
+
     def inspect
       "#<#{self.class.name}:#{object_id} token=***>"
     end

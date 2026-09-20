@@ -61,6 +61,12 @@ module Yandex360
   autoload :SessionsResource, "yandex360/resources/sessions"
   autoload :DomainSession, "yandex360/objects/types"
 
+  autoload :PasswordsResource, "yandex360/resources/passwords"
+  autoload :DomainPassword, "yandex360/objects/types"
+
+  autoload :DomainPoliciesResource, "yandex360/resources/domain_policies"
+  autoload :DomainPolicy, "yandex360/objects/types"
+
   autoload :MailboxesResource, "yandex360/resources/mailboxes"
   autoload :Mailbox, "yandex360/objects/types"
   autoload :MailboxResource, "yandex360/objects/types"
