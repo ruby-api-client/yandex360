@@ -5,14 +5,18 @@ on:
     tags:
       - "v*"
 
-permissions:
-  contents: write
-  packages: write
-
 jobs:
   release:
     name: Release Gem
     runs-on: ubuntu-latest
+    permissions:
+      # Creating the GitHub Release.
+      contents: write
+      # Publishing the mirror copy to GitHub Packages.
+      packages: write
+      # Minting the OIDC token that RubyGems trades for a short-lived
+      # credential. Without this the trusted publishing step cannot work.
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v7.0.1
@@ -23,32 +27,39 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: true
 
-      - name: Configure gem credentials
-        run: |
-          mkdir -p ~/.gem
-          cat > ~/.gem/credentials << EOF
-          ---
-          :rubygems_api_key: ${{ secrets.RUBYGEMS_API_KEY }}
-          EOF
-          chmod 600 ~/.gem/credentials
-
       - name: Build gem
         run: gem build yandex360.gemspec
+
+      # Trusted publishing: RubyGems verifies the workflow's OIDC identity and
+      # issues a credential valid for this run only. There is no API key to
+      # store, rotate, or leak, and nothing to keep in sync with the account's
+      # MFA settings.
+      #
+      # Requires a trusted publisher registered on RubyGems for this gem,
+      # naming the repository owner, the repository, and this file.
+      - name: Authenticate to RubyGems
+        uses: rubygems/configure-rubygems-credentials@v2.1.0
 
       - name: Publish to RubyGems
         run: gem push yandex360-*.gem
 
+      # GitHub Packages has no OIDC equivalent here and still takes a token,
+      # but GITHUB_TOKEN is issued per run, so there is no stored secret in
+      # this path either.
       - name: Configure GitHub Packages credentials
         run: |
+          mkdir -p ~/.gem
           cat > ~/.gem/credentials << EOF
           ---
-          :rubygems_api_key: ${{ secrets.RUBYGEMS_API_KEY }}
           :github: Bearer ${{ secrets.GITHUB_TOKEN }}
           EOF
           chmod 600 ~/.gem/credentials
 
       - name: Publish to GitHub Packages
-        run: gem push yandex360-*.gem --host https://rubygems.pkg.github.com/${{ github.repository_owner }}
+        run: |
+          gem push yandex360-*.gem \
+            --key github \
+            --host https://rubygems.pkg.github.com/${{ github.repository_owner }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3.0.3
@@ -58,9 +69,8 @@ jobs:
           draft: false
           prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
 
-      - name: Update release notes
+      - name: Summarise
         run: |
-          echo "✅ Gem version $(ruby -e "require './lib/yandex360/version'; puts Yandex360::VERSION") published successfully!"
-          echo "📦 Available at:"
-          echo "  - RubyGems: https://rubygems.org/gems/yandex360"
-          echo "  - GitHub Packages: https://github.com/${{ github.repository }}/packages"
+          echo "Published $(ruby -e "require './lib/yandex360/version'; puts Yandex360::VERSION")"
+          echo "  RubyGems:        https://rubygems.org/gems/yandex360"
+          echo "  GitHub Packages: https://github.com/${{ github.repository }}/packages"
