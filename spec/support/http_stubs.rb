@@ -424,6 +424,55 @@ module DomainPolicyStubs
   end
 end
 
+module RoutingStubs
+  def mock_routing_rules
+    {
+      "rules" => [
+        {
+          "terminal" => true,
+          "condition" => {"field" => "from", "operator" => "matches", "value" => "*@spam.example"},
+          "actions" => [{"action" => "drop"}],
+          "scope" => {"direction" => "inbound"}
+        }
+      ]
+    }
+  end
+end
+
+module ServiceApplicationStubs
+  def mock_service_applications
+    {
+      "applications" => [
+        {"id" => "app-1", "scopes" => %w[ya360_security:domain_passwords_read]}
+      ]
+    }
+  end
+end
+
+module ExternalContactStubs
+  def mock_external_contacts_list
+    {
+      "contacts" => [mock_external_contact],
+      "page" => 1,
+      "pages" => 1,
+      "perPage" => 10,
+      "total" => 1
+    }
+  end
+
+  def mock_external_contact
+    {
+      "id" => "contact-1",
+      "firstName" => "Ivan",
+      "lastName" => "Petrov",
+      "emails" => [{"email" => "ivan@partner.example", "type" => "work", "main" => true}],
+      "phones" => [{"phone" => "+70000000000", "type" => "work", "main" => true}],
+      "createdAt" => "2026-01-01T00:00:00Z",
+      "updatedAt" => "2026-01-02T00:00:00Z"
+    }
+  end
+end
+
 module HttpStubs
   def stub_client
     @stubs ||= Faraday::Adapter::Test::Stubs.new
@@ -460,4 +509,7 @@ module HttpStubs
   include MailboxStubs
   include PasswordStubs
   include DomainPolicyStubs
+  include RoutingStubs
+  include ServiceApplicationStubs
+  include ExternalContactStubs
 end

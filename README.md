@@ -32,6 +32,9 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
   - [Mailboxes](#mailboxes)
   - [Password Policy](#password-policy)
   - [Domain Policies](#domain-policies)
+  - [Mail Routing](#mail-routing)
+  - [Service Applications](#service-applications)
+  - [External Contacts](#external-contacts)
 - [Error Handling](#error-handling)
 - [Development](#development)
 - [Contributing](#contributing)
@@ -842,6 +845,87 @@ client.domain_policies.set(
     }
   ]
 )
+```
+
+---
+
+### Mail Routing
+
+```ruby
+routing = client.routing.list(org_id: 1234567)
+routing.rules.each {|rule| puts "#{rule.scope.direction}: #{rule.actions.first.action}" }
+
+# set replaces the entire rule set, like domain_policies.set.
+client.routing.set(
+  org_id: 1234567,
+  rules: [
+    {
+      terminal: true,
+      scope: {direction: "inbound"},
+      condition: {field: "from", operator: "matches", value: "*@spam.example"},
+      actions: [{action: "drop"}]
+    }
+  ]
+)
+```
+
+---
+
+### Service Applications
+
+```ruby
+apps = client.service_applications.list(org_id: 1234567)
+apps.each {|app| puts "#{app.id}: #{app.scopes.join(', ')}" }
+
+# create replaces the stored list rather than appending to it.
+client.service_applications.create(
+  org_id: 1234567,
+  applications: [{id: "app-1", scopes: ["ya360_security:domain_passwords_read"]}]
+)
+
+client.service_applications.activate(org_id: 1234567)
+client.service_applications.deactivate(org_id: 1234567)
+
+# There is no per-application delete: this clears the whole list.
+client.service_applications.delete(org_id: 1234567)
+```
+
+---
+
+### External Contacts
+
+```ruby
+contacts = client.external_contacts.list(org_id: 1234567, page: 1, per_page: 50)
+contacts.each {|contact| puts "#{contact.firstName} #{contact.lastName}" }
+
+# At least one email is required.
+created = client.external_contacts.create(
+  org_id: 1234567,
+  first_name: "Ivan",
+  last_name: "Petrov",
+  emails: [{email: "ivan@partner.example", type: "work", main: true}],
+  company: "Partner Ltd"
+)
+
+client.external_contacts.info(org_id: 1234567, contact_id: created.id)
+
+# PATCH: only the fields given are touched.
+client.external_contacts.update(org_id: 1234567, contact_id: created.id, title: "CTO")
+
+# Emails and phones have their own endpoints, and each call replaces the
+# whole list. Exactly one email must carry main: true.
+client.external_contacts.update_emails(
+  org_id: 1234567,
+  contact_id: created.id,
+  emails: [{email: "ivan@partner.example", main: true}]
+)
+client.external_contacts.update_phones(
+  org_id: 1234567,
+  contact_id: created.id,
+  phones: [{phone: "+70000000000", type: "work", main: true}]
+)
+
+client.external_contacts.delete(org_id: 1234567, contact_id: created.id)
 ```
 
 ---

@@ -67,6 +67,15 @@ module Yandex360
   autoload :DomainPoliciesResource, "yandex360/resources/domain_policies"
   autoload :DomainPolicy, "yandex360/objects/types"
 
+  autoload :RoutingResource, "yandex360/resources/routing"
+  autoload :RoutingRules, "yandex360/objects/types"
+
+  autoload :ServiceApplicationsResource, "yandex360/resources/service_applications"
+  autoload :ServiceApplication, "yandex360/objects/types"
+
+  autoload :ExternalContactsResource, "yandex360/resources/external_contacts"
+  autoload :ExternalContact, "yandex360/objects/types"
+
   autoload :MailboxesResource, "yandex360/resources/mailboxes"
   autoload :Mailbox, "yandex360/objects/types"
   autoload :MailboxResource, "yandex360/objects/types"
