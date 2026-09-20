@@ -43,24 +43,8 @@ jobs:
       - name: Publish to RubyGems
         run: gem push yandex360-*.gem
 
-      # GitHub Packages has no OIDC equivalent here and still takes a token,
-      # but GITHUB_TOKEN is issued per run, so there is no stored secret in
-      # this path either.
-      - name: Configure GitHub Packages credentials
-        run: |
-          mkdir -p ~/.gem
-          cat > ~/.gem/credentials << EOF
-          ---
-          :github: Bearer ${{ secrets.GITHUB_TOKEN }}
-          EOF
-          chmod 600 ~/.gem/credentials
-
-      - name: Publish to GitHub Packages
-        run: |
-          gem push yandex360-*.gem \
-            --key github \
-            --host https://rubygems.pkg.github.com/${{ github.repository_owner }}
-
+      # Created before the mirror below, so that a failure to mirror cannot
+      # leave a published gem without its release.
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3.0.3
         with:
@@ -68,6 +52,21 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+
+      # A convenience copy. RubyGems is the canonical location, so a failure
+      # here is reported without failing the release.
+      - name: Publish to GitHub Packages
+        continue-on-error: true
+        env:
+          # The trusted publishing step exports GEM_HOST_API_KEY for every
+          # later step, and that variable takes precedence over any
+          # credentials file. It has to be replaced here, or the RubyGems
+          # token is what reaches GitHub. The Bearer prefix is what GitHub
+          # Packages expects.
+          GEM_HOST_API_KEY: Bearer ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gem push yandex360-*.gem \
+            --host https://rubygems.pkg.github.com/${{ github.repository_owner }}
 
       - name: Summarise
         run: |
