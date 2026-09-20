@@ -28,6 +28,8 @@
   - [Журнал аудита](#журнал-аудита)
   - [Настройки почты](#настройки-почты)
   - [Антиспам](#антиспам)
+  - [Сессии пользователей](#сессии-пользователей)
+  - [Почтовые ящики](#почтовые-ящики)
 - [Обработка ошибок](#обработка-ошибок)
 - [Разработка](#разработка)
 - [Вклад в проект](#вклад-в-проект)
@@ -714,6 +716,85 @@ puts "Обновлённый список: #{result.allow_list}"
 ```ruby
 client.antispam.delete(org_id: 1234567)
 puts "Список очищен"
+```
+
+---
+
+### Сессии пользователей
+
+#### Узнать время жизни cookie сессий
+
+```ruby
+sessions = client.sessions.info(org_id: 1234567)
+puts "Сессии завершаются через #{sessions.authTTL} секунд"
+```
+
+#### Задать время жизни cookie сессий
+
+```ruby
+# В секундах. Ноль означает, что сессии не истекают.
+client.sessions.update(org_id: 1234567, auth_ttl: 3600)
+```
+
+#### Выйти из аккаунта на всех устройствах
+
+```ruby
+# Пригодится, когда аккаунт скомпрометирован.
+client.sessions.logout(org_id: 1234567, user_id: 987654321)
+```
+
+---
+
+### Почтовые ящики
+
+#### Общие ящики
+
+```ruby
+mailboxes = client.mailboxes.shared_list(org_id: 1234567, page: 1, per_page: 50)
+mailboxes.each {|mailbox| puts "#{mailbox.resourceId}: #{mailbox.count} сотрудников" }
+
+created = client.mailboxes.create_shared(
+  org_id: 1234567,
+  email: "support@example.com",
+  name: "Поддержка",
+  description: "Общий ящик поддержки"
+)
+
+mailbox = client.mailboxes.shared_info(org_id: 1234567, resource_id: created.resourceId)
+puts mailbox.email
+
+client.mailboxes.update_shared(org_id: 1234567, resource_id: created.resourceId, name: "Helpdesk")
+client.mailboxes.delete_shared(org_id: 1234567, resource_id: created.resourceId)
+```
+
+#### Делегированные ящики
+
+```ruby
+client.mailboxes.delegated_list(org_id: 1234567)
+client.mailboxes.create_delegated(org_id: 1234567, resource_id: "1130000000000001")
+client.mailboxes.delete_delegated(org_id: 1234567, resource_id: "1130000000000001")
+```
+
+#### Права доступа
+
+```ruby
+# Кто имеет доступ к ящику
+client.mailboxes.actors(org_id: 1234567, resource_id: "1130000000000001")
+
+# К каким ящикам имеет доступ сотрудник
+client.mailboxes.resources(org_id: 1234567, actor_id: 987654321)
+
+# Выдача прав асинхронная: опрашивайте статус задачи.
+task = client.mailboxes.set_access(
+  org_id: 1234567,
+  resource_id: "1130000000000001",
+  actor_id: 987654321,
+  roles: ["shared_mailbox_reader", "shared_mailbox_sender"],
+  notify: "none" # "all" (по умолчанию), "delegates" или "none"
+)
+
+status = client.mailboxes.task_status(org_id: 1234567, task_id: task.taskId)
+puts status.status # running, complete или error
 ```
 
 ---

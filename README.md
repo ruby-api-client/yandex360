@@ -28,6 +28,8 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
   - [Audit Logs](#audit-logs)
   - [Post Settings](#post-settings)
   - [Antispam](#antispam)
+  - [User Sessions](#user-sessions)
+  - [Mailboxes](#mailboxes)
 - [Error Handling](#error-handling)
 - [Development](#development)
 - [Contributing](#contributing)
@@ -714,6 +716,85 @@ puts "Updated allowlist: #{result.allow_list}"
 ```ruby
 client.antispam.delete(org_id: 1234567)
 puts "Allowlist cleared"
+```
+
+---
+
+### User Sessions
+
+#### Read the session cookie lifetime
+
+```ruby
+sessions = client.sessions.info(org_id: 1234567)
+puts "Sessions expire after #{sessions.authTTL} seconds"
+```
+
+#### Set the session cookie lifetime
+
+```ruby
+# Seconds. Zero means sessions never expire.
+client.sessions.update(org_id: 1234567, auth_ttl: 3600)
+```
+
+#### Sign a user out on all devices
+
+```ruby
+# Useful when an account is compromised.
+client.sessions.logout(org_id: 1234567, user_id: 987654321)
+```
+
+---
+
+### Mailboxes
+
+#### Shared mailboxes
+
+```ruby
+mailboxes = client.mailboxes.shared_list(org_id: 1234567, page: 1, per_page: 50)
+mailboxes.each {|mailbox| puts "#{mailbox.resourceId}: #{mailbox.count} employees" }
+
+created = client.mailboxes.create_shared(
+  org_id: 1234567,
+  email: "support@example.com",
+  name: "Support",
+  description: "Shared support mailbox"
+)
+
+mailbox = client.mailboxes.shared_info(org_id: 1234567, resource_id: created.resourceId)
+puts mailbox.email
+
+client.mailboxes.update_shared(org_id: 1234567, resource_id: created.resourceId, name: "Helpdesk")
+client.mailboxes.delete_shared(org_id: 1234567, resource_id: created.resourceId)
+```
+
+#### Delegated mailboxes
+
+```ruby
+client.mailboxes.delegated_list(org_id: 1234567)
+client.mailboxes.create_delegated(org_id: 1234567, resource_id: "1130000000000001")
+client.mailboxes.delete_delegated(org_id: 1234567, resource_id: "1130000000000001")
+```
+
+#### Access rights
+
+```ruby
+# Who can reach a mailbox
+client.mailboxes.actors(org_id: 1234567, resource_id: "1130000000000001")
+
+# Which mailboxes an employee can reach
+client.mailboxes.resources(org_id: 1234567, actor_id: 987654321)
+
+# Granting access is asynchronous: poll the returned task.
+task = client.mailboxes.set_access(
+  org_id: 1234567,
+  resource_id: "1130000000000001",
+  actor_id: 987654321,
+  roles: ["shared_mailbox_reader", "shared_mailbox_sender"],
+  notify: "none" # "all" (default), "delegates" or "none"
+)
+
+status = client.mailboxes.task_status(org_id: 1234567, task_id: task.taskId)
+puts status.status # running, complete or error
 ```
 
 ---

@@ -45,9 +45,13 @@ jobs:
           - os: ubuntu-latest
             ruby: "3.5.0-preview1"
             experimental: true
-          - os: ubuntu-latest
-            ruby: head
-            experimental: true
+          # Disabled: bundler on ruby-head fails at `bundle install` with
+          # "uninitialized constant Pathname::SEPARATOR_PAT", an upstream bug
+          # that says nothing about this gem and leaves a red job on every PR.
+          # Restore once ruby-head installs again.
+          # - os: ubuntu-latest
+          #   ruby: head
+          #   experimental: true
 
     steps:
       - name: Checkout code

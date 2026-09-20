@@ -44,8 +44,12 @@ module Yandex360
       handle_response(perform { client.connection.get(url, params, headers) })
     end
 
-    def post(url, body:, headers: {})
-      handle_response(perform { client.connection.post(url, body, headers) })
+    def post(url, body:, params: {}, headers: {})
+      handle_response(perform do
+        client.connection.post(url, body, headers) do |req|
+          req.params.update(params) unless params.empty?
+        end
+      end)
     end
 
     def patch(url, body:, headers: {})
