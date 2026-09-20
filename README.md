@@ -30,6 +30,8 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
   - [Antispam](#antispam)
   - [User Sessions](#user-sessions)
   - [Mailboxes](#mailboxes)
+  - [Password Policy](#password-policy)
+  - [Domain Policies](#domain-policies)
 - [Error Handling](#error-handling)
 - [Development](#development)
 - [Contributing](#contributing)
@@ -795,6 +797,51 @@ task = client.mailboxes.set_access(
 
 status = client.mailboxes.task_status(org_id: 1234567, task_id: task.taskId)
 puts status.status # running, complete or error
+```
+
+---
+
+### Password Policy
+
+```ruby
+policy = client.passwords.info(org_id: 1234567)
+puts "Users may change their password: #{policy.enabled}"
+puts "Password expires after #{policy.changeFrequency} days"
+
+# Either field may be sent on its own.
+client.passwords.update(org_id: 1234567, change_frequency: 90)
+client.passwords.update(org_id: 1234567, enabled: false)
+```
+
+---
+
+### Domain Policies
+
+Rules for incoming mail at the domain level.
+
+```ruby
+policies = client.domain_policies.list(org_id: 1234567)
+puts "Revision #{policies.revision}"
+policies.rules.each {|rule| puts "#{rule.name}: #{rule.action.type}" }
+
+# set replaces the entire rule set: anything left out is removed.
+client.domain_policies.set(
+  org_id: 1234567,
+  rules: [
+    {
+      name: "block-spammers",
+      enabled: true,
+      condition: {domain_filter: {domains: ["spam.example"]}},
+      action: {type: "reject"}
+    },
+    {
+      name: "trust-partner",
+      enabled: true,
+      condition: {ip_filter: {ips: ["203.0.113.0/24"]}},
+      action: {type: "accept", options: {force: "ham"}}
+    }
+  ]
+)
 ```
 
 ---

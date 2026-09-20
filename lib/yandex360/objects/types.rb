@@ -27,6 +27,8 @@ module Yandex360
 
   class User2FA < Object; end
   class DomainSession < Object; end
+  class DomainPassword < Object; end
+  class DomainPolicy < Object; end
   class Mailbox < Object; end
   class MailboxResource < Object; end
   class MailboxActor < Object; end

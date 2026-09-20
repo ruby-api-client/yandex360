@@ -30,6 +30,8 @@
   - [Антиспам](#антиспам)
   - [Сессии пользователей](#сессии-пользователей)
   - [Почтовые ящики](#почтовые-ящики)
+  - [Парольная политика](#парольная-политика)
+  - [Политики домена](#политики-домена)
 - [Обработка ошибок](#обработка-ошибок)
 - [Разработка](#разработка)
 - [Вклад в проект](#вклад-в-проект)
@@ -795,6 +797,51 @@ task = client.mailboxes.set_access(
 
 status = client.mailboxes.task_status(org_id: 1234567, task_id: task.taskId)
 puts status.status # running, complete или error
+```
+
+---
+
+### Парольная политика
+
+```ruby
+policy = client.passwords.info(org_id: 1234567)
+puts "Пользователи могут менять пароль: #{policy.enabled}"
+puts "Срок действия пароля: #{policy.changeFrequency} дней"
+
+# Каждое поле можно передавать отдельно.
+client.passwords.update(org_id: 1234567, change_frequency: 90)
+client.passwords.update(org_id: 1234567, enabled: false)
+```
+
+---
+
+### Политики домена
+
+Правила для входящей почты на уровне домена.
+
+```ruby
+policies = client.domain_policies.list(org_id: 1234567)
+puts "Ревизия #{policies.revision}"
+policies.rules.each {|rule| puts "#{rule.name}: #{rule.action.type}" }
+
+# set заменяет весь набор правил: всё, что не передано, удаляется.
+client.domain_policies.set(
+  org_id: 1234567,
+  rules: [
+    {
+      name: "block-spammers",
+      enabled: true,
+      condition: {domain_filter: {domains: ["spam.example"]}},
+      action: {type: "reject"}
+    },
+    {
+      name: "trust-partner",
+      enabled: true,
+      condition: {ip_filter: {ips: ["203.0.113.0/24"]}},
+      action: {type: "accept", options: {force: "ham"}}
+    }
+  ]
+)
 ```
 
 ---
