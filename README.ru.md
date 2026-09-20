@@ -244,6 +244,36 @@ has_2fa = client.users.has2FA?(org_id: 1234567, user_id: 987654321)
 puts "2FA включена: #{has_2fa}"
 ```
 
+#### Аватар, контакты и телефон 2FA
+
+```ruby
+# Аватар передаётся сырыми байтами, не multipart и не base64.
+client.users.update_avatar(
+  org_id: 1234567,
+  user_id: 987654321,
+  image: File.binread("avatar.png"),
+  content_type: "image/png" # значение по умолчанию
+)
+
+# Заменяет список контактов. Записи, созданные самим API и помеченные
+# флагом synthetic, не редактируются и переживают оба вызова ниже.
+client.users.update_contacts(
+  org_id: 1234567,
+  user_id: 987654321,
+  contacts: [
+    {type: "phone", value: "+70000000000", label: "Рабочий"},
+    {type: "site", value: "https://example.com"}
+  ]
+)
+
+client.users.delete_contacts(org_id: 1234567, user_id: 987654321)
+
+# Удаляет телефон для двухфакторной аутентификации. Если телефон не задан,
+# API отвечает 400, что здесь становится Yandex360::ValidationError.
+client.users.delete_2fa_phone(org_id: 1234567, user_id: 987654321)
+```
+
+
 #### Удалить пользователя
 
 ```ruby
@@ -1065,6 +1095,10 @@ users.update(org_id:, user_id:, **user_params)
 users.info(org_id:, user_id:)
 users.list(org_id:, page: 1, per_page: 10)
 users.get2FA(org_id:, user_id:)
+users.delete_2fa_phone(org_id:, user_id:)
+users.update_avatar(org_id:, user_id:, image:, content_type: "image/png")
+users.update_contacts(org_id:, user_id:, contacts:)
+users.delete_contacts(org_id:, user_id:)
 users.has2FA?(org_id:, user_id:)
 users.delete_alias(org_id:, user_id:, user_alias:)
 users.delete(org_id:, user_id:)

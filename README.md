@@ -244,6 +244,35 @@ has_2fa = client.users.has2FA?(org_id: 1234567, user_id: 987654321)
 puts "2FA enabled: #{has_2fa}"
 ```
 
+#### Avatar, contacts and the 2FA phone
+
+```ruby
+# The avatar is sent as raw bytes, not multipart or base64.
+client.users.update_avatar(
+  org_id: 1234567,
+  user_id: 987654321,
+  image: File.binread("avatar.png"),
+  content_type: "image/png" # the default
+)
+
+# Replaces the contact list. Entries the API generated itself, marked
+# synthetic, are not editable and survive both calls below.
+client.users.update_contacts(
+  org_id: 1234567,
+  user_id: 987654321,
+  contacts: [
+    {type: "phone", value: "+70000000000", label: "Work"},
+    {type: "site", value: "https://example.com"}
+  ]
+)
+
+client.users.delete_contacts(org_id: 1234567, user_id: 987654321)
+
+# Removes the phone set up for two-factor authentication. The API answers
+# 400, raised here as Yandex360::ValidationError, if no phone is configured.
+client.users.delete_2fa_phone(org_id: 1234567, user_id: 987654321)
+```
+
 #### Delete a user
 
 ```ruby
@@ -1067,6 +1096,10 @@ users.update(org_id:, user_id:, **user_params)
 users.info(org_id:, user_id:)
 users.list(org_id:, page: 1, per_page: 10)
 users.get2FA(org_id:, user_id:)
+users.delete_2fa_phone(org_id:, user_id:)
+users.update_avatar(org_id:, user_id:, image:, content_type: "image/png")
+users.update_contacts(org_id:, user_id:, contacts:)
+users.delete_contacts(org_id:, user_id:)
 users.has2FA?(org_id:, user_id:)
 users.delete_alias(org_id:, user_id:, user_alias:)
 users.delete(org_id:, user_id:)
