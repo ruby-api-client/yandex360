@@ -591,50 +591,47 @@ result = client.two_fa.configure_domain(
 
 ---
 
-### Журнал аудита
+### Аудит-логи
 
-Доступ к журналам аудита и экспорт для отслеживания безопасности и соответствия требованиям.
-
-#### Получить список событий аудита
+У Почты и Диска отдельные аудит-логи и отдельные эндпоинты. Оба пагинируются
+непрозрачным токеном, а не номером страницы, поэтому аргумента `page` здесь нет.
 
 ```ruby
-# Базовый список
-events = client.audit.list(
-  org_id: 1234567,
-  page: 1,
-  per_page: 100
-)
+# События Почты
+events = client.audit.mail(org_id: 1234567, page_size: 100)
 
 events.each do |event|
-  puts "Событие: #{event.type}"
-  puts "Пользователь: #{event.user_id}"
-  puts "Время: #{event.created_at}"
-  puts "---"
+  puts "#{event.date} #{event.eventType} от #{event.userLogin}"
 end
 
-# С фильтрами
-filtered_events = client.audit.list(
-  org_id: 1234567,
-  page: 1,
-  per_page: 100,
-  from: "2024-01-01",
-  to: "2024-12-31",
-  event_type: "user.created"
-)
+# События Диска
+client.audit.disk(org_id: 1234567).each {|event| puts "#{event.eventType} #{event.path}" }
 ```
 
-#### Экспортировать журналы аудита
+Фильтры передаются в snake_case и преобразуются в camelCase, как того требует API:
 
 ```ruby
-# Экспорт журналов за определённый период
-export_result = client.audit.export(
+client.audit.mail(
   org_id: 1234567,
-  from: "2024-01-01",
-  to: "2024-12-31",
-  format: "json"  # или "csv"
+  page_size: 100,
+  after_date: "2026-01-01T00:00:00Z",
+  before_date: "2026-02-01T00:00:00Z",
+  include_uids: [987654321],
+  types: ["message_receive", "mailbox_send"]
 )
-puts "ID экспорта: #{export_result.export_id}"
 ```
+
+Пагинация работает так же, как в остальных ресурсах, по токену из ответа:
+
+```ruby
+client.audit.mail(org_id: 1234567).each_page do |page|
+  puts "#{page.size} событий, есть ещё: #{!page.last_page?}"
+end
+
+client.audit.disk(org_id: 1234567).auto_paginate.each {|event| puts event.path }
+```
+
+`page_size` ограничен сотней на стороне API и по умолчанию равен ей.
 
 ---
 
@@ -1112,8 +1109,8 @@ two_fa.domain_status(org_id:)
 two_fa.configure_domain(org_id:, enabled:)
 
 # Журнал аудита
-audit.list(org_id:, page: 1, per_page: 100, **params)
-audit.export(org_id:, **params)
+audit.mail(org_id:, page_size: 100, page_token: nil, **filters)
+audit.disk(org_id:, page_size: 100, page_token: nil, **filters)
 
 # Настройки почты
 post_settings.list(org_id:, user_id:)

@@ -296,19 +296,37 @@ module TwoFaStubs
 end
 
 module AuditStubs
-  def mock_audit_list
-    {
+  def mock_mail_audit_log(next_page_token: nil)
+    body = {
       "events" => [
         {
-          "id" => "audit123",
-          "event_type" => "user_login",
-          "user_id" => "1130000061922106",
-          "timestamp" => "2024-01-01T00:00:00Z"
+          "eventType" => "message_receive",
+          "date" => "2026-01-01T00:00:00Z",
+          "orgId" => 1_130_000_018_743_049,
+          "userUid" => "1130000061922106",
+          "userLogin" => "ivan.ivanov",
+          "subject" => "Hello"
         }
-      ],
-      "total" => 1,
-      "items" => 1
+      ]
     }
+    body["nextPageToken"] = next_page_token if next_page_token
+    body
+  end
+
+  def mock_disk_audit_log(next_page_token: nil)
+    body = {
+      "events" => [
+        {
+          "eventType" => "fs-store",
+          "date" => "2026-01-01T00:00:00Z",
+          "userUid" => "1130000061922106",
+          "path" => "/disk/report.xlsx",
+          "size" => 2048
+        }
+      ]
+    }
+    body["nextPageToken"] = next_page_token if next_page_token
+    body
   end
 end
 
