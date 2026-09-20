@@ -12,13 +12,18 @@ Gem::Specification.new do |s|
   s.description   = "Yandex 360 API wrapper written in Ruby"
   s.authors       = ["Ilya Brin"]
   s.email         = "ilya@codeplay.ru"
-  s.files         = `git ls-files`.split($RS).reject {|fn| fn.start_with? "spec" }
-  s.executables   = s.files.grep(%r{^bin/}) {|f| File.basename(f) }
+  # Ship what consumers need and nothing else. `git ls-files` minus spec/ also
+  # packaged .github/, .rubocop.yml, Gemfile.lock and the Rakefile.
+  s.files         = Dir["lib/**/*.rb"] + %w[README.md README.ru.md LICENSE CHANGELOG.md]
+  s.executables   = []
   s.require_paths = ["lib"]
   s.homepage      = "https://github.com/ruby-api-client/yandex360"
   s.license       = "MIT"
 
-  s.required_ruby_version = ">= 2.6"
+  # Matches the CI matrix. 3.1 and 3.2 are both past end of life, and faraday 2
+  # already requires 3.0, so ">= 2.6" was never true. RubyGems keeps serving
+  # older releases to older Rubies, so nobody's existing install breaks.
+  s.required_ruby_version = ">= 3.3"
 
   s.metadata["rubygems_mfa_required"] = "true"
 
