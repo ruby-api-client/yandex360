@@ -64,12 +64,17 @@ jobs:
       - name: Run tests
         run: bundle exec rspec --format progress
 
+      # Reporting, not verification. The action installs its own reporter
+      # binary at run time and has failed on that download and its checksum,
+      # which says nothing about the code under test and should not turn a
+      # passing suite red.
       - name: Upload coverage (Ubuntu Ruby 3.3 only)
         if: matrix.os == 'ubuntu-latest' && matrix.ruby == '3.3'
         uses: coverallsapp/github-action@v2.3.8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov/yandex360.lcov
+          fail-on-error: false
 
   integration:
     name: Integration Tests
