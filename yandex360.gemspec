@@ -23,10 +23,12 @@ Gem::Specification.new do |s|
   s.metadata["rubygems_mfa_required"] = "true"
 
   s.add_dependency "faraday", ">= 1.7", "< 3.0"
+  # Required at runtime by lib/yandex360/object.rb. Ruby 3.5 demotes ostruct
+  # from a default gem to a bundled one, so it must be declared explicitly.
+  s.add_dependency "ostruct", ">= 0.5"
 
   s.add_development_dependency "fiddle", "~> 1.0"
   s.add_development_dependency "logger", "~> 1.4"
-  s.add_development_dependency "ostruct", "~> 0.5"
 
   s.add_development_dependency "bundler"
   s.add_development_dependency "rake", "~> 13.3.0"
