@@ -15,6 +15,11 @@ Metrics/MethodLength:
 Metrics/ClassLength:
   Max: 1500
 
+# Keyword arguments are self-documenting at the call site, so a long list of
+# them does not carry the readability cost this cop guards against.
+Metrics/ParameterLists:
+  CountKeywordArgs: false
+
 # No space makes the method definition shorter and differentiates
 # from a regular assignment.
 Layout/SpaceAroundEqualsInParameterDefault:

@@ -1,8 +1,9 @@
 PATH
   remote: .
   specs:
-    yandex360 (1.1.5)
+    yandex360 (1.2.0)
       faraday (>= 1.7, < 3.0)
+      faraday-retry (>= 1.0)
       ostruct (>= 0.5)
 
 GEM
@@ -17,6 +18,8 @@ GEM
       logger
     faraday-net_http (3.4.4)
       net-http (~> 0.5)
+    faraday-retry (2.4.0)
+      faraday (~> 2.0)
     fiddle (1.1.8)
     json (3.0.2)
     language_server-protocol (3.17.0.6)

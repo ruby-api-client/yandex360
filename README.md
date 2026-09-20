@@ -88,6 +88,17 @@ require "yandex360"
 # Initialize the client with your OAuth token
 client = Yandex360::Client.new(token: "your_access_token_here")
 
+# Timeouts and retries have defaults and can be tuned. Retries cover 429 and
+# 5xx responses plus connection and timeout errors, and apply only to
+# idempotent verbs, so a POST is never replayed.
+client = Yandex360::Client.new(
+  token: "your_access_token_here",
+  open_timeout: 5,   # seconds to establish the connection
+  timeout: 30,       # seconds for the whole response
+  max_retries: 2,    # attempts on top of the initial request
+  retry_interval: 0.5 # seconds before the first retry, doubling after that
+)
+
 # List all organizations
 organizations = client.organizations.list
 puts "Organizations: #{organizations.count}"

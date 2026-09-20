@@ -41,25 +41,34 @@ module Yandex360
     end
 
     def get(url, params: {}, headers: {})
-      handle_response client.connection.get(url, params, headers)
+      handle_response(perform { client.connection.get(url, params, headers) })
     end
 
     def post(url, body:, headers: {})
-      handle_response client.connection.post(url, body, headers)
+      handle_response(perform { client.connection.post(url, body, headers) })
     end
 
     def patch(url, body:, headers: {})
-      handle_response client.connection.patch(url, body, headers)
+      handle_response(perform { client.connection.patch(url, body, headers) })
     end
 
     def put(url, body:, headers: {})
-      handle_response client.connection.put(url, body, headers)
+      handle_response(perform { client.connection.put(url, body, headers) })
     end
 
     def delete(url, params: {}, headers: {})
-      handle_response client.connection.delete(url, params, headers)
+      handle_response(perform { client.connection.delete(url, params, headers) })
     end
     alias delete_request delete
+
+    # Once retries are exhausted for a retryable status, faraday-retry raises
+    # instead of returning. Unwrap it so callers keep getting typed errors
+    # rather than a Faraday exception leaking through.
+    def perform
+      yield
+    rescue Faraday::RetriableResponse => e
+      e.response
+    end
 
     def handle_response(response)
       return response if successful_response?(response)
@@ -82,7 +91,7 @@ module Yandex360
         raise AuthorizationError, "You are not allowed to perform that action. #{error_message}"
       when 404
         raise NotFoundError, "No results were found for your request. #{error_message}"
-      when 429, 503
+      when 429
         raise RateLimitError, "Your request exceeded the API rate limit. #{error_message}"
       when 500..599
         raise ServerError, "We were unable to perform the request due to server-side problems. #{error_message}"
