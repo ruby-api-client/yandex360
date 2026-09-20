@@ -26,6 +26,9 @@ Gem::Specification.new do |s|
   # Required at runtime by lib/yandex360/object.rb. Ruby 3.5 demotes ostruct
   # from a default gem to a bundled one, so it must be declared explicitly.
   s.add_dependency "ostruct", ">= 0.5"
+  # Retry middleware. 1.0.x carries no faraday constraint and 2.x requires
+  # faraday 2, so this resolves across the supported faraday range.
+  s.add_dependency "faraday-retry", ">= 1.0"
 
   s.add_development_dependency "fiddle", "~> 1.0"
   s.add_development_dependency "logger", "~> 1.4"

@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 require "faraday"
+begin
+  # Extracted from faraday core in 2.0. Bundled there in 1.x.
+  require "faraday/retry"
+rescue LoadError
+  nil
+end
 require "yandex360/version"
 
 module Yandex360
