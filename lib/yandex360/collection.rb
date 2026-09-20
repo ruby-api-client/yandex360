@@ -36,11 +36,11 @@ module Yandex360
     end
 
     def first(idx=nil)
-      n ? data.first(idx) : data.first
+      idx ? data.first(idx) : data.first
     end
 
     def last(idx=nil)
-      n ? data.last(idx) : data.last
+      idx ? data.last(idx) : data.last
     end
 
     def [](index)
