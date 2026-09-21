@@ -58,7 +58,7 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
 Add this line to your application's `Gemfile`:
 
 ```ruby
-gem 'yandex360', '~> 3.0'
+gem 'yandex360', '~> 4.0'
 ```
 
 Then execute:
@@ -84,6 +84,11 @@ To use the Yandex 360 API, you need an OAuth token. You can obtain this token by
 For more information, visit the [Yandex 360 API Documentation](https://yandex.ru/dev/api360/doc/concepts/access.html).
 
 ## Upgrading from 1.x
+
+Coming from 3.x instead? The breaking changes in 4.0 are listed in the
+[changelog](CHANGELOG.md): four resources were calling endpoints that do not
+exist and have been corrected.
+
 
 Two major versions happened at once: 1.1.4 was the last published release
 before 3.0.0. Everything that needs your attention is here. The
