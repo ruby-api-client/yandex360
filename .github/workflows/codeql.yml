@@ -69,7 +69,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v7.0.1
 
+    # Supplementary to CodeQL, which is the primary analysis and runs in its
+    # own job. The action downloads the trivy binary at run time and has failed
+    # on that download, which says nothing about the code being scanned and
+    # should not fail the workflow.
     - name: Run Trivy vulnerability scanner
+      id: trivy
+      continue-on-error: true
       uses: aquasecurity/trivy-action@v0.36.0
       with:
         scan-type: 'fs'
@@ -77,8 +83,11 @@ jobs:
         format: 'sarif'
         output: 'trivy-results.sarif'
 
+    # Without the guard this fails with "Path does not exist" whenever the scan
+    # above did not get far enough to write one, which is a confusing way to
+    # report that a download failed.
     - name: Upload Trivy scan results
+      if: always() && hashFiles('trivy-results.sarif') != ''
       uses: github/codeql-action/upload-sarif@v4.38.1
-      if: always()
       with:
         sarif_file: 'trivy-results.sarif'

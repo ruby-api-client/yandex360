@@ -6,6 +6,15 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Internal
+
+- The Trivy scan no longer fails the security workflow when it cannot download
+  its own binary, and the SARIF upload is skipped when no report was written
+  rather than failing with "Path does not exist". CodeQL is the primary
+  analysis and runs in its own job. This is the same reasoning already applied
+  to the coverage upload: a third-party tool failing to fetch itself says
+  nothing about the code.
+
 ### Fixed
 
 - `users.add_alias` returns a `User` again. `CreateUserAlias` answers the whole
