@@ -39,6 +39,12 @@ jobs:
           use-verbose-mode: "yes"
           config-file: ".github/markdown-link-check.json"
 
+      # The reference lists every public method, and it drifted before: it
+      # described ten of seventeen resources while the guide above it described
+      # all of them.
+      - name: Check the API reference against the code
+        run: bundle exec rake docs:check
+
       - name: Validate code examples in README
         run: |
           echo "Checking the syntax of Ruby examples in the READMEs..."

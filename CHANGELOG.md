@@ -6,6 +6,21 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- An "Upgrading from 1.x" section in both READMEs. 1.1.4 was the last release
+  before 3.0.0, so anyone still on it meets two majors at once.
+- `rake docs:check`, which compares the API reference in both READMEs against
+  the source and fails when they disagree. That section had drifted before,
+  describing ten of seventeen resources while the guide above it described all
+  of them. It runs in CI.
+
+### Fixed
+
+- Three examples in the new upgrade section were not valid Ruby: a bare
+  `rescue` outside `begin`, and `(...)` standing in for arguments. The check
+  that parses every fenced block caught them.
+
 ## [3.0.0] - 2026-09-21
 
 Response objects stop being OpenStruct.
