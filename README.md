@@ -388,9 +388,15 @@ users.auto_paginate.each {|user| puts user.nickname }
 first_fifty = client.users.list(org_id: 1234567, per_page: 25).auto_paginate.first(50)
 ```
 
-Both are available on `users`, `groups`, `departments`, `external_contacts`
-and the two mailbox lists. Arguments given to the original call, such as
-`per_page` or a department's `parent_id`, are carried into the following pages.
+Not every list paginates, and those that do differ. `users`, `groups`,
+`departments`, `external_contacts`, `domains`, `dns` and the two mailbox
+listings take `page` and `per_page`. `organizations` and the two audit logs
+page by token instead, so they take `page_size` and no `page`. Group members,
+mailbox access rights and service applications answer everything at once and
+take neither.
+
+Arguments given to the original call, such as `per_page` or a department's
+`parent_id`, are carried into the following pages.
 
 ## Response Objects
 
@@ -1361,7 +1367,7 @@ date. See the sections above for what each one does.
 
 ```ruby
 # Directory
-organizations.list
+organizations.list(page_size: 10, page_token: nil)
 organizations.info(org_id:)
 users.add(org_id:, dep_id:, **user_params)
 users.add_alias(org_id:, user_id:, user_alias:)
@@ -1389,6 +1395,7 @@ groups.info(org_id:, group_id:)
 groups.params(org_id:, group_id:)   # deprecated, use info
 groups.list(org_id:, page: 1, per_page: 10)
 groups.users(org_id:, group_id:)
+groups.members(org_id:, group_id:)
 groups.create(org_id:, name:, **group_params)
 groups.delete(org_id:, group_id:)
 groups.delete_user(org_id:, group_id:, type:, user_id:)
@@ -1401,12 +1408,12 @@ external_contacts.update_emails(org_id:, contact_id:, emails:)
 external_contacts.update_phones(org_id:, contact_id:, phones:)
 
 # Domains
-domains.list(org_id:)
+domains.list(org_id:, page: 1, per_page: 10)
 domains.add(org_id:, name:, **params)
 domains.info(org_id:, domain:)
 domains.delete(org_id:, domain:)
 domains.verify(org_id:, domain:)
-dns.list(org_id:, domain:)
+dns.list(org_id:, domain:, page: 1, per_page: 50)
 dns.create(org_id:, domain:, **params)
 dns.update(org_id:, domain:, record_id:, **params)
 dns.delete(org_id:, domain:, record_id:)

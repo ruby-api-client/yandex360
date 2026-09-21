@@ -4,10 +4,13 @@ module Yandex360
   class DomainsResource < Resource
     include ParamBuilder
 
-    def list(org_id:)
+    # per_page is capped at 10 by the API.
+    def list(org_id:, page: 1, per_page: 10)
       validate_required_params({org_id: org_id}, [:org_id])
-      resp = get("/directory/v1/org/#{org_id}/domains")
-      Collection.from_response(resp, key: "domains", type: Domain)
+      resp = get("/directory/v1/org/#{org_id}/domains", params: {page: page, perPage: per_page})
+      Collection.from_response(resp, key: "domains", type: Domain) do |next_page|
+        list(org_id: org_id, page: next_page, per_page: per_page)
+      end
     end
 
     def add(org_id:, name:, **params)

@@ -88,6 +88,12 @@ module Yandex360
     attribute :created_at, from: "createdAt"
   end
 
+  class GroupMembers < Record
+    attribute :departments
+    attribute :groups
+    attribute :users
+  end
+
   class Alias < Record
     attribute :alias
     attribute :id

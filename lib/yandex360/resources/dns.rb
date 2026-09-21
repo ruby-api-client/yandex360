@@ -4,10 +4,13 @@ module Yandex360
   class DnsResource < Resource
     include ParamBuilder
 
-    def list(org_id:, domain:)
+    def list(org_id:, domain:, page: 1, per_page: 50)
       validate_required_params({org_id: org_id, domain: domain}, %i[org_id domain])
-      resp = get("/directory/v1/org/#{org_id}/domains/#{domain}/dns")
-      Collection.from_response(resp, key: "records", type: DnsRecord)
+      resp = get("/directory/v1/org/#{org_id}/domains/#{domain}/dns",
+                 params: {page: page, perPage: per_page})
+      Collection.from_response(resp, key: "records", type: DnsRecord) do |next_page|
+        list(org_id: org_id, domain: domain, page: next_page, per_page: per_page)
+      end
     end
 
     def create(org_id:, domain:, **params)
