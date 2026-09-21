@@ -6,20 +6,39 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.1.0] - 2026-09-21
+
+Extension points, so the gem sits comfortably in Rails, Sinatra or a plain
+script without depending on any of them. Nothing here is breaking.
+
 ### Added
 
-- An "Upgrading from 1.x" section in both READMEs. 1.1.4 was the last release
-  before 3.0.0, so anyone still on it meets two majors at once.
-- `rake docs:check`, which compares the API reference in both READMEs against
-  the source and fails when they disagree. That section had drifted before,
-  describing ten of seventeen resources while the guide above it described all
-  of them. It runs in CI.
+- `Yandex360.configure` for defaults every client inherits: token, logger,
+  adapter and the timeout and retry settings. Anything passed to
+  `Client.new` still wins. The settings are read when a client is built and not
+  consulted again, so reconfiguring later cannot change a client that already
+  exists.
+- A `logger:` option taking any object with the usual level methods. It logs
+  verb, path, status and duration per request, and belongs to the client rather
+  than the process, so two clients can log to different places. The token
+  travels in a header and never reaches the log.
+- `Yandex360.on(:request)`, a framework-free instrumentation hook. Events carry
+  `http_method`, `path`, `status`, `duration`, `error` and `success?`. In Rails
+  bridge it to `ActiveSupport::Notifications` as `request.yandex360`, the name
+  ActiveSupport's own convention produces. One event per HTTP attempt rather
+  than per call, so the cost of a retry is visible. A subscriber that raises is
+  reported and does not break the request.
+- A block on `Client.new` receiving the Faraday builder, after the gem's
+  middleware and before the adapter, for middleware of your own.
 
-### Fixed
+### Notes
 
-- Three examples in the new upgrade section were not valid Ruby: a bare
-  `rescue` outside `begin`, and `(...)` standing in for arguments. The check
-  that parses every fenced block caught them.
+The `Client::DEFAULT_*` constants now live on `Configuration`, where the
+defaults are set. They remain reachable under their old names, which were
+public in 3.0.
+
+`Client#settings` exposes the resolved configuration. 172 -> 187 examples,
+line coverage stays at 100%.
 
 ## [3.0.0] - 2026-09-21
 
@@ -283,6 +302,7 @@ and is kept below unchanged. Release notes for those versions are also on the
 - build(deps): bump ruby/setup-ruby from 1.316.0 to 1.319.0 by @dependabot[bot] in #149
 - build(deps): bump github/codeql-action from 4 to 4.37.4 by @dependabot[bot] in #152
 
-[Unreleased]: https://github.com/ruby-api-client/yandex360/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/ruby-api-client/yandex360/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/ruby-api-client/yandex360/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/ruby-api-client/yandex360/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/ruby-api-client/yandex360/compare/v1.1.4...v2.0.0

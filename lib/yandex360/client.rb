@@ -4,37 +4,48 @@ module Yandex360
   class Client
     BASE_URL = "https://api360.yandex.net/"
 
-    # Seconds to wait for the connection to be established.
-    DEFAULT_OPEN_TIMEOUT = 5
-    # Seconds to wait for the response to complete.
-    DEFAULT_TIMEOUT = 30
-    # Retries attempted on top of the initial request.
-    DEFAULT_MAX_RETRIES = 2
-    # Seconds before the first retry. Doubles on each subsequent attempt.
-    DEFAULT_RETRY_INTERVAL = 0.5
+    # The defaults live on Configuration now, since that is where they are set.
+    # They stay reachable here because they were public in 3.0.
+    DEFAULT_OPEN_TIMEOUT = Configuration::DEFAULT_OPEN_TIMEOUT
+    DEFAULT_TIMEOUT = Configuration::DEFAULT_TIMEOUT
+    DEFAULT_MAX_RETRIES = Configuration::DEFAULT_MAX_RETRIES
+    DEFAULT_RETRY_INTERVAL = Configuration::DEFAULT_RETRY_INTERVAL
+
     # Statuses worth retrying. Everything else is a client error that will not
     # change on its own.
     RETRY_STATUSES = [429, 500, 502, 503, 504].freeze
 
-    attr_reader :token, :adapter, :connection, :open_timeout, :timeout, :max_retries,
-                :retry_interval
+    attr_reader :connection, :settings
 
-    def initialize(token:, adapter: Faraday.default_adapter, stubs: nil,
-                   open_timeout: DEFAULT_OPEN_TIMEOUT, timeout: DEFAULT_TIMEOUT,
-                   max_retries: DEFAULT_MAX_RETRIES, retry_interval: DEFAULT_RETRY_INTERVAL)
+    # Anything left out falls back to Yandex360.config, which is read here and
+    # not consulted again, so changing it later cannot affect a client already
+    # built.
+    #
+    # A block is handed the Faraday builder after the gem's own middleware and
+    # before the adapter, which is where your own belongs.
+    #
+    #   Yandex360::Client.new(token: "...") do |conn|
+    #     conn.use MyTracing
+    #   end
+    def initialize(stubs: nil, **overrides, &middleware)
+      @settings = Yandex360.config.merge(overrides)
       raise ArgumentError, "Token cannot be nil or empty" if token.nil? || token.to_s.strip.empty?
 
-      @token = token
-      @adapter = adapter
       @stubs = stubs
-      @open_timeout = open_timeout
-      @timeout = timeout
-      @max_retries = max_retries
-      @retry_interval = retry_interval
+      @middleware = middleware
       # Built eagerly: memoizing on first use races when a client is shared
       # across threads, which is the norm under Puma and Sidekiq.
       @connection = build_connection
     end
+
+    def token = settings.token
+    def logger = settings.logger
+    def open_timeout = settings.open_timeout
+    def timeout = settings.timeout
+    def max_retries = settings.max_retries
+    def retry_interval = settings.retry_interval
+
+    def adapter = settings.adapter || Faraday.default_adapter
 
     def antispam
       AntispamResource.new(self)
@@ -112,15 +123,27 @@ module Yandex360
 
     def build_connection
       Faraday.new(BASE_URL, request: {open_timeout: open_timeout, timeout: timeout}) do |conn|
-        conn.request :authorization, :OAuth, token
-        conn.request :json
-        conn.request :url_encoded
-        conn.request :retry, retry_options
-
-        conn.response :json, content_type: "application/json"
-
+        build_stack(conn)
         conn.adapter adapter, @stubs
       end
+    end
+
+    # Order matters here and is easier to read in one place.
+    def build_stack(conn)
+      conn.request :authorization, :OAuth, token
+      conn.request :json
+      conn.request :url_encoded
+      conn.request :retry, retry_options
+
+      conn.response :json, content_type: "application/json"
+
+      # Inside the retry middleware, so each attempt is reported rather than
+      # only the last one.
+      conn.use Instrumentation::Middleware
+      conn.use Instrumentation::Logging, logger if logger
+
+      # The caller's own middleware goes last, still ahead of the adapter.
+      @middleware&.call(conn)
     end
 
     def retry_options
