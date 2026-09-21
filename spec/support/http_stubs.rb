@@ -70,10 +70,12 @@ module UserStubs
     }
   end
 
+  # CreateUserAlias answers the employee, with the new alias among aliases.
   def mock_user_alias
     {
-      "alias" => "ruby_gem_api",
-      "id" => "1130000061922106"
+      "id" => "1130000061922106",
+      "nickname" => "ivan.ivanov",
+      "aliases" => ["ruby_gem_api"]
     }
   end
 
@@ -127,10 +129,12 @@ module DepartmentStubs
     }
   end
 
+  # CreateAlias answers the department, with the new alias among aliases.
   def mock_department_alias
     {
-      "alias" => "support-team",
-      "department_id" => "1"
+      "id" => 1,
+      "name" => "Support",
+      "aliases" => ["support-team"]
     }
   end
 
@@ -200,7 +204,7 @@ module GroupStubs
 
   def mock_group_delete_user
     {
-      "removed" => true,
+      "deleted" => true,
       "type" => "user",
       "id" => "987654321"
     }

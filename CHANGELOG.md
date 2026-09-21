@@ -6,6 +6,25 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- `users.add_alias` returns a `User` again. `CreateUserAlias` answers the whole
+  employee, aliases included, not the alias. It was changed to `Alias` in 3.0.0
+  on the strength of a stub that had invented that shape, which is exactly the
+  mistake the typed records were meant to expose rather than commit.
+- `departments.add_alias` returns a `Department` for the same reason, and
+  `departments.delete_alias` a `DepartmentAlias`, since deleting one does
+  answer `{alias, removed}`.
+- The stub for `groups.delete_user` said `removed`; `DeleteMember` answers
+  `deleted`. `GroupService_Delete` does answer `removed`, so the two really do
+  differ and the spec now asserts each correctly.
+
+### Notes
+
+Every path and response shape in the gem has now been checked against the
+published reference rather than against our own stubs.
+
+
 ## [3.2.0] - 2026-09-21
 
 ### Added
