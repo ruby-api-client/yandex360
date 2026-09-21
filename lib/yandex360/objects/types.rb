@@ -110,6 +110,16 @@ module Yandex360
     attribute :status
   end
 
+  class DomainStatus < Record
+    attribute :status
+    attribute :methods
+  end
+
+  class DomainDkim < Record
+    attribute :enabled
+    attribute :public_key, from: "publicKey"
+  end
+
   class DnsRecord < Record
     attribute :record_id, from: "recordId"
     attribute :type

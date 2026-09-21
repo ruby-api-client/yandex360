@@ -236,29 +236,29 @@ module DomainStubs
   def mock_domains_list
     {
       "domains" => [
-        {"name" => "example.com", "verified" => true, "default" => true}
+        {"name" => "example.com", "country" => "ru", "mx" => true,
+         "delegated" => true, "master" => true, "verified" => true}
       ],
-      "total" => 1,
-      "items" => 1
+      "page" => 1,
+      "pages" => 1,
+      "perPage" => 10,
+      "total" => 1
     }
   end
 
-  def mock_domain_info
+  def mock_domain_added
+    {"name" => "example.com", "country" => "ru", "verified" => false}
+  end
+
+  def mock_domain_status
     {
-      "name" => "example.com",
-      "verified" => true,
-      "default" => true,
-      "created_at" => "2024-01-01T00:00:00Z"
+      "status" => "verified",
+      "methods" => [{"method" => "dns", "code" => "yandex-verification: abc123"}]
     }
   end
 
-  def mock_domain_create
-    {
-      "name" => "newdomain.com",
-      "verified" => false,
-      "default" => false,
-      "created_at" => "2024-01-01T00:00:00Z"
-    }
+  def mock_domain_dkim
+    {"enabled" => true, "publicKey" => "v=DKIM1; k=rsa; p=MIGf..."}
   end
 end
 

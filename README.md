@@ -577,6 +577,10 @@ puts "Email: #{org.email}"
 puts "Subscription plan: #{org.subscription_plan}"
 ```
 
+The service offers a list and nothing narrower, so this searches it rather than
+fetching one organization. A token usually reaches a single organization, so it
+is one request in practice.
+
 ---
 
 ### Users
@@ -906,52 +910,43 @@ client.external_contacts.delete(org_id: 1234567, contact_id: created.id)
 
 ### Domains
 
-Manage organization domains and verify ownership.
-
-#### List domains
-
 ```ruby
-domains = client.domains.list(org_id: 1234567)
-domains.each do |domain|
-  puts "Domain: #{domain.name}"
-  puts "Status: #{domain.status}"
-  puts "Verified: #{domain.verified}"
-end
-```
+domains = client.domains.list(org_id: 1234567, page: 1, per_page: 10)
+domains.each {|domain| puts "#{domain.name} verified=#{domain.verified}" }
 
-#### Add a domain
-
-```ruby
-domain = client.domains.add(
-  org_id: 1234567,
-  name: "example.com"
-)
-puts "Added domain: #{domain.name}"
-puts "Verification status: #{domain.status}"
-```
-
-#### Get domain information
-
-```ruby
-domain = client.domains.info(org_id: 1234567, domain: "example.com")
-puts "Domain: #{domain.name}"
-puts "Status: #{domain.status}"
-puts "Verified: #{domain.verified}"
-puts "Master admin email: #{domain.master_admin}"
-```
-
-#### Verify domain ownership
-
-```ruby
-domain = client.domains.verify(org_id: 1234567, domain: "example.com")
-puts "Verification status: #{domain.status}"
-```
-
-#### Delete a domain
-
-```ruby
+client.domains.add(org_id: 1234567, name: "example.com")
 client.domains.delete(org_id: 1234567, domain: "example.com")
 ```
+
+There is no endpoint for reading one domain, so `find` walks the list. It
+costs a request per page rather than one, which is why it is named for what it
+does:
+
+```ruby
+client.domains.find(org_id: 1234567, domain: "example.com")
+```
+
+Connection status carries the confirmation methods and their codes, which is
+what verifying a domain needs:
+
+```ruby
+status = client.domains.connection_status(org_id: 1234567, domain: "example.com")
+status.status
+status.methods.each {|method| puts "#{method.method}: #{method.code}" }
+```
+
+The DKIM signature:
+
+```ruby
+dkim = client.domains.dkim_status(org_id: 1234567, domain: "example.com")
+dkim.enabled
+dkim.public_key
+
+client.domains.enable_dkim(org_id: 1234567, domain: "example.com")
+client.domains.disable_dkim(org_id: 1234567, domain: "example.com")
+```
+
+Cyrillic domains must be given in Punycode, as the API documents.
 
 ---
 
@@ -1409,10 +1404,13 @@ external_contacts.update_phones(org_id:, contact_id:, phones:)
 
 # Domains
 domains.list(org_id:, page: 1, per_page: 10)
+domains.find(org_id:, domain:)
 domains.add(org_id:, name:, **params)
-domains.info(org_id:, domain:)
 domains.delete(org_id:, domain:)
-domains.verify(org_id:, domain:)
+domains.connection_status(org_id:, domain:)
+domains.dkim_status(org_id:, domain:)
+domains.enable_dkim(org_id:, domain:)
+domains.disable_dkim(org_id:, domain:)
 dns.list(org_id:, domain:, page: 1, per_page: 50)
 dns.create(org_id:, domain:, **params)
 dns.update(org_id:, domain:, record_id:, **params)
