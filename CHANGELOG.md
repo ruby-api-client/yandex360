@@ -6,6 +6,17 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Internal
+
+- The Trivy scan is removed. It duplicated `bundle audit`: across 86 runs it
+  reported the same five advisories in faraday and json, and dropped to zero
+  the day the lockfile was refreshed. It never found anything `bundle audit`
+  did not, there is no Dockerfile or infrastructure here for it to scan, and
+  its findings went to the Security tab where they sat unread for months while
+  the failing `bundle audit` step is what actually forced the fix. It was also
+  the job that broke, failing to download its own binary. CodeQL remains the
+  primary analysis, alongside bundle audit, dependency review and Dependabot.
+
 ### Fixed
 
 - `users.add_alias` returns a `User` again. `CreateUserAlias` answers the whole

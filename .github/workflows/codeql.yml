@@ -23,7 +23,6 @@ permissions:
   security-events: write
   actions: read
   contents: read
-  packages: read
 
 jobs:
   codeql:
@@ -60,25 +59,3 @@ jobs:
       uses: github/codeql-action/analyze@v4.38.1
       with:
         category: "/language:${{matrix.language}}"
-
-  dependency-scanning:
-    name: Dependency Scanning
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v7.0.1
-
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@v0.36.0
-      with:
-        scan-type: 'fs'
-        scan-ref: '.'
-        format: 'sarif'
-        output: 'trivy-results.sarif'
-
-    - name: Upload Trivy scan results
-      uses: github/codeql-action/upload-sarif@v4.38.1
-      if: always()
-      with:
-        sarif_file: 'trivy-results.sarif'
