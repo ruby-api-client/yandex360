@@ -1217,51 +1217,33 @@ puts "Список очищен"
 
 ### Двухфакторная аутентификация (2FA)
 
-Управление настройками двухфакторной аутентификации для пользователей и всего домена.
-
-#### Включить 2FA для пользователя
-
-```ruby
-result = client.two_fa.enable(org_id: 1234567, user_id: 987654321)
-puts "2FA успешно включена"
-```
-
-#### Отключить 2FA для пользователя
+Обязательная 2FA для всей организации. Все три вызова идут по одному пути и
+различаются только глаголом, поэтому отдельных эндпоинтов для включения и
+выключения нет.
 
 ```ruby
-result = client.two_fa.disable(org_id: 1234567, user_id: 987654321)
-puts "2FA успешно отключена"
-```
+settings = client.two_fa.status(org_id: 1234567)
+settings.enabled
+settings.duration    # секунд, на которые сотрудник может отложить настройку
+settings.enabled_at
 
-#### Проверить статус 2FA пользователя
-
-```ruby
-status = client.two_fa.status(org_id: 1234567, user_id: 987654321)
-puts "2FA включена: #{status.enabled}"
-puts "Есть TOTP: #{status.has_totp}"
-```
-
-#### Получить статус 2FA для всего домена
-
-```ruby
-domain_status = client.two_fa.domain_status(org_id: 1234567)
-puts "2FA включена для домена: #{domain_status.enabled}"
-```
-
-#### Настроить 2FA для всего домена
-
-```ruby
-# Включить 2FA для всего домена
-result = client.two_fa.configure_domain(
+# duration обязателен: значения по умолчанию у API нет.
+client.two_fa.enable(
   org_id: 1234567,
-  enabled: true
+  duration: 3600,
+  logout_users: true,        # необязательно, завершает все сессии
+  validation_method: "phone" # необязательно, "default" или "phone"
 )
 
-# Отключить 2FA для всего домена
-result = client.two_fa.configure_domain(
-  org_id: 1234567,
-  enabled: false
-)
+client.two_fa.disable(org_id: 1234567)
+```
+
+Персональная 2FA находится не здесь. Она относится к сотруднику, поэтому живёт
+на `users`:
+
+```ruby
+client.users.get2FA(org_id: 1234567, user_id: 987654321)
+client.users.delete_2fa_phone(org_id: 1234567, user_id: 987654321)
 ```
 
 ---
@@ -1456,11 +1438,10 @@ antispam.create(org_id, *strings)
 antispam.delete(org_id:)
 
 # Безопасность
-two_fa.enable(org_id:, user_id:)
-two_fa.disable(org_id:, user_id:)
-two_fa.status(org_id:, user_id:)
+two_fa.status(org_id:)
+two_fa.enable(org_id:, duration:, logout_users: nil, validation_method: nil)
+two_fa.disable(org_id:)
 two_fa.domain_status(org_id:)
-two_fa.configure_domain(org_id:, enabled:)
 sessions.info(org_id:)
 sessions.update(org_id:, auth_ttl:)
 sessions.logout(org_id:, user_id:)
