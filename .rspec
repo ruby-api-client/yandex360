@@ -3,3 +3,4 @@
 --format documentation # progress
 --backtrace
 --require spec_helper
+--exclude-pattern **/railtie_spec.rb

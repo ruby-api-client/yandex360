@@ -20,6 +20,7 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
 - [Choosing the HTTP library](#choosing-the-http-library)
+- [Rails](#rails)
 - [Pagination](#pagination)
 - [Response Objects](#response-objects)
 - [Error Handling](#error-handling)
@@ -469,6 +470,56 @@ end
 - `Yandex360::ValidationError` - Invalid request parameters (400)
 - `Yandex360::RateLimitError` - API rate limit exceeded (429)
 - `Yandex360::ServerError` - Server-side error (5xx)
+
+---
+
+## Rails
+
+Nothing here is required. The gem has no Rails dependency, and everything the
+Railtie does can be written by hand in three lines. It loads only when Rails is
+already present.
+
+Configure it where you configure everything else:
+
+```ruby
+# config/application.rb, or an initializer
+config.yandex360.token = ENV.fetch("YA360_TOKEN")
+config.yandex360.timeout = 60
+```
+
+Then a client needs no arguments:
+
+```ruby
+Yandex360::Client.new
+```
+
+`Rails.logger` is used unless you name a logger of your own, and requests are
+published through `ActiveSupport::Notifications` as `request.yandex360`, which
+is the shape ActiveSupport's own convention produces, so an APM picks them up
+without being told:
+
+```ruby
+ActiveSupport::Notifications.subscribe("request.yandex360") do |*, payload|
+  payload[:http_method]  # :get
+  payload[:path]
+  payload[:status]
+  payload[:duration]
+end
+```
+
+To skip the bridge:
+
+```ruby
+config.yandex360.instrument = false
+```
+
+Sinatra, Hanami, Roda or a plain script do the same thing directly, and the
+result is identical:
+
+```ruby
+Yandex360.configure { |config| config.token = ENV.fetch("YA360_TOKEN") }
+Yandex360.on(:request) {|event| MyMetrics.record(event) }
+```
 
 ---
 
