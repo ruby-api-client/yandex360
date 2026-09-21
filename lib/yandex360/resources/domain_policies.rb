@@ -15,7 +15,7 @@ module Yandex360
     # so anything left out is removed.
     def set(org_id:, rules:)
       validate_required_params({org_id: org_id, rules: rules}, %i[org_id rules])
-      Object.new put("/admin/v1/org/#{org_id}/mail/routing/policies", body: {rules: rules}).body
+      Response.new put("/admin/v1/org/#{org_id}/mail/routing/policies", body: {rules: rules}).body
     end
   end
 end

@@ -31,7 +31,7 @@ RSpec.describe Yandex360::RoutingResource do
     end
 
     expect(client_for(stubs).routing.set(org_id: org_id, rules: mock_routing_rules["rules"]))
-      .to be_a(Yandex360::Object)
+      .to be_a(Yandex360::Response)
   end
 
   it "requires rules" do
@@ -82,14 +82,14 @@ RSpec.describe Yandex360::ServiceApplicationsResource do
     stubs = Faraday::Adapter::Test::Stubs.new
     stubs.post("#{path}/activate") { mock_response(body: {}) }
 
-    expect(client_for(stubs).service_applications.activate(org_id: org_id)).to be_a(Yandex360::Object)
+    expect(client_for(stubs).service_applications.activate(org_id: org_id)).to be_a(Yandex360::Response)
   end
 
   it "deactivates the feature" do
     stubs = Faraday::Adapter::Test::Stubs.new
     stubs.post("#{path}/deactivate") { mock_response(body: {}) }
 
-    expect(client_for(stubs).service_applications.deactivate(org_id: org_id)).to be_a(Yandex360::Object)
+    expect(client_for(stubs).service_applications.deactivate(org_id: org_id)).to be_a(Yandex360::Response)
   end
 end
 
@@ -165,7 +165,7 @@ RSpec.describe Yandex360::ExternalContactsResource do
     stubs.delete("#{base}/#{contact_id}") { mock_response(body: {}) }
 
     expect(client_for(stubs).external_contacts.delete(org_id: org_id, contact_id: contact_id))
-      .to be_a(Yandex360::Object)
+      .to be_a(Yandex360::Response)
   end
 
   it "replaces the email list through its own endpoint" do

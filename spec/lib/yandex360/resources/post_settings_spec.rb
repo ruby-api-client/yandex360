@@ -17,7 +17,7 @@ RSpec.describe "#post_settings.list" do
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
       resp = client.post_settings.list(org_id: org_id, user_id: user_id)
 
-      expect(resp).to be_a(Yandex360::Object)
+      expect(resp).to be_a(Yandex360::Response)
     end
   end
 end

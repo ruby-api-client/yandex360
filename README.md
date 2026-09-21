@@ -19,6 +19,7 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
 - [Pagination](#pagination)
+- [Response Objects](#response-objects)
 - [Error Handling](#error-handling)
 - [Resources](#resources)
   - **Directory**: [Organizations](#organizations), [Users](#users), [Departments](#departments), [Groups](#groups), [External Contacts](#external-contacts)
@@ -174,6 +175,51 @@ first_fifty = client.users.list(org_id: 1234567, per_page: 25).auto_paginate.fir
 Both are available on `users`, `groups`, `departments`, `external_contacts`
 and the two mailbox lists. Arguments given to the original call, such as
 `per_page` or a department's `parent_id`, are carried into the following pages.
+
+## Response Objects
+
+Every response is an object whose declared fields are real methods, so a
+misspelled name says so instead of quietly handing back nil:
+
+```ruby
+user = client.users.info(org_id: 1234567, user_id: 987654321)
+
+user.nickname    # "ivan.ivanov"
+user.nickame     # NoMethodError
+```
+
+Field names are snake_case even where the API spells them otherwise, which
+matches how the gem already takes its arguments:
+
+```ruby
+client.passwords.update(org_id: 1234567, change_frequency: 90)
+client.passwords.info(org_id: 1234567).change_frequency
+```
+
+The original spelling still works and warns. It goes in 4.0.
+
+```ruby
+policy.changeFrequency
+# [yandex360] Yandex360::DomainPassword#changeFrequency is deprecated,
+# use #change_frequency
+```
+
+Nested objects and arrays of objects are wrapped too:
+
+```ruby
+user.name.first
+routing.rules.first.actions.first.action
+```
+
+A field the gem does not know about, because the API gained it after the last
+release, is still reachable. Nothing has to be published for you to read it:
+
+```ruby
+user["fieldAddedLater"]
+user.to_h                 # the parsed body, exactly as it arrived
+```
+
+---
 
 ## Error Handling
 
@@ -552,7 +598,7 @@ client.groups.delete(org_id: 1234567, group_id: 789)
 
 ```ruby
 contacts = client.external_contacts.list(org_id: 1234567, page: 1, per_page: 50)
-contacts.each {|contact| puts "#{contact.firstName} #{contact.lastName}" }
+contacts.each {|contact| puts "#{contact.first_name} #{contact.last_name}" }
 
 # At least one email is required.
 created = client.external_contacts.create(
@@ -769,7 +815,7 @@ client.post_settings.delete_forwarding(
 
 ```ruby
 mailboxes = client.mailboxes.shared_list(org_id: 1234567, page: 1, per_page: 50)
-mailboxes.each {|mailbox| puts "#{mailbox.resourceId}: #{mailbox.count} employees" }
+mailboxes.each {|mailbox| puts "#{mailbox.resource_id}: #{mailbox.count} employees" }
 
 created = client.mailboxes.create_shared(
   org_id: 1234567,
@@ -778,11 +824,11 @@ created = client.mailboxes.create_shared(
   description: "Shared support mailbox"
 )
 
-mailbox = client.mailboxes.shared_info(org_id: 1234567, resource_id: created.resourceId)
+mailbox = client.mailboxes.shared_info(org_id: 1234567, resource_id: created.resource_id)
 puts mailbox.email
 
-client.mailboxes.update_shared(org_id: 1234567, resource_id: created.resourceId, name: "Helpdesk")
-client.mailboxes.delete_shared(org_id: 1234567, resource_id: created.resourceId)
+client.mailboxes.update_shared(org_id: 1234567, resource_id: created.resource_id, name: "Helpdesk")
+client.mailboxes.delete_shared(org_id: 1234567, resource_id: created.resource_id)
 ```
 
 #### Delegated mailboxes
@@ -811,7 +857,7 @@ task = client.mailboxes.set_access(
   notify: "none" # "all" (default), "delegates" or "none"
 )
 
-status = client.mailboxes.task_status(org_id: 1234567, task_id: task.taskId)
+status = client.mailboxes.task_status(org_id: 1234567, task_id: task.task_id)
 puts status.status # running, complete or error
 ```
 
@@ -962,7 +1008,7 @@ result = client.two_fa.configure_domain(
 
 ```ruby
 sessions = client.sessions.info(org_id: 1234567)
-puts "Sessions expire after #{sessions.authTTL} seconds"
+puts "Sessions expire after #{sessions.auth_ttl} seconds"
 ```
 
 #### Set the session cookie lifetime
@@ -986,7 +1032,7 @@ client.sessions.logout(org_id: 1234567, user_id: 987654321)
 ```ruby
 policy = client.passwords.info(org_id: 1234567)
 puts "Users may change their password: #{policy.enabled}"
-puts "Password expires after #{policy.changeFrequency} days"
+puts "Password expires after #{policy.change_frequency} days"
 
 # Either field may be sent on its own.
 client.passwords.update(org_id: 1234567, change_frequency: 90)
@@ -1006,11 +1052,11 @@ argument here.
 events = client.audit.mail(org_id: 1234567, page_size: 100)
 
 events.each do |event|
-  puts "#{event.date} #{event.eventType} by #{event.userLogin}"
+  puts "#{event.date} #{event.event_type} by #{event.user_login}"
 end
 
 # Disk events
-client.audit.disk(org_id: 1234567).each {|event| puts "#{event.eventType} #{event.path}" }
+client.audit.disk(org_id: 1234567).each {|event| puts "#{event.event_type} #{event.path}" }
 ```
 
 Filters are passed as keywords in snake_case and converted to the camelCase

@@ -30,7 +30,7 @@ RSpec.describe "users avatar, contacts and 2FA phone" do
       stubs.delete("#{base}/2fa") { mock_response(body: {}) }
 
       expect(client_for(stubs).users.delete_2fa_phone(org_id: org_id, user_id: user_id))
-        .to be_a(Yandex360::Object)
+        .to be_a(Yandex360::Response)
     end
 
     it "surfaces the 400 the API returns when no phone is set" do

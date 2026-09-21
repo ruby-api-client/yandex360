@@ -115,7 +115,7 @@ RSpec.describe "#users.add_alias" do
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
       resp = client.users.add_alias(org_id: org_id, user_id: user_id, user_alias: user_alias)
 
-      expect(resp).to be_an(Yandex360::User)
+      expect(resp).to be_a(Yandex360::Alias)
       expect(resp.alias).to eq user_alias
     end
   end
@@ -158,7 +158,7 @@ RSpec.describe "#users.get2FA" do
       resp = client.users.get2FA(org_id: org_id, user_id: user_id)
 
       expect(resp).to be_a(Yandex360::User2FA)
-      expect(resp.id).to eq("1130000018743049")
+      expect(resp.user_id).to eq("1130000018743049")
       expect(resp.has2fa).to be(true).or be(false)
     end
   end
@@ -211,7 +211,7 @@ RSpec.describe "#users.info" do
       resp = client.users.info(org_id: org_id, user_id: user_id)
 
       expect(resp).to be_an(Yandex360::User)
-      expect(resp.name).to be_an(OpenStruct)
+      expect(resp.name).to be_a(Yandex360::Response)
       expect(resp.contacts).to be_an(Array)
     end
   end

@@ -23,7 +23,7 @@ module Yandex360
 
     def delete(org_id:, domain:)
       validate_required_params({org_id: org_id, domain: domain}, %i[org_id domain])
-      Object.new delete_request("/directory/v1/org/#{org_id}/domains/#{domain}").body
+      Response.new delete_request("/directory/v1/org/#{org_id}/domains/#{domain}").body
     end
 
     def verify(org_id:, domain:)

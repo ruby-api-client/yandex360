@@ -9,7 +9,8 @@ module Yandex360
         id: user_id,
         type: type
       }
-      Group.new post("/directory/v1/org/#{org_id}/groups/#{group_id}/members", body: user).body
+      # The reply is {"added": true}, not a group.
+      Response.new post("/directory/v1/org/#{org_id}/groups/#{group_id}/members", body: user).body
     end
 
     def update(org_id:, group_id:, **user_params)
@@ -59,7 +60,7 @@ module Yandex360
     def delete_user(org_id:, group_id:, type:, user_id:)
       validate_required_params({org_id: org_id, group_id: group_id, type: type, user_id: user_id},
                                %i[org_id group_id type user_id])
-      Object.new delete_request("/directory/v1/org/#{org_id}/groups/#{group_id}/members/#{type}/#{user_id}").body
+      Response.new delete_request("/directory/v1/org/#{org_id}/groups/#{group_id}/members/#{type}/#{user_id}").body
     end
   end
 end

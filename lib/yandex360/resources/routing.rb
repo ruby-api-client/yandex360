@@ -15,7 +15,7 @@ module Yandex360
     # removed rather than kept.
     def set(org_id:, rules:)
       validate_required_params({org_id: org_id, rules: rules}, %i[org_id rules])
-      Object.new put("/admin/v1/org/#{org_id}/mail/routing/rules", body: {rules: rules}).body
+      Response.new put("/admin/v1/org/#{org_id}/mail/routing/rules", body: {rules: rules}).body
     end
   end
 end

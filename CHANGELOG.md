@@ -6,29 +6,49 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-09-20
+
+Response objects stop being OpenStruct.
+
+### Breaking
+
+- A misspelled attribute raises `NoMethodError` instead of returning nil.
+  `user.nickame` used to be indistinguishable from a field that was genuinely
+  absent.
+- Attribute names are snake_case: `change_frequency`, `auth_ttl`, `first_name`,
+  `event_type`. The API's own spelling still works and warns, and goes in 4.0.
+  Input was already snake_case, so the two now agree.
+- `Yandex360::Object` is gone, replaced by `Yandex360::Record` for declared
+  types and `Yandex360::Response` for replies with no documented entity behind
+  them. The old name shadowed `::Object` throughout the namespace, which meant
+  any code inside `module Yandex360` needing the real one had to write
+  `::Object`.
+- `groups.add_user` returns a `Response` rather than a `Group`. It answers
+  `{"added": true}` and never was a group; declaring fields is what exposed
+  this.
+- `users.add_alias` returns an `Alias` rather than a `User`, for the same
+  reason.
+- Eight type classes nothing constructed are removed: `UserList`, `GroupList`,
+  `DepartmentList`, `UserAlias`, `DeletedUser`, `DeletedGroup`,
+  `DeletedDepartment` and `DeletedDepartmentAlias`.
+
 ### Added
 
-- `groups.info`, the name the same call carries on every other resource.
-
-### Deprecated
-
-- `groups.params`, which is now an alias for `groups.info` and warns. The name
-  said nothing about what the call does and collides with a very common word.
-  Removed in 3.0.
+- `#[]` reads any key of a response, declared or not, so a field the API gains
+  after a release needs no release here to be reachable. `#to_h` returns the
+  parsed body as it arrived.
+- Records compare by content and print their keys rather than their values.
 
 ### Removed
 
-- `Resource#build_url`, which nothing called, and the `build_user_params`,
-  `build_group_params` and `build_department_params` wrappers, each of which
-  only forwarded to `build_params`. Line coverage reached 100% as a result:
-  this was the code the suite could not reach.
+- The `ostruct` runtime dependency, which existed only for the old base class.
 
-### Internal
+### Notes
 
-- Resources load by directory instead of from a hand-written list of 54
-  `autoload` lines. Forgetting an entry raised `NameError` for the caller at
-  runtime, and the suite caught it only if some spec happened to touch that
-  constant.
+The 29 type classes were empty markers: they named a type in specs and
+declared nothing, so they offered the appearance of typing without any of it.
+Field lists now come from the published API reference. 152 -> 172 examples,
+line coverage stays at 100%.
 
 ## [2.0.0] - 2026-09-20
 
@@ -230,5 +250,6 @@ and is kept below unchanged. Release notes for those versions are also on the
 - build(deps): bump ruby/setup-ruby from 1.316.0 to 1.319.0 by @dependabot[bot] in #149
 - build(deps): bump github/codeql-action from 4 to 4.37.4 by @dependabot[bot] in #152
 
-[Unreleased]: https://github.com/ruby-api-client/yandex360/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/ruby-api-client/yandex360/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/ruby-api-client/yandex360/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/ruby-api-client/yandex360/compare/v1.1.4...v2.0.0

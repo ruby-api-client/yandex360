@@ -11,7 +11,7 @@ end
 # Base classes first: types subclass Object, resources subclass Resource.
 require "yandex360/version"
 require "yandex360/error"
-require "yandex360/object"
+require "yandex360/record"
 require "yandex360/collection"
 require "yandex360/param_builder"
 require "yandex360/resource"

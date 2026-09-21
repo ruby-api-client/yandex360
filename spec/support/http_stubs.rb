@@ -86,8 +86,9 @@ module UserStubs
 
   def mock_user_2fa
     {
-      "id" => "1130000018743049",
-      "has2fa" => true
+      "userId" => "1130000018743049",
+      "has2fa" => true,
+      "hasSecurityPhone" => true
     }
   end
 end

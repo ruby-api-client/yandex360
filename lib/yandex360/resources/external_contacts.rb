@@ -40,7 +40,7 @@ module Yandex360
 
     def delete(org_id:, contact_id:)
       validate_required_params({org_id: org_id, contact_id: contact_id}, %i[org_id contact_id])
-      Object.new delete_request("/directory/v1/org/#{org_id}/external_contacts/#{contact_id}").body
+      Response.new delete_request("/directory/v1/org/#{org_id}/external_contacts/#{contact_id}").body
     end
 
     # Replaces the address list entirely. It cannot be empty and exactly one
