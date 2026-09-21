@@ -143,6 +143,34 @@ RSpec.describe "configuration, instrumentation and middleware" do
     end
   end
 
+  describe "the HTTP adapter" do
+    it "uses Net::HTTP from the standard library unless told otherwise" do
+      client = Yandex360::Client.new(token: "t")
+
+      expect(client.connection.builder.adapter).to eq(Faraday::Adapter::NetHttp)
+    end
+
+    it "takes another adapter per client" do
+      client = Yandex360::Client.new(token: "t", adapter: :net_http)
+
+      expect(client.adapter).to eq(:net_http)
+    end
+
+    it "takes one from the configuration" do
+      Yandex360.configure do |config|
+        config.token = "t"
+        config.adapter = :net_http
+      end
+
+      expect(Yandex360::Client.new.adapter).to eq(:net_http)
+    end
+
+    it "complains about an adapter that is not registered" do
+      expect { Yandex360::Client.new(token: "t", adapter: :no_such_adapter) }
+        .to raise_error(Faraday::Error)
+    end
+  end
+
   describe "the middleware block" do
     it "runs the caller's middleware inside the stack" do
       seen = []

@@ -27,10 +27,13 @@ Gem::Specification.new do |s|
 
   s.metadata["rubygems_mfa_required"] = "true"
 
-  s.add_dependency "faraday", ">= 1.7", "< 3.0"
-  # Retry middleware. 1.0.x carries no faraday constraint and 2.x requires
-  # faraday 2, so this resolves across the supported faraday range.
-  s.add_dependency "faraday-retry", ">= 1.0"
+  # faraday 1.x cannot work here: its authorization middleware requires
+  # base64, which stopped being a default gem in Ruby 3.4, and faraday 1
+  # predates that change and never declared it. On the Rubies this gem
+  # supports, building a client raises LoadError.
+  s.add_dependency "faraday", "~> 2.0"
+  # Retry middleware, split out of faraday core in 2.0.
+  s.add_dependency "faraday-retry", "~> 2.0"
 
   s.add_development_dependency "fiddle", "~> 1.0"
   s.add_development_dependency "logger", "~> 1.4"
