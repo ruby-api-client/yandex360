@@ -242,6 +242,85 @@ error, not a Faraday one.
 The client builds its connection in the constructor and is safe to share
 between threads.
 
+### Setting defaults once
+
+```ruby
+Yandex360.configure do |config|
+  config.token  = ENV.fetch("YA360_TOKEN")
+  config.logger = Logger.new($stdout)
+end
+
+client = Yandex360::Client.new
+```
+
+In Rails this is an initializer, in Sinatra a line at boot, in a script a call
+before the work starts. No framework is required for it.
+
+Anything passed to the constructor wins:
+
+```ruby
+Yandex360::Client.new(token: "another token", timeout: 60)
+```
+
+The settings are read when the client is built and not consulted again, so
+reconfiguring later cannot change a client that already exists.
+
+### Logging
+
+```ruby
+Yandex360::Client.new(token: "...", logger: Rails.logger)
+```
+
+Any object with the usual level methods will do. Each request is logged with
+its verb, path, status and duration. The token travels in a header and never
+reaches the log.
+
+The logger belongs to the client, not the process, so two clients can log to
+different places.
+
+### Instrumentation
+
+```ruby
+Yandex360.on(:request) do |event|
+  event.http_method  # :get
+  event.path         # "/directory/v1/org/1234567/users"
+  event.status       # 200, or nil when the request raised
+  event.duration     # seconds
+  event.error        # the exception, when there was one
+  event.success?
+end
+```
+
+This is a plain hook with no dependency on any framework. In Rails bridge it to
+`ActiveSupport::Notifications` as `request.yandex360`, which is the convention
+ActiveSupport follows, and your APM will pick it up:
+
+```ruby
+Yandex360.on(:request) do |event|
+  ActiveSupport::Notifications.instrument("request.yandex360", event.to_h)
+end
+```
+
+One event per HTTP attempt rather than per call, so a request that was retried
+twice reports three times. That is what metrics should see, and it is the only
+way the cost of retrying shows up at all.
+
+A subscriber that raises is reported on stderr and does not break the request.
+
+### Your own middleware
+
+```ruby
+client = Yandex360::Client.new(token: "...") do |conn|
+  conn.use MyTracingMiddleware
+  conn.request :gzip
+end
+```
+
+The block is handed the Faraday builder after the gem's own middleware and
+before the adapter.
+
+---
+
 ## Pagination
 
 Every list endpoint returns one page. The collection carries the pagination

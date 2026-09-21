@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    yandex360 (3.0.0)
+    yandex360 (3.1.0)
       faraday (>= 1.7, < 3.0)
       faraday-retry (>= 1.0)
 
