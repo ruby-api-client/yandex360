@@ -6,6 +6,12 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-09-21
+
+Every path in the gem has now been read against the published reference
+individually. Five areas were wrong, and the four services that follow were
+calling endpoints that do not exist.
+
 ### Breaking
 
 - `two_fa` covers the organization only, and its methods have changed. Three of
@@ -50,8 +56,6 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `forwarding_list`, `add_forwarding` and `delete_forwarding` have no
   successors of the same shape. `client.post_settings` stays as an accessor
   that warns and returns the new resource, removed in 5.0.
-
-### Breaking
 
 - `domains.verify` and `domains.info` are gone. `DomainService` has seven
   operations and neither is among them: there is no way to verify a domain
@@ -109,7 +113,6 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 Every path and response shape in the gem has now been checked against the
 published reference rather than against our own stubs.
-
 
 ## [3.2.0] - 2026-09-21
 
@@ -436,7 +439,8 @@ and is kept below unchanged. Release notes for those versions are also on the
 - build(deps): bump ruby/setup-ruby from 1.316.0 to 1.319.0 by @dependabot[bot] in #149
 - build(deps): bump github/codeql-action from 4 to 4.37.4 by @dependabot[bot] in #152
 
-[Unreleased]: https://github.com/ruby-api-client/yandex360/compare/v3.2.0...HEAD
+[Unreleased]: https://github.com/ruby-api-client/yandex360/compare/v4.0.0...HEAD
+[4.0.0]: https://github.com/ruby-api-client/yandex360/compare/v3.2.0...v4.0.0
 [3.2.0]: https://github.com/ruby-api-client/yandex360/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/ruby-api-client/yandex360/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/ruby-api-client/yandex360/compare/v2.0.0...v3.0.0
