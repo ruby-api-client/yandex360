@@ -1217,51 +1217,33 @@ puts "Allowlist cleared"
 
 ### Two-Factor Authentication (2FA)
 
-Manage two-factor authentication settings for users and the entire domain.
-
-#### Enable 2FA for a user
-
-```ruby
-result = client.two_fa.enable(org_id: 1234567, user_id: 987654321)
-puts "2FA enabled successfully"
-```
-
-#### Disable 2FA for a user
+Mandatory 2FA for the whole organization. All three calls share one path and
+differ only by verb, which is why there is no separate enable or disable
+endpoint.
 
 ```ruby
-result = client.two_fa.disable(org_id: 1234567, user_id: 987654321)
-puts "2FA disabled successfully"
-```
+settings = client.two_fa.status(org_id: 1234567)
+settings.enabled
+settings.duration    # seconds an employee may postpone setting it up
+settings.enabled_at
 
-#### Check user 2FA status
-
-```ruby
-status = client.two_fa.status(org_id: 1234567, user_id: 987654321)
-puts "2FA enabled: #{status.enabled}"
-puts "Has TOTP: #{status.has_totp}"
-```
-
-#### Get domain-wide 2FA status
-
-```ruby
-domain_status = client.two_fa.domain_status(org_id: 1234567)
-puts "Domain 2FA enabled: #{domain_status.enabled}"
-```
-
-#### Configure domain-wide 2FA
-
-```ruby
-# Enable 2FA for entire domain
-result = client.two_fa.configure_domain(
+# duration is required: the API does not default it.
+client.two_fa.enable(
   org_id: 1234567,
-  enabled: true
+  duration: 3600,
+  logout_users: true,        # optional, ends every session
+  validation_method: "phone" # optional, "default" or "phone"
 )
 
-# Disable 2FA for entire domain
-result = client.two_fa.configure_domain(
-  org_id: 1234567,
-  enabled: false
-)
+client.two_fa.disable(org_id: 1234567)
+```
+
+Per-employee 2FA is not here. It belongs to the employee, so it lives on
+`users`:
+
+```ruby
+client.users.get2FA(org_id: 1234567, user_id: 987654321)
+client.users.delete_2fa_phone(org_id: 1234567, user_id: 987654321)
 ```
 
 ---
@@ -1458,11 +1440,10 @@ antispam.create(org_id, *strings)
 antispam.delete(org_id:)
 
 # Security
-two_fa.enable(org_id:, user_id:)
-two_fa.disable(org_id:, user_id:)
-two_fa.status(org_id:, user_id:)
+two_fa.status(org_id:)
+two_fa.enable(org_id:, duration:, logout_users: nil, validation_method: nil)
+two_fa.disable(org_id:)
 two_fa.domain_status(org_id:)
-two_fa.configure_domain(org_id:, enabled:)
 sessions.info(org_id:)
 sessions.update(org_id:, auth_ttl:)
 sessions.logout(org_id:, user_id:)

@@ -227,6 +227,12 @@ module Yandex360
     attribute :roles
   end
 
+  class Domain2FA < Record
+    attribute :enabled
+    attribute :duration
+    attribute :enabled_at, from: "enabledAt"
+  end
+
   class MailAddressBook < Record
     attribute :collect_addresses, from: "collectAddresses"
   end

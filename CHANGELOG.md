@@ -8,6 +8,30 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Breaking
 
+- `two_fa` covers the organization only, and its methods have changed. Three of
+  the five called paths that are not in the API:
+  `/security/v1/org/{orgId}/users/{userId}/2fa/enable`, `/disable` and
+  `/status` do not exist. A fourth, `configure_domain`, used the right path but
+  sent `enabled`, which the endpoint does not accept.
+
+  `Domain2FAService` puts all three operations on one path and distinguishes
+  them by verb:
+
+  | Operation | Method |
+  |---|---|
+  | `two_fa.status(org_id:)` | `GET /security/v1/org/{orgId}/domain_2fa` |
+  | `two_fa.enable(org_id:, duration:, ...)` | `POST` to the same path |
+  | `two_fa.disable(org_id:)` | `DELETE` to the same path |
+
+  `duration` is required, since the API does not default it, and
+  `logout_users` and `validation_method` are optional. `domain_status` remains
+  as an alias of `status` that warns, removed in 5.0. `configure_domain` is
+  gone: with enabling and disabling now separate verbs there is nothing for it
+  to mean.
+
+  Per-employee 2FA was never here. Reading it is `users.get2FA` and clearing
+  the phone is `users.delete_2fa_phone`, both of which were already correct.
+
 - `client.post_settings` is now `client.mail_settings`, and every method on it
   has changed. The old resource called paths that are not part of the API:
   `/directory/v1/org/{orgId}/users/{userId}/settings/mail` and its forwarding

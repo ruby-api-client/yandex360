@@ -285,17 +285,11 @@ module DnsStubs
 end
 
 module TwoFaStubs
-  def mock_two_fa_status
+  def mock_domain_2fa
     {
       "enabled" => true,
-      "method" => "sms"
-    }
-  end
-
-  def mock_two_fa_domain_status
-    {
-      "enabled" => false,
-      "enforced" => false
+      "duration" => 3600,
+      "enabledAt" => "2026-01-01T00:00:00Z"
     }
   end
 end
