@@ -6,16 +6,26 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Internal
+### Breaking
 
-- The Trivy scan is removed. It duplicated `bundle audit`: across 86 runs it
-  reported the same five advisories in faraday and json, and dropped to zero
-  the day the lockfile was refreshed. It never found anything `bundle audit`
-  did not, there is no Dockerfile or infrastructure here for it to scan, and
-  its findings went to the Security tab where they sat unread for months while
-  the failing `bundle audit` step is what actually forced the fix. It was also
-  the job that broke, failing to download its own binary. CodeQL remains the
-  primary analysis, alongside bundle audit, dependency review and Dependabot.
+- `client.post_settings` is now `client.mail_settings`, and every method on it
+  has changed. The old resource called paths that are not part of the API:
+  `/directory/v1/org/{orgId}/users/{userId}/settings/mail` and its forwarding
+  sub-paths do not exist, so none of it could have worked. The real service is
+  `MailUserSettingsService`, under
+  `/admin/v1/org/{orgId}/mail/users/{userId}/settings`, and it covers three
+  settings rather than one:
+
+  | Setting | Path | Methods |
+  |---|---|---|
+  | Contact collection | `address_book` | `address_book`, `update_address_book` |
+  | Sender name and signatures | `sender_info` | `sender_info`, `update_sender_info` |
+  | Auto-replies and forwards | `user_rules` | `rules`, `create_rule`, `delete_rule` |
+
+  Forwarding is one of two kinds of rule rather than a thing of its own, so
+  `forwarding_list`, `add_forwarding` and `delete_forwarding` have no
+  successors of the same shape. `client.post_settings` stays as an accessor
+  that warns and returns the new resource, removed in 5.0.
 
 ### Fixed
 
@@ -29,6 +39,17 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - The stub for `groups.delete_user` said `removed`; `DeleteMember` answers
   `deleted`. `GroupService_Delete` does answer `removed`, so the two really do
   differ and the spec now asserts each correctly.
+
+### Internal
+
+- The Trivy scan is removed. It duplicated `bundle audit`: across 86 runs it
+  reported the same five advisories in faraday and json, and dropped to zero
+  the day the lockfile was refreshed. It never found anything `bundle audit`
+  did not, there is no Dockerfile or infrastructure here for it to scan, and
+  its findings went to the Security tab where they sat unread for months while
+  the failing `bundle audit` step is what actually forced the fix. It was also
+  the job that broke, failing to download its own binary. CodeQL remains the
+  primary analysis, alongside bundle audit, dependency review and Dependabot.
 
 ### Notes
 
