@@ -27,7 +27,7 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
 - [Resources](#resources)
   - **Directory**: [Organizations](#organizations), [Users](#users), [Departments](#departments), [Groups](#groups), [External Contacts](#external-contacts)
   - **Domains**: [Domains](#domains), [DNS Records](#dns-records)
-  - **Mail**: [Post Settings](#post-settings), [Mailboxes](#mailboxes), [Mail Routing](#mail-routing), [Domain Policies](#domain-policies), [Antispam](#antispam)
+  - **Mail**: [Mail Settings](#mail-settings), [Mailboxes](#mailboxes), [Mail Routing](#mail-routing), [Domain Policies](#domain-policies), [Antispam](#antispam)
   - **Security**: [Two-Factor Authentication (2FA)](#two-factor-authentication-2fa), [User Sessions](#user-sessions), [Password Policy](#password-policy), [Audit Logs](#audit-logs), [Service Applications](#service-applications)
 - [API Reference](#api-reference)
 - [Development](#development)
@@ -538,7 +538,7 @@ covered.
 |  | `client.external_contacts` | [External Contacts](#external-contacts) |
 | Domains | `client.domains` | [Domains](#domains) |
 |  | `client.dns` | [DNS Records](#dns-records) |
-| Mail | `client.post_settings` | [Post Settings](#post-settings) |
+| Mail | `client.mail_settings` | [Mail Settings](#mail-settings) |
 |  | `client.mailboxes` | [Mailboxes](#mailboxes) |
 |  | `client.routing` | [Mail Routing](#mail-routing) |
 |  | `client.domain_policies` | [Domain Policies](#domain-policies) |
@@ -1022,55 +1022,53 @@ client.dns.delete(
 
 ---
 
-### Post Settings
+### Mail Settings
 
-Manage email settings for users including forwarding rules.
-
-#### Get user mail settings
+Per-employee settings: automatic contact collection, the sender name and
+signatures, and the auto-reply and forwarding rules.
 
 ```ruby
-settings = client.post_settings.list(org_id: 1234567, user_id: 987654321)
-puts "Signature: #{settings.signature}"
-puts "Reply-to: #{settings.reply_to}"
+# Automatic contact collection
+book = client.mail_settings.address_book(org_id: 1234567, user_id: 987654321)
+book.collect_addresses
+
+client.mail_settings.update_address_book(
+  org_id: 1234567, user_id: 987654321, collect_addresses: false
+)
+
+# Sender name, default address and signatures
+info = client.mail_settings.sender_info(org_id: 1234567, user_id: 987654321)
+puts "#{info.from_name} <#{info.default_from}>"
+info.signs.each {|sign| puts sign.text }
+
+client.mail_settings.update_sender_info(
+  org_id: 1234567,
+  user_id: 987654321,
+  from_name: "Ivan Ivanov",
+  sign_position: "under" # or "bottom", the default
+)
 ```
 
-#### Update mail settings
+Auto-replies and forwards are two kinds of the same rule and arrive together:
 
 ```ruby
-updated = client.post_settings.update(
-  org_id: 1234567,
-  user_id: 987654321,
-  signature: "Best regards,\nJohn Doe",
-  replyTo: "john.doe@example.com"
-)
-```
+rules = client.mail_settings.rules(org_id: 1234567, user_id: 987654321)
+rules.autoreplies
+rules.forwards
 
-#### Manage email forwarding
-
-```ruby
-# List forwarding addresses
-forwardings = client.post_settings.forwarding_list(
-  org_id: 1234567,
-  user_id: 987654321
+# One rule per call, of one kind. An auto-reply:
+created = client.mail_settings.create_rule(
+  org_id: 1234567, user_id: 987654321,
+  rule_name: "On holiday", text: "Back on Monday"
 )
 
-forwardings.each do |forwarding|
-  puts "Forwarding to: #{forwarding.address}"
-end
-
-# Add forwarding address
-client.post_settings.add_forwarding(
-  org_id: 1234567,
-  user_id: 987654321,
-  address: "forward@example.com"
+# Or a forward:
+client.mail_settings.create_rule(
+  org_id: 1234567, user_id: 987654321,
+  rule_name: "To archive", address: "archive@example.com", with_store: true
 )
 
-# Delete forwarding address
-client.post_settings.delete_forwarding(
-  org_id: 1234567,
-  user_id: 987654321,
-  address: "forward@example.com"
-)
+client.mail_settings.delete_rule(org_id: 1234567, user_id: 987654321, rule_id: created.rule_id)
 ```
 
 ---
@@ -1432,11 +1430,13 @@ dns.update(org_id:, domain:, record_id:, **params)
 dns.delete(org_id:, domain:, record_id:)
 
 # Mail
-post_settings.list(org_id:, user_id:)
-post_settings.update(org_id:, user_id:, **params)
-post_settings.forwarding_list(org_id:, user_id:)
-post_settings.add_forwarding(org_id:, user_id:, address:)
-post_settings.delete_forwarding(org_id:, user_id:, address:)
+mail_settings.address_book(org_id:, user_id:)
+mail_settings.update_address_book(org_id:, user_id:, collect_addresses:)
+mail_settings.sender_info(org_id:, user_id:)
+mail_settings.update_sender_info(org_id:, user_id:, **params)
+mail_settings.rules(org_id:, user_id:)
+mail_settings.create_rule(org_id:, user_id:, **params)
+mail_settings.delete_rule(org_id:, user_id:, rule_id:)
 mailboxes.shared_list(org_id:, page: 1, per_page: 10)
 mailboxes.create_shared(org_id:, email:, name:, description:)
 mailboxes.shared_info(org_id:, resource_id:)

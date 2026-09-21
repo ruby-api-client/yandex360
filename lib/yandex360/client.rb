@@ -83,8 +83,15 @@ module Yandex360
       AuditResource.new(self)
     end
 
+    def mail_settings
+      MailSettingsResource.new(self)
+    end
+
+    # Deprecated: the old name, for a resource that called paths the API does
+    # not have. Removed in 5.0.
     def post_settings
-      PostSettingsResource.new(self)
+      warn "[yandex360] client.post_settings is deprecated, use client.mail_settings", uplevel: 1
+      mail_settings
     end
 
     def sessions

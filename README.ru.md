@@ -537,7 +537,7 @@ Yandex 360, к которой относится. Покрыты все семн
 |  | `client.external_contacts` | [Внешние контакты](#внешние-контакты) |
 | Домены | `client.domains` | [Домены](#домены) |
 |  | `client.dns` | [DNS-записи](#dns-записи) |
-| Почта | `client.post_settings` | [Настройки почты](#настройки-почты) |
+| Почта | `client.mail_settings` | [Настройки почты](#настройки-почты) |
 |  | `client.mailboxes` | [Почтовые ящики](#почтовые-ящики) |
 |  | `client.routing` | [Маршрутизация почты](#маршрутизация-почты) |
 |  | `client.domain_policies` | [Политики домена](#политики-домена) |
@@ -1024,53 +1024,51 @@ client.dns.delete(
 
 ### Настройки почты
 
-Управление настройками электронной почты для пользователей, включая правила пересылки.
-
-#### Получить настройки почты пользователя
+Настройки отдельного сотрудника: автоматический сбор контактов, имя
+отправителя и подписи, правила автоответа и пересылки.
 
 ```ruby
-settings = client.post_settings.list(org_id: 1234567, user_id: 987654321)
-puts "Подпись: #{settings.signature}"
-puts "Ответить на: #{settings.reply_to}"
+# Автоматический сбор контактов
+book = client.mail_settings.address_book(org_id: 1234567, user_id: 987654321)
+book.collect_addresses
+
+client.mail_settings.update_address_book(
+  org_id: 1234567, user_id: 987654321, collect_addresses: false
+)
+
+# Имя отправителя, основной адрес и подписи
+info = client.mail_settings.sender_info(org_id: 1234567, user_id: 987654321)
+puts "#{info.from_name} <#{info.default_from}>"
+info.signs.each {|sign| puts sign.text }
+
+client.mail_settings.update_sender_info(
+  org_id: 1234567,
+  user_id: 987654321,
+  from_name: "Иван Иванов",
+  sign_position: "under" # либо "bottom", значение по умолчанию
+)
 ```
 
-#### Обновить настройки почты
+Автоответы и пересылки это два вида одного правила, и приходят они вместе:
 
 ```ruby
-updated = client.post_settings.update(
-  org_id: 1234567,
-  user_id: 987654321,
-  signature: "С уважением,\nИван Иванов",
-  replyTo: "ivan.ivanov@example.ru"
-)
-```
+rules = client.mail_settings.rules(org_id: 1234567, user_id: 987654321)
+rules.autoreplies
+rules.forwards
 
-#### Управление пересылкой почты
-
-```ruby
-# Получить список адресов пересылки
-forwardings = client.post_settings.forwarding_list(
-  org_id: 1234567,
-  user_id: 987654321
+# Одно правило за вызов, одного вида. Автоответ:
+created = client.mail_settings.create_rule(
+  org_id: 1234567, user_id: 987654321,
+  rule_name: "В отпуске", text: "Вернусь в понедельник"
 )
 
-forwardings.each do |forwarding|
-  puts "Пересылка на: #{forwarding.address}"
-end
-
-# Добавить адрес пересылки
-client.post_settings.add_forwarding(
-  org_id: 1234567,
-  user_id: 987654321,
-  address: "forward@example.ru"
+# Либо пересылка:
+client.mail_settings.create_rule(
+  org_id: 1234567, user_id: 987654321,
+  rule_name: "В архив", address: "archive@example.com", with_store: true
 )
 
-# Удалить адрес пересылки
-client.post_settings.delete_forwarding(
-  org_id: 1234567,
-  user_id: 987654321,
-  address: "forward@example.ru"
-)
+client.mail_settings.delete_rule(org_id: 1234567, user_id: 987654321, rule_id: created.rule_id)
 ```
 
 ---
@@ -1430,11 +1428,13 @@ dns.update(org_id:, domain:, record_id:, **params)
 dns.delete(org_id:, domain:, record_id:)
 
 # Почта
-post_settings.list(org_id:, user_id:)
-post_settings.update(org_id:, user_id:, **params)
-post_settings.forwarding_list(org_id:, user_id:)
-post_settings.add_forwarding(org_id:, user_id:, address:)
-post_settings.delete_forwarding(org_id:, user_id:, address:)
+mail_settings.address_book(org_id:, user_id:)
+mail_settings.update_address_book(org_id:, user_id:, collect_addresses:)
+mail_settings.sender_info(org_id:, user_id:)
+mail_settings.update_sender_info(org_id:, user_id:, **params)
+mail_settings.rules(org_id:, user_id:)
+mail_settings.create_rule(org_id:, user_id:, **params)
+mail_settings.delete_rule(org_id:, user_id:, rule_id:)
 mailboxes.shared_list(org_id:, page: 1, per_page: 10)
 mailboxes.create_shared(org_id:, email:, name:, description:)
 mailboxes.shared_info(org_id:, resource_id:)

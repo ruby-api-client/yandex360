@@ -335,23 +335,41 @@ module AuditStubs
   end
 end
 
-module PostSettingsStubs
-  def mock_post_settings_list
+module MailSettingsStubs
+  def mock_mail_address_book
+    {"collectAddresses" => true}
+  end
+
+  def mock_mail_sender_info
     {
-      "forwarding_enabled" => false,
-      "signature" => "Best regards",
-      "auto_reply_enabled" => false
+      "fromName" => "Ivan Ivanov",
+      "defaultFrom" => "ivan@example.com",
+      "signs" => [
+        {
+          "emails" => ["ivan@example.com"],
+          "isDefault" => true,
+          "text" => "Best regards",
+          "lang" => "en"
+        }
+      ],
+      "signPosition" => "bottom"
     }
   end
 
-  def mock_post_settings_forwarding_list
+  def mock_mail_user_rules
     {
-      "forwardings" => [
-        {"address" => "forward@example.com", "enabled" => true}
+      "autoreplies" => [
+        {"ruleId" => 1, "ruleName" => "On holiday", "text" => "Back on Monday"}
       ],
-      "total" => 1,
-      "items" => 1
+      "forwards" => [
+        {"ruleId" => 2, "ruleName" => "To archive", "address" => "archive@example.com",
+         "withStore" => true}
+      ]
     }
+  end
+
+  def mock_mail_rule_created
+    {"ruleId" => 3}
   end
 end
 
@@ -527,7 +545,7 @@ module HttpStubs
   include DnsStubs
   include TwoFaStubs
   include AuditStubs
-  include PostSettingsStubs
+  include MailSettingsStubs
   include SessionStubs
   include MailboxStubs
   include PasswordStubs

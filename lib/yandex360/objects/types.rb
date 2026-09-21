@@ -227,6 +227,26 @@ module Yandex360
     attribute :roles
   end
 
+  class MailAddressBook < Record
+    attribute :collect_addresses, from: "collectAddresses"
+  end
+
+  class MailSenderInfo < Record
+    attribute :from_name, from: "fromName"
+    attribute :default_from, from: "defaultFrom"
+    attribute :signs
+    attribute :sign_position, from: "signPosition"
+  end
+
+  class MailUserRules < Record
+    attribute :autoreplies
+    attribute :forwards
+  end
+
+  class MailRule < Record
+    attribute :rule_id, from: "ruleId"
+  end
+
   class MailboxTask < Record
     attribute :task_id, from: "taskId"
     attribute :status
