@@ -576,6 +576,10 @@ puts "Email: #{org.email}"
 puts "План подписки: #{org.subscription_plan}"
 ```
 
+У сервиса есть список и ничего уже, поэтому здесь поиск по нему, а не запрос
+одной организации. Токен обычно даёт доступ к одной организации, так что на
+практике это один запрос.
+
 ---
 
 ### Пользователи
@@ -906,52 +910,42 @@ client.external_contacts.delete(org_id: 1234567, contact_id: created.id)
 
 ### Домены
 
-Управление доменами организации и проверка владения.
-
-#### Получить список доменов
-
 ```ruby
-domains = client.domains.list(org_id: 1234567)
-domains.each do |domain|
-  puts "Домен: #{domain.name}"
-  puts "Статус: #{domain.status}"
-  puts "Подтверждён: #{domain.verified}"
-end
+domains = client.domains.list(org_id: 1234567, page: 1, per_page: 10)
+domains.each {|domain| puts "#{domain.name} подтверждён=#{domain.verified}" }
+
+client.domains.add(org_id: 1234567, name: "example.com")
+client.domains.delete(org_id: 1234567, domain: "example.com")
 ```
 
-#### Добавить домен
+Эндпоинта для чтения одного домена нет, поэтому `find` обходит список. Это
+стоит запроса на страницу, а не одного, отсюда и имя:
 
 ```ruby
-domain = client.domains.add(
-  org_id: 1234567,
-  name: "example.ru"
-)
-puts "Добавлен домен: #{domain.name}"
-puts "Статус проверки: #{domain.status}"
+client.domains.find(org_id: 1234567, domain: "example.com")
 ```
 
-#### Получить информацию о домене
+Статус подключения несёт методы подтверждения и их коды, то есть ровно то, что
+нужно для подтверждения домена:
 
 ```ruby
-domain = client.domains.info(org_id: 1234567, domain: "example.ru")
-puts "Домен: #{domain.name}"
-puts "Статус: #{domain.status}"
-puts "Подтверждён: #{domain.verified}"
-puts "Email главного администратора: #{domain.master_admin}"
+status = client.domains.connection_status(org_id: 1234567, domain: "example.com")
+status.status
+status.methods.each {|method| puts "#{method.method}: #{method.code}" }
 ```
 
-#### Подтвердить владение доменом
+Подпись DKIM:
 
 ```ruby
-domain = client.domains.verify(org_id: 1234567, domain: "example.ru")
-puts "Статус проверки: #{domain.status}"
+dkim = client.domains.dkim_status(org_id: 1234567, domain: "example.com")
+dkim.enabled
+dkim.public_key
+
+client.domains.enable_dkim(org_id: 1234567, domain: "example.com")
+client.domains.disable_dkim(org_id: 1234567, domain: "example.com")
 ```
 
-#### Удалить домен
-
-```ruby
-client.domains.delete(org_id: 1234567, domain: "example.ru")
-```
+Кириллические домены передаются в Punycode, как указано в документации API.
 
 ---
 
@@ -1407,10 +1401,13 @@ external_contacts.update_phones(org_id:, contact_id:, phones:)
 
 # Домены
 domains.list(org_id:, page: 1, per_page: 10)
+domains.find(org_id:, domain:)
 domains.add(org_id:, name:, **params)
-domains.info(org_id:, domain:)
 domains.delete(org_id:, domain:)
-domains.verify(org_id:, domain:)
+domains.connection_status(org_id:, domain:)
+domains.dkim_status(org_id:, domain:)
+domains.enable_dkim(org_id:, domain:)
+domains.disable_dkim(org_id:, domain:)
 dns.list(org_id:, domain:, page: 1, per_page: 50)
 dns.create(org_id:, domain:, **params)
 dns.update(org_id:, domain:, record_id:, **params)

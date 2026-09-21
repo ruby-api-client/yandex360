@@ -14,9 +14,12 @@ module Yandex360
       end
     end
 
+    # OrganizationsService offers a list and nothing narrower, so this walks
+    # it. The token usually reaches one organization, so it is a single
+    # request in practice, but it is a search rather than a fetch.
     def info(org_id:)
       validate_required_params({org_id: org_id}, [:org_id])
-      Organization.new get("/directory/v1/org/#{org_id}").body
+      list.auto_paginate.find {|organization| organization.id.to_s == org_id.to_s }
     end
   end
 end

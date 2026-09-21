@@ -51,7 +51,24 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   successors of the same shape. `client.post_settings` stays as an accessor
   that warns and returns the new resource, removed in 5.0.
 
+### Breaking
+
+- `domains.verify` and `domains.info` are gone. `DomainService` has seven
+  operations and neither is among them: there is no way to verify a domain
+  through a dedicated call, and no way to read one domain. What verification
+  actually needs is `domains.connection_status`, which answers the confirmation
+  methods and their codes. `domains.find` replaces `info` by walking the list,
+  and is named for what it does, since it costs a request per page.
+- `organizations.info` now searches the list rather than fetching.
+  `OrganizationsService` offers only a list, so the path it used,
+  `/directory/v1/org/{orgId}`, does not exist. The method keeps its name and
+  its arguments and returns nil when the token does not reach that
+  organization.
+
 ### Added
+
+- The four domain operations the gem never had: `connection_status`,
+  `dkim_status`, `enable_dkim` and `disable_dkim`.
 
 - Pagination on the three lists that have it and were missing it: `domains` and
   `dns` take `page` and `per_page`, and `organizations` pages by token, so it
