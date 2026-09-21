@@ -6,25 +6,34 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-### Added
-
-### Changed
-
-- The faraday requirement is `~> 2.0`, down from `>= 1.7, < 3.0`. faraday 1.x
-  could not have worked on the Rubies this gem supports: its authorization
-  middleware requires `base64`, which stopped being a default gem in Ruby 3.4,
-  and faraday 1 predates that change and never declared it, so building a
-  client raises `LoadError`. Verified against faraday 1.10.6 rather than
-  assumed. `faraday-retry` narrows to `~> 2.0` with it, 1.0.x existing only for
-  faraday 1.
+## [3.2.0] - 2026-09-21
 
 ### Added
 
-- A section in both READMEs on choosing the HTTP library. The `adapter:` option
-  has always existed but was documented nowhere, so the ability to run the gem
-  on httpx, typhoeus or anything else with a Faraday adapter was effectively
-  invisible. Worth saying plainly: the default is `Net::HTTP` from the standard
-  library, so installing this gem brings no HTTP stack of its own along.
+- An optional Railtie, loaded only when Rails is already present. It carries
+  `config.yandex360` into the gem's configuration, uses `Rails.logger` unless
+  the application names one, and republishes requests through
+  `ActiveSupport::Notifications` as `request.yandex360`. Set
+  `config.yandex360.instrument = false` to skip the bridge.
+- A Rails section in both READMEs, which says plainly that none of it is
+  required and shows the three lines that do the same thing anywhere else.
+
+### Notes
+
+The gem still has no Rails dependency. What the Railtie does lives in
+`Yandex360::Rails` as plain methods, so it is tested without booting anything,
+and the Railtie itself is wiring.
+
+The Railtie suite runs in its own process, through `rake spec_all`. RSpec loads
+every spec file into one process, so requiring rails in one of them would mean
+Rails was loaded while the rest of the suite ran, and the rest of the suite is
+what shows the gem works without it. Rails also permits one `initialize!` per
+process, so the real boot happens once and the variations are exercised against
+`Yandex360::Rails` directly.
+
+`railties` is a development dependency, added so the Railtie is booted in a
+spec rather than taken on trust, and `tzinfo-data` joins the Gemfile for
+Windows, which is in the CI matrix and cannot boot Rails without it.
 
 ## [3.1.0] - 2026-09-21
 
@@ -322,7 +331,8 @@ and is kept below unchanged. Release notes for those versions are also on the
 - build(deps): bump ruby/setup-ruby from 1.316.0 to 1.319.0 by @dependabot[bot] in #149
 - build(deps): bump github/codeql-action from 4 to 4.37.4 by @dependabot[bot] in #152
 
-[Unreleased]: https://github.com/ruby-api-client/yandex360/compare/v3.1.0...HEAD
+[Unreleased]: https://github.com/ruby-api-client/yandex360/compare/v3.2.0...HEAD
+[3.2.0]: https://github.com/ruby-api-client/yandex360/compare/v3.1.0...v3.2.0
 [3.1.0]: https://github.com/ruby-api-client/yandex360/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/ruby-api-client/yandex360/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/ruby-api-client/yandex360/compare/v1.1.4...v2.0.0

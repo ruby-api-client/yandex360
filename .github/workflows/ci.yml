@@ -61,8 +61,12 @@ jobs:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
 
+      # rake spec_all rather than rspec: the Railtie suite runs in its own
+      # process, because requiring rails in one spec file would load it for
+      # every other example, and those are there to show the gem works without
+      # it.
       - name: Run tests
-        run: bundle exec rspec --format progress
+        run: bundle exec rake spec_all
 
       # Reporting, not verification. The action installs its own reporter
       # binary at run time and has failed on that download and its checksum,

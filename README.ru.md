@@ -20,6 +20,7 @@
 - [Быстрый старт](#быстрый-старт)
 - [Настройка](#настройка)
 - [Выбор HTTP-библиотеки](#выбор-http-библиотеки)
+- [Rails](#rails)
 - [Пагинация](#пагинация)
 - [Объекты ответа](#объекты-ответа)
 - [Обработка ошибок](#обработка-ошибок)
@@ -468,6 +469,56 @@ end
 - `Yandex360::ValidationError` - Неверные параметры запроса (400)
 - `Yandex360::RateLimitError` - Превышен лимит запросов к API (429)
 - `Yandex360::ServerError` - Ошибка на стороне сервера (5xx)
+
+---
+
+## Rails
+
+Здесь нет ничего обязательного. Гем не зависит от Rails, а всё, что делает
+Railtie, пишется руками в три строки. Он подключается, только если Rails уже
+загружен.
+
+Настраивайте там же, где настраиваете остальное:
+
+```ruby
+# config/application.rb или инициализатор
+config.yandex360.token = ENV.fetch("YA360_TOKEN")
+config.yandex360.timeout = 60
+```
+
+После этого клиенту не нужны аргументы:
+
+```ruby
+Yandex360::Client.new
+```
+
+`Rails.logger` используется, если вы не назвали свой, а запросы публикуются
+через `ActiveSupport::Notifications` под именем `request.yandex360`. Это форма,
+которую даёт соглашение самого ActiveSupport, поэтому APM подхватит их без
+настройки:
+
+```ruby
+ActiveSupport::Notifications.subscribe("request.yandex360") do |*, payload|
+  payload[:http_method]  # :get
+  payload[:path]
+  payload[:status]
+  payload[:duration]
+end
+```
+
+Чтобы обойтись без моста:
+
+```ruby
+config.yandex360.instrument = false
+```
+
+Sinatra, Hanami, Roda или обычный скрипт делают то же самое напрямую, и
+результат тот же:
+
+```ruby
+Yandex360.configure { |config| config.token = ENV.fetch("YA360_TOKEN") }
+Yandex360.on(:request) {|event| MyMetrics.record(event) }
+```
 
 ---
 

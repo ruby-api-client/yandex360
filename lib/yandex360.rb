@@ -27,3 +27,7 @@ require "yandex360/client"
 Dir[File.join(__dir__, "yandex360", "resources", "*.rb")].sort.each do |resource|
   require resource
 end
+
+# Optional, and the only place Rails is mentioned. Everything the Railtie does
+# can be done by hand, so the gem stays usable anywhere.
+require "yandex360/railtie" if defined?(::Rails::Railtie)
