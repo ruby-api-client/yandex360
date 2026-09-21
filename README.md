@@ -19,6 +19,7 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
 - [Authentication](#authentication)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
+- [Choosing the HTTP library](#choosing-the-http-library)
 - [Pagination](#pagination)
 - [Response Objects](#response-objects)
 - [Error Handling](#error-handling)
@@ -318,6 +319,39 @@ end
 
 The block is handed the Faraday builder after the gem's own middleware and
 before the adapter.
+
+---
+
+### Choosing the HTTP library
+
+By default the gem uses `Net::HTTP` from the standard library, so installing it
+brings no HTTP stack of its own along. If that suits you, there is nothing to
+configure.
+
+Any Faraday adapter can be used instead, per client:
+
+```ruby
+Yandex360::Client.new(token: "...", adapter: :net_http)  # the default
+Yandex360::Client.new(token: "...", adapter: :httpx)
+Yandex360::Client.new(token: "...", adapter: :typhoeus)
+```
+
+or for every client at once:
+
+```ruby
+Yandex360.configure do |config|
+  config.token = ENV.fetch("YA360_TOKEN")
+  config.adapter = :httpx
+end
+```
+
+Apart from `:net_http`, each adapter needs its own gem in your Gemfile, such as
+`httpx` with `faraday-httpx`, or `typhoeus`. An adapter Faraday does not know
+raises `Faraday::Error` when the client is built, rather than on the first
+request.
+
+This is also how you reuse a connection pool your application already has: pick
+the adapter it is built on.
 
 ---
 

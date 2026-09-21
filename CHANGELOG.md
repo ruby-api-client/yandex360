@@ -6,6 +6,14 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- A section in both READMEs on choosing the HTTP library. The `adapter:` option
+  has always existed but was documented nowhere, so the ability to run the gem
+  on httpx, typhoeus or anything else with a Faraday adapter was effectively
+  invisible. Worth saying plainly: the default is `Net::HTTP` from the standard
+  library, so installing this gem brings no HTTP stack of its own along.
+
 ## [3.1.0] - 2026-09-21
 
 Extension points, so the gem sits comfortably in Rails, Sinatra or a plain
