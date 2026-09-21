@@ -101,8 +101,8 @@ RSpec.describe "#departments.add_alias" do
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
       resp = client.departments.add_alias(org_id: org_id, dep_id: dep_id, name: name)
 
-      expect(resp).to be_an Yandex360::DepartmentAlias
-      expect(resp.alias).to eq name
+      expect(resp).to be_a Yandex360::Department
+      expect(resp.aliases).to include(name)
     end
   end
 end
@@ -122,7 +122,7 @@ RSpec.describe "#departments.delete_alias" do
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
       resp = client.departments.delete_alias(org_id: org_id, dep_id: dep_id, name: name)
 
-      expect(resp).to be_a Yandex360::Response
+      expect(resp).to be_a Yandex360::DepartmentAlias
       expect(resp.removed).to be true
       expect(resp.alias).to eq name
     end

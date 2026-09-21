@@ -166,7 +166,7 @@ RSpec.describe "#groups.delete_user" do
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
       resp = client.groups.delete_user(org_id: org_id, group_id: "19", type: "user", user_id: user_id)
 
-      expect(resp.removed).to be true
+      expect(resp.deleted).to be true
       expect(resp.type).to eq "user"
       expect(resp.id).to eq user_id
     end

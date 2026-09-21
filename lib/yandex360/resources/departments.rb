@@ -6,7 +6,9 @@ module Yandex360
     def add_alias(org_id:, dep_id:, name:)
       validate_required_params({org_id: org_id, dep_id: dep_id, name: name}, %i[org_id dep_id name])
       dep_alias = {alias: name}
-      DepartmentAlias.new post("/directory/v1/org/#{org_id}/departments/#{dep_id}/aliases", body: dep_alias).body
+      # The reply is the whole department, aliases included.
+      Department.new post("/directory/v1/org/#{org_id}/departments/#{dep_id}/aliases",
+                          body: dep_alias).body
     end
 
     def update(org_id:, dep_id:, parent_id:, **params)
@@ -52,7 +54,8 @@ module Yandex360
 
     def delete_alias(org_id:, dep_id:, name:)
       validate_required_params({org_id: org_id, dep_id: dep_id, name: name}, %i[org_id dep_id name])
-      Response.new delete_request("/directory/v1/org/#{org_id}/departments/#{dep_id}/aliases/#{name}").body
+      path = "/directory/v1/org/#{org_id}/departments/#{dep_id}/aliases/#{name}"
+      DepartmentAlias.new delete_request(path).body
     end
 
     def delete(org_id:, dep_id:)

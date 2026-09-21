@@ -115,8 +115,8 @@ RSpec.describe "#users.add_alias" do
       client = Yandex360::Client.new(token: "test_token", adapter: :test, stubs: stubs)
       resp = client.users.add_alias(org_id: org_id, user_id: user_id, user_alias: user_alias)
 
-      expect(resp).to be_a(Yandex360::Alias)
-      expect(resp.alias).to eq user_alias
+      expect(resp).to be_a(Yandex360::User)
+      expect(resp.aliases).to include("ruby_gem_api")
     end
   end
 end

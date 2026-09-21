@@ -14,7 +14,8 @@ module Yandex360
       validate_required_params({org_id: org_id, user_id: user_id, user_alias: user_alias},
                                %i[org_id user_id user_alias])
       body = {alias: user_alias}
-      Alias.new post("/directory/v1/org/#{org_id}/users/#{user_id}/aliases", body: body).body
+      # The reply is the whole employee, aliases included, not the alias.
+      User.new post("/directory/v1/org/#{org_id}/users/#{user_id}/aliases", body: body).body
     end
 
     def update(org_id:, user_id:, **user_params)
