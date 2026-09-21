@@ -48,7 +48,7 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
 ## Requirements
 
 - Ruby >= 3.3
-- Faraday >= 1.7, < 3.0
+- Faraday ~> 2.0
 
 ## Installation
 

@@ -8,6 +8,18 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+### Changed
+
+- The faraday requirement is `~> 2.0`, down from `>= 1.7, < 3.0`. faraday 1.x
+  could not have worked on the Rubies this gem supports: its authorization
+  middleware requires `base64`, which stopped being a default gem in Ruby 3.4,
+  and faraday 1 predates that change and never declared it, so building a
+  client raises `LoadError`. Verified against faraday 1.10.6 rather than
+  assumed. `faraday-retry` narrows to `~> 2.0` with it, 1.0.x existing only for
+  faraday 1.
+
+### Added
+
 - A section in both READMEs on choosing the HTTP library. The `adapter:` option
   has always existed but was documented nowhere, so the ability to run the gem
   on httpx, typhoeus or anything else with a Faraday adapter was effectively
