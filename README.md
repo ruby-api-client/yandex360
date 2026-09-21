@@ -15,6 +15,7 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
 - [Features](#features)
 - [Requirements](#requirements)
 - [Installation](#installation)
+- [Upgrading from 1.x](#upgrading-from-1x)
 - [Authentication](#authentication)
 - [Quick Start](#quick-start)
 - [Configuration](#configuration)
@@ -79,6 +80,107 @@ To use the Yandex 360 API, you need an OAuth token. You can obtain this token by
 3. Obtaining an access token through the OAuth flow
 
 For more information, visit the [Yandex 360 API Documentation](https://yandex.ru/dev/api360/doc/concepts/access.html).
+
+## Upgrading from 1.x
+
+Two major versions happened at once: 1.1.4 was the last published release
+before 3.0.0. Everything that needs your attention is here. The
+[changelog](CHANGELOG.md) has the reasoning.
+
+### Ruby
+
+3.0 requires Ruby 3.3. Older Rubies keep resolving to 1.1.4, so nothing
+installed today breaks.
+
+### Attribute names are snake_case
+
+```ruby
+policy.changeFrequency   # still works, warns, removed in 4.0
+policy.change_frequency  # use this
+```
+
+The same applies to `auth_ttl`, `first_name`, `last_name`, `event_type`,
+`resource_id`, `task_id`, `members_count` and the rest. Arguments already took
+snake_case, so the two directions now agree.
+
+### A misspelled attribute raises
+
+```ruby
+user.nickame   # was nil, now NoMethodError
+```
+
+If you relied on nil for a field that may be absent, that still works: a
+declared field the response omits reads as nil. Only names the gem does not
+know raise.
+
+A field the API has gained since the last release is not a name the gem knows,
+so reach for it explicitly:
+
+```ruby
+user["fieldAddedLater"]
+```
+
+### The audit log is two endpoints
+
+`audit.list` and `audit.export` are gone. They called a path that is not part
+of the API, so they could not have worked against the real service.
+
+```ruby
+client.audit.mail(org_id: 1234567, page_size: 100)
+client.audit.disk(org_id: 1234567)
+```
+
+These page by token rather than page number, so there is no `page` argument.
+Filters are passed in snake_case: `after_date`, `before_date`, `include_uids`.
+
+### 503 is a server error
+
+```ruby
+begin
+  client.users.list(org_id: 1234567)
+rescue Yandex360::RateLimitError
+  # 429 only. A 503 used to arrive here as well.
+rescue Yandex360::ServerError
+  # 503 arrives here now.
+end
+```
+
+### Methods that returned the wrong type
+
+Both had been wrong since they were written, and only surfaced once responses
+had declared fields.
+
+```ruby
+# was a Group, is a Response, and answers {"added" => true}
+client.groups.add_user(org_id: 1234567, group_id: 789, user_id: 987654321)
+
+# was a User, is an Alias
+client.users.add_alias(org_id: 1234567, user_id: 987654321, user_alias: "ivan")
+```
+
+### Renamed and removed
+
+```ruby
+# still works, warns, removed in 4.0
+client.groups.params(org_id: 1234567, group_id: 789)
+
+# use this
+client.groups.info(org_id: 1234567, group_id: 789)
+```
+
+`Yandex360::Object` is now `Yandex360::Record` for declared types and
+`Yandex360::Response` for replies with no documented entity behind them. Eight
+type classes nothing ever constructed are gone: `UserList`, `GroupList`,
+`DepartmentList`, `UserAlias`, `DeletedUser`, `DeletedGroup`,
+`DeletedDepartment`, `DeletedDepartmentAlias`.
+
+### Worth knowing, nothing to change
+
+Requests now carry timeouts and retry 429 and 5xx on idempotent verbs, and
+list results can walk their own pages. See [Configuration](#configuration) and
+[Pagination](#pagination).
+
+---
 
 ## Quick Start
 
