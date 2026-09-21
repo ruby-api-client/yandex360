@@ -51,6 +51,19 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   successors of the same shape. `client.post_settings` stays as an accessor
   that warns and returns the new resource, removed in 5.0.
 
+### Added
+
+- Pagination on the three lists that have it and were missing it: `domains` and
+  `dns` take `page` and `per_page`, and `organizations` pages by token, so it
+  takes `page_size` and no `page`. Which list paginates and how was read from
+  the reference one endpoint at a time rather than assumed, and the lists that
+  answer everything at once, group members, mailbox access rights and service
+  applications, are left without arguments the API would ignore. Both READMEs
+  now say which is which.
+- `groups.members`, answering the departments, groups and employees a group
+  holds. `ListMembers` returns all three and `groups.users` shows one, so
+  members of the other two kinds were invisible.
+
 ### Fixed
 
 - `users.add_alias` returns a `User` again. `CreateUserAlias` answers the whole

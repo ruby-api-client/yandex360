@@ -46,6 +46,13 @@ module Yandex360
       Collection.from_response(resp, key: "users", type: User)
     end
 
+    # A group can hold departments and other groups as well as employees, and
+    # the endpoint answers all three. #users shows only one of them.
+    def members(org_id:, group_id:)
+      validate_required_params({org_id: org_id, group_id: group_id}, %i[org_id group_id])
+      GroupMembers.new get("/directory/v1/org/#{org_id}/groups/#{group_id}/members").body
+    end
+
     def create(org_id:, name:, **group_params)
       validate_required_params({org_id: org_id, name: name}, %i[org_id name])
       group = build_params({name: name}, group_params)

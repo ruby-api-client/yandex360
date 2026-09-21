@@ -387,9 +387,15 @@ users.auto_paginate.each {|user| puts user.nickname }
 first_fifty = client.users.list(org_id: 1234567, per_page: 25).auto_paginate.first(50)
 ```
 
-Доступно для `users`, `groups`, `departments`, `external_contacts` и двух
-списков почтовых ящиков. Аргументы исходного вызова, такие как `per_page`
-или `parent_id` у подразделений, переносятся на следующие страницы.
+Пагинируются не все списки, и те, что пагинируются, делают это по-разному.
+`users`, `groups`, `departments`, `external_contacts`, `domains`, `dns` и два
+списка почтовых ящиков принимают `page` и `per_page`. `organizations` и оба
+аудит-лога листаются токеном, поэтому принимают `page_size` и не принимают
+`page`. Участники групп, права доступа к ящикам и сервисные приложения
+отвечают целиком и не принимают ни того, ни другого.
+
+Аргументы исходного вызова, такие как `per_page` или `parent_id` у
+подразделений, переносятся на следующие страницы.
 
 ## Объекты ответа
 
@@ -1359,7 +1365,7 @@ client.service_applications.delete(org_id: 1234567)
 
 ```ruby
 # Каталог
-organizations.list
+organizations.list(page_size: 10, page_token: nil)
 organizations.info(org_id:)
 users.add(org_id:, dep_id:, **user_params)
 users.add_alias(org_id:, user_id:, user_alias:)
@@ -1387,6 +1393,7 @@ groups.info(org_id:, group_id:)
 groups.params(org_id:, group_id:)   # deprecated, use info
 groups.list(org_id:, page: 1, per_page: 10)
 groups.users(org_id:, group_id:)
+groups.members(org_id:, group_id:)
 groups.create(org_id:, name:, **group_params)
 groups.delete(org_id:, group_id:)
 groups.delete_user(org_id:, group_id:, type:, user_id:)
@@ -1399,12 +1406,12 @@ external_contacts.update_emails(org_id:, contact_id:, emails:)
 external_contacts.update_phones(org_id:, contact_id:, phones:)
 
 # Домены
-domains.list(org_id:)
+domains.list(org_id:, page: 1, per_page: 10)
 domains.add(org_id:, name:, **params)
 domains.info(org_id:, domain:)
 domains.delete(org_id:, domain:)
 domains.verify(org_id:, domain:)
-dns.list(org_id:, domain:)
+dns.list(org_id:, domain:, page: 1, per_page: 50)
 dns.create(org_id:, domain:, **params)
 dns.update(org_id:, domain:, record_id:, **params)
 dns.delete(org_id:, domain:, record_id:)
