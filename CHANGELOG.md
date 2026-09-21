@@ -6,7 +6,7 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
-## [3.0.0] - 2026-09-20
+## [3.0.0] - 2026-09-21
 
 Response objects stop being OpenStruct.
 
@@ -38,10 +38,28 @@ Response objects stop being OpenStruct.
   after a release needs no release here to be reachable. `#to_h` returns the
   parsed body as it arrived.
 - Records compare by content and print their keys rather than their values.
+- `groups.info`, the name the same call carries on every other resource.
+
+### Deprecated
+
+- `groups.params`, now an alias for `groups.info` that warns. The name said
+  nothing about what the call does and collides with a very common word.
+  Removed in 4.0.
 
 ### Removed
 
 - The `ostruct` runtime dependency, which existed only for the old base class.
+- `Resource#build_url`, which nothing called, and the `build_user_params`,
+  `build_group_params` and `build_department_params` wrappers, each of which
+  only forwarded to `build_params`. Line coverage reached 100% as a result:
+  this was the code the suite could not reach.
+
+### Internal
+
+- Resources load by directory instead of from a hand-written list of 54
+  `autoload` lines. Forgetting an entry raised `NameError` for the caller at
+  runtime, and the suite caught it only if some spec happened to touch that
+  constant.
 
 ### Notes
 

@@ -55,7 +55,7 @@ A comprehensive Ruby wrapper for the [Yandex 360 API](https://yandex.ru/dev/api3
 Add this line to your application's `Gemfile`:
 
 ```ruby
-gem 'yandex360', '~> 2.0'
+gem 'yandex360', '~> 3.0'
 ```
 
 Then execute:
