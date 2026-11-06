@@ -123,7 +123,7 @@ GEM
       tsort (>= 0.2)
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
-    rake (13.3.1)
+    rake (13.4.2)
     rbs (4.2.0)
       logger
       prism (>= 1.6.0)
@@ -197,7 +197,7 @@ DEPENDENCIES
   fiddle (~> 1.0)
   logger (~> 1.4)
   railties (>= 7.0)
-  rake (~> 13.3.0)
+  rake (~> 13.4.2)
   rspec (~> 3.0)
   rubocop (~> 1.60)
   simplecov (~> 0.9)
