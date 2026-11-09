@@ -46,7 +46,7 @@ jobs:
       # Created before the mirror below, so that a failure to mirror cannot
       # leave a published gem without its release.
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3.0.3
+        uses: softprops/action-gh-release@v3.0.4
         with:
           files: yandex360-*.gem
           generate_release_notes: true
