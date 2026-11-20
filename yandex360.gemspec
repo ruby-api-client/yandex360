@@ -40,7 +40,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "bundler"
   s.add_development_dependency "bundler-audit", "~> 0.9"
-  s.add_development_dependency "rake", "~> 13.3.0"
+  s.add_development_dependency "rake", "~> 13.4.2"
   # Only so the Railtie can be booted in a spec rather than taken on trust.
   s.add_development_dependency "railties", ">= 7.0"
   s.add_development_dependency "rspec", "~> 3.0"
