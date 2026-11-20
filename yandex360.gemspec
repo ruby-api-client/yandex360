@@ -45,6 +45,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "railties", ">= 7.0"
   s.add_development_dependency "rspec", "~> 3.0"
   s.add_development_dependency "rubocop", "~> 1.60"
-  s.add_development_dependency "simplecov", "~> 0.9"
+  s.add_development_dependency "simplecov", "~> 1.3"
   s.add_development_dependency "simplecov-lcov", "~> 0.9.0"
 end
